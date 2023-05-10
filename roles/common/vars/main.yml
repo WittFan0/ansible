@@ -14,8 +14,9 @@ base_packages:
     - nano
     - sudo
     - xdg-user-dirs
+    - gparted
+    - btrfs-progs
     - man-db
-    - git
     - ansible
     - efibootmgr
     - cups
@@ -24,11 +25,9 @@ base_packages:
     - p7zip
     - unrar
     - pigz
-
-filesystem_packages:
     - dosfstools
     - ntfs-3g
     - exfat-utils
-    - gparted
-    - btrfs-progs
+    - rsync
+    - rclone
 

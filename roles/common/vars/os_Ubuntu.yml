@@ -1,5 +1,9 @@
 distro_packages:
     - aptitude
+    - openssh-server
+    - grub-efi-amd64-signed
+    - gdisk
+    - lib32z1  # needed by Brother printer driver
 
 os_groups: [sudo,dip,plugdev]
 

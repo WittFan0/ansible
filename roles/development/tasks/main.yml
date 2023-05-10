@@ -5,11 +5,11 @@
 - name: Install development packages
   ansible.builtin.package:
     name: 
+      - "{{ base_dev_packages }}"
+      - git
       - giggle
-      - code
-      - x11-ssh-askpass
+      - "{{ code_editor_packages }}"
       - meld
-      - ansible
     state: present
   tags:
     - packages

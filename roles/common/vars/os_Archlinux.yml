@@ -1,9 +1,17 @@
 distro_packages:
+    - base
+    - linux-zen
+    - linux-firmware
+    - openssh
+    - reflector
+    - grub
+    - gptfdisk
     - archlinux-contrib
     - pacman-contrib
     - python-setuptools
     - python-requests
     - python-virtualenv
+    - lib32-zlib  # needed by Brother printer driver
 
 os_groups: [network,log,wheel,power,rfkill,storage,optical]
 

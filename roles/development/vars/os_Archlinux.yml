@@ -1,2 +1,5 @@
+base_dev_packages: base_devel
 
-
+code_editor_packages: 
+  - code
+  - x11-ssh-askpass

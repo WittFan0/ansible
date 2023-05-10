@@ -1,0 +1,81 @@
+---
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: Update package cache and upgrade (arch)
+      community.general.pacman:
+        update_cache: true
+        upgrade: true
+      tags:
+        - packages
+      when: ansible_facts['distribution'] == "Archlinux"
+
+  #   - name: Update package cache and upgrade (debian)
+  #     ansible.builtin.apt: 
+  #       update_cache: yes
+  #       cache_valid_time: 3600  # Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+  #       name: "*"
+  #       state: latest
+  #       autoclean: yes
+  #       autoremove: yes
+  #     tags:
+  #       - packages
+  #     when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+  tasks:
+    - name: Classify hosts depending on their OS distribution
+      group_by:
+        key: os_{{ ansible_facts['distribution'] }}
+
+  roles:
+    - common
+    - sshd-keyonly
+    - geerlingguy.ntp
+    - monitor
+    - harden  # TODO: Limit to WAN interface
+
+- hosts: router
+  become: true
+  roles:
+    - dnsmasq
+
+# - hosts: docker_host
+#   become: true
+#   roles:
+#     - geerlingguy.docker
+
+- hosts: media_server
+  become: true
+  roles:
+    - geerlingguy.docker
+    - mediasrv
+    # - harden  # TODO: Limit to WAN interface
+
+- hosts: collab_server
+  become: true
+  roles:
+    - geerlingguy.docker
+    - collab
+
+- hosts: workstation
+  become: true
+  roles:
+    - sound
+    - xfce4
+    - multimedia
+    - development
+    - graphics
+
+- hosts: vmhost
+  become: true
+  roles:
+    - vmhost
+
+- hosts: workstation
+  become: true
+  become_user: "{{ remote_user.name }}"
+  environment:
+    DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/{{ remote_user.uid }}/bus
+  roles: 
+    - xfce4-customize
+

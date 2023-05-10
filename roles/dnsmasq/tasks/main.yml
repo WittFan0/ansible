@@ -1,0 +1,138 @@
+- name: Install DNS, DHCP and TFTP servers
+  ansible.builtin.package:
+    name: dnsmasq
+    state: present
+    update_cache: true
+  tags:
+    - packages
+
+- name: Create hosts file for DNS server
+  ansible.builtin.template:
+    src: hosts_dnsmasq.j2
+    dest: /etc/hosts.dnsmasq
+    mode: '0644'
+    backup: yes
+  notify: restart_dnsmasq
+
+- name: Download DNS blacklist
+  ansible.builtin.get_url:
+    url: https://github.com/notracking/hosts-blocklists/raw/master/dnsmasq/dnsmasq.blacklist.txt
+    dest: /etc/dnsmasq.blacklist.txt
+    mode: '0644'
+    backup: no
+
+- name: Create dnsmasq config directory if it does not exist
+  ansible.builtin.file:
+    path: /etc/dnsmasq.d
+    state: directory
+    mode: '0755'
+
+- name: Add DNS blacklist to DNS server
+  ansible.builtin.copy:
+    content: conf-file=/etc/dnsmasq.blacklist.txt
+    dest: /etc/dnsmasq.d/10-dnsblacklist.conf
+    mode: '0644'
+    backup: no
+  notify: restart_dnsmasq
+
+- name: Add cron job for refreshing DNS blacklist
+  ansible.builtin.copy:
+    src: dns-blacklist-update
+    dest: /etc/cron.daily/dns-blacklist-update
+    mode: '0755'
+    backup: no
+
+- name: Create PXE directory if it does not exist
+  ansible.builtin.file:
+    path: /srv/tftp/pxe
+    state: directory
+    mode: '0755'
+
+- name: Download boot file for BIOS netbooting
+  ansible.builtin.get_url:
+    url: http://boot.ipxe.org/undionly.kpxe
+    dest: /srv/tftp/pxe/undionly.kpxe
+    mode: '0644'
+    backup: no
+  notify: restart_dnsmasq
+
+- name: Download boot file for UEFI netbooting
+  ansible.builtin.get_url:
+    url: http://boot.ipxe.org/ipxe.efi
+    dest: /srv/tftp/pxe/ipxe.efi
+    mode: '0644'
+    backup: no
+  notify: restart_dnsmasq
+
+- name: Create netboot menu
+  ansible.builtin.copy:
+    src: bootmenu.ipxe
+    dest: /srv/tftp/pxe/bootmenu.ipxe
+    mode: '0644'
+    backup: yes
+  notify: restart_dnsmasq
+
+- name: Configure netboot
+  ansible.builtin.copy:
+    src: 10-netboot.conf
+    dest: /etc/dnsmasq.d/10-netboot.conf
+    mode: '0644'
+    backup: yes
+  notify: restart_dnsmasq
+
+- name: Configure DNS and DHCP servers
+  ansible.builtin.template:
+    src: 10-router_conf.j2
+    dest: /etc/dnsmasq.d/10-router.conf
+    mode: '0644'
+    backup: yes
+  notify: restart_dnsmasq
+
+- name: Add DNS setting for Plex
+  ansible.builtin.copy:
+    content: rebind-domain-ok=/plex.direct/
+    dest: /etc/dnsmasq.d/10-plex.conf
+    mode: '0644'
+    backup: no
+  notify: restart_dnsmasq
+
+- name: Create resolved.conf directory if it does not exist
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+    mode: '0755'
+
+- name: Stop systemd-resolved from binding to port 53
+  ansible.builtin.copy:
+    content: |
+      [Resolve]
+      DNSStubListener=no
+    dest: /etc/systemd/resolved.conf.d/99-dnsmasq.conf
+    mode: '0644'
+    backup: no
+
+- name: Restart systemd-resolved
+  service:
+    name: systemd-resolved.service
+    state: restarted
+
+- name: Open nameserver port
+  ansible.builtin.command: |
+    ufw allow from {{ lan.subnet }} to {{ lan0.ip}} port 53 comment 'DNS'
+  become: true
+
+- name: Open Netboot port
+  ansible.builtin.command: |
+    ufw allow bootps comment 'DHCP'
+  become: true
+
+- name: Open DHCP port
+  ansible.builtin.command: |
+    ufw allow from {{ lan.subnet }} to {{ lan0.ip}} port 68:69 proto udp comment 'Netboot'
+  become: true
+
+- name: Enable and start DNS, DHCP and TFTP servers
+  service:
+    name: dnsmasq.service
+    enabled: yes
+    state: started

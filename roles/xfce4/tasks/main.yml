@@ -1,0 +1,139 @@
+---
+- name: Set OS distribution dependent variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install packages
+  ansible.builtin.package:
+    name: 
+      - lightdm-gtk-greeter-settings
+      - xfce4
+      - thunar
+      - gvfs-google
+      - gvfs-nfs
+      - gvfs-smb
+      - mousepad
+      - parole
+      - gst-libav
+      - ristretto
+      - firefox
+      - catfish
+      - thunar-archive-plugin
+      - thunar-media-tags-plugin
+      - xfce4-artwork
+      - xfce4-clipman-plugin
+      - xfce4-cpufreq-plugin
+      - xfce4-cpugraph-plugin
+      - xfce4-diskperf-plugin
+      - xfce4-fsguard-plugin
+      - xfce4-genmon-plugin
+      - xfce4-mount-plugin
+      - xfce4-mpc-plugin
+      - xfce4-netload-plugin
+      - xfce4-notes-plugin
+      - xfce4-notifyd
+      - xfce4-pulseaudio-plugin
+      - xfce4-screensaver
+      - xfce4-screenshooter
+      - xfce4-sensors-plugin
+      - xfce4-smartbookmark-plugin
+      - xfce4-systemload-plugin
+      - xfce4-taskmanager
+      - xfce4-timer-plugin
+      - xfce4-verve-plugin
+      - xfce4-weather-plugin
+      # GTK apps
+      - seahorse
+      - gparted
+      - vinagre
+      - gwakeonlan
+    state: present
+    update_cache: true
+  tags:
+    - packages
+  notify: restart_lightdm
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Install XFCE AUR pacakges
+  kewlfft.aur.aur:
+    name: 
+      - thunar-custom-actions
+      # - xfce4-sysinfo  # Doesn't build -- Key import error
+      # - xfce4-theme-switcher  # Doesn't start
+      # - cryptkeeper  # requires gtk2
+    state: present
+  tags:
+    - aur
+    - packages
+  become: "yes"
+  become_user: "{{ aur.builder }}"
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Copy wallpaper
+  ansible.builtin.copy:
+    src: wallpaper/
+    dest: /usr/share/backgrounds/xfce/
+    backup: false
+#   notify: 
+
+- name: Install XFCE4 Gradient-black theme
+  ansible.builtin.unarchive:
+    src: Gradient-black-46.1.tar.gz
+    dest: /usr/share/themes/
+
+- name: Install EFDark-IconsCream icon theme
+  ansible.builtin.unarchive:
+    src: EFDark-IconsCream.tar.gz
+    dest: /usr/share/icons/
+
+# - name: Set font
+#   community.general.xfconf:
+#     channel: xsettings
+#     property: /Gtk/FontName
+#     value_type: string
+#     value: System-ui 12
+#     state: present
+
+# - name: Set monospace font
+#   community.general.xfconf:
+#     channel: xsettings
+#     property: /Gtk/MonospaceFontName
+#     value_type: string
+#     value: Monospace 10
+#     state: present
+
+# - name: Configure 
+#   ansible.builtin.template:
+#     src: 
+#     dest: /
+#     backup: true
+#   notify: 
+
+# - include_tasks: .yml
+#   when: ansible_facts['distribution'] == "DistroName"
+
+- name: Set greeter theme
+  ansible.builtin.lineinfile:
+    dest: /etc/lightdm/lightdm-gtk-greeter.conf
+    insertafter: "[greeter]"
+    regexp: "^theme-name"
+    line: "theme-name = Gradient-black-46"
+
+- name: Set greeter icon theme
+  ansible.builtin.lineinfile:
+    dest: /etc/lightdm/lightdm-gtk-greeter.conf
+    insertafter: "[greeter]"
+    regexp: "^icon-theme-name"
+    line: "icon-theme-name = EFDark-IconsCream"
+
+- name: Set greeter background
+  ansible.builtin.lineinfile:
+    dest: /etc/lightdm/lightdm-gtk-greeter.conf
+    insertafter: "[greeter]"
+    regexp: "^background"
+    line: "background = /usr/share/backgrounds/xfce/XFCE_83_No_Logo.png"
+
+- name: Enable display manager
+  service:
+    name: lightdm.service
+    enabled: yes
+    state: started

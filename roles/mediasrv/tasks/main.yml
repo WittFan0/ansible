@@ -1,0 +1,12 @@
+- name: Configure Plex firewall exception
+  ansible.builtin.copy:
+    src: ufw-plexmediacenter
+    dest: /etc/ufw/applications.d/plexmediaserver
+    backup: yes
+  notify: restart_ufw
+
+- name: Open Plex ports
+  ansible.builtin.command: |
+    ufw allow plexmediaserver comment 'Plex'
+  become: true
+

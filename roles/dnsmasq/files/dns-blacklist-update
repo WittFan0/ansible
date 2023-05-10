@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+# Test whether curl exists and is executable.
+[ -x /usr/bin/curl ] || exit 0
+
+sleep_then_download() {
+# Sleep for up to an hour to spread the load of checking for updates
+/usr/bin/sleep $(/usr/bin/shuf -i 1-3600 -n 1)
+/usr/bin/curl -o /etc/dnsmasq.blacklist.txt https://github.com/notracking/hosts-blocklists/raw/master/dnsmasq/dnsmasq.blacklist.txt
+}
+
+sleep_then_download &

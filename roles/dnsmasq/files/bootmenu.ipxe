@@ -1,0 +1,17 @@
+#!ipxe
+menu PXE Boot Options
+
+item shell iPXE shell
+item netboot Netboot.xyz
+item exit  Exit to BIOS
+
+choose --default exit --timeout 10000 option && goto ${option}
+
+:shell
+shell
+
+:netboot
+chain --autofree http://boot.netboot.xyz
+
+:exit
+exit

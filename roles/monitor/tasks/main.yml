@@ -1,0 +1,136 @@
+- name: Set OS distribution dependent variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install nullmailer
+  ansible.builtin.package:
+    name: nullmailer
+    state: present
+    update_cache: true
+  tags:
+    - packages
+
+- name: Configure nullmailer admin address
+  ansible.builtin.copy:
+    content: "{{ remote_user.email }}"
+    dest: /etc/nullmailer/adminaddr
+    backup: yes
+  notify: restart_nullmailer
+
+- name: Configure nullmailer network domain name
+  ansible.builtin.copy:
+    content: "{{ lan.domain }}"
+    dest: /etc/nullmailer/defaultdomain
+    backup: yes
+  notify: restart_nullmailer
+
+- name: Configure mailname
+  ansible.builtin.copy:
+    content: "{{ hostname }}.{{ lan.domain }}"
+    dest: /etc/mailname
+    backup: yes
+  notify: restart_nullmailer
+
+- name: Configure nullmailer remote server
+  ansible.builtin.template:
+    src: nullmailer-remotes.j2
+    dest: /etc/nullmailer/remotes
+    owner: "{{ nullmailer_owner }}"
+    mode: '0600'
+    backup: yes
+  notify: restart_nullmailer
+
+- name: Copy nullmailer test script
+  ansible.builtin.template:
+    src: testnullmailer_sh.j2
+    dest: /usr/local/sbin/testnullmailer.sh
+    mode: '0755'
+
+- name: Enable and start nullmailer
+  service:
+    name: nullmailer.service
+    enabled: yes
+    state: started
+
+- name: Install mailutils
+  ansible.builtin.package:
+    name: mailutils
+    state: present
+    update_cache: true
+  tags:
+    - packages
+
+- name: Install hardrive monitor
+  ansible.builtin.package:
+    name: smartmontools
+    state: present
+    update_cache: true
+  tags:
+    - packages
+
+- name: Configure hardrive monitor
+  ansible.builtin.template:
+    src: smartd.j2
+    dest: /etc/smartd.conf
+    backup: yes
+  notify:
+    - restart_smartd
+
+- name: Install sensors
+  ansible.builtin.package:
+    name: 
+      - "{{ sensors_package }}"
+      - i2c-tools
+    state: present
+    update_cache: true
+  tags:
+    - packages
+    
+- name: Create sensors config file
+  ansible.builtin.shell: |
+    modprobe i2c_dev
+    modprobe at24
+    modprobe drivetemp
+    sensors-detect --auto
+  become: true
+  notify: restart_sensorsd
+
+- name: Enable and start sensors daemon
+  service:
+    name: "{{ sensors_package }}.service"
+    enabled: yes
+    state: started
+  when: ansible_facts['virtualization_role'] != "guest"
+
+- name: Install log monitor
+  ansible.builtin.package:
+    name: logwatch
+    state: present
+    update_cache: true
+  tags:
+    - packages
+
+- name: Configure log monitor
+  ansible.builtin.template:
+    src: logwatch_conf.j2
+    dest: /etc/logwatch/conf/logwatch.conf
+    backup: yes
+  notify: restart_logwatch
+
+- name: Configure smartd log monitoring
+  ansible.builtin.copy:
+    content: "LogFile = syslog"
+    dest: /etc/logwatch/conf/services/smartd.conf
+  notify: restart_logwatch
+
+- name: Enable and start logwatch timer
+  service:
+    name: logwatch.timer
+    enabled: yes
+    state: started
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Install reboot check cron job
+  ansible.builtin.template:
+    src: reboot-check.j2
+    dest: /etc/cron.daily/reboot-check
+    mode: '0755'

@@ -1,0 +1,64 @@
+---
+# - name: Set OS distribution dependent variables
+#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install packages
+  ansible.builtin.package:
+    name: 
+      - libvirt
+      - qemu-desktop
+      - dmidecode
+      - gettext
+      - virt-manager
+    state: present
+  tags:
+    - packages
+    - vmhost
+
+# - name: Install AUR pacakges
+#   kewlfft.aur.aur:
+#     name: 
+#       - thunar-custom-actions
+#     state: present
+#   tags:
+#     - aur
+#     - packages
+#   become: "yes"
+#   become_user: "{{ aur.builder }}"
+#   when: ansible_facts['distribution'] == "Archlinux"
+
+# - name: Configure 
+#   ansible.builtin.template:
+#     src: 
+#     dest: /
+#     backup: true
+#   notify: 
+
+# - name: Create file
+#   ansible.builtin.copy:
+#     src: 
+#     dest: /
+#     backup: true
+#   notify: 
+
+# - include_tasks: .yml
+#   when: ansible_facts['distribution'] == "DistroName"
+
+# The libvirt group is optional. It is not needed if the user is a member of the wheel group
+- name: Create libvirt group
+  ansible.builtin.group:
+    name: libvirt
+    state: present
+  tags:
+    - vmhost
+
+- name: Add prime user to libvirt group
+  ansible.builtin.command: |
+    usermod -a -G libvirt {{ remote_user.name }}
+  become: true
+
+- name: Enable and start libvirt
+  service:
+    name: libvirtd.service
+    enabled: yes
+    state: started

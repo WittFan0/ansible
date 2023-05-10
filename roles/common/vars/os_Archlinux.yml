@@ -1,0 +1,13 @@
+distro_packages:
+    - archlinux-contrib
+    - pacman-contrib
+    - python-setuptools
+    - python-requests
+    - python-virtualenv
+
+os_groups: [network,log,wheel,power,rfkill,storage,optical]
+
+aur:
+    builder: aur_builder
+    dir: aur
+

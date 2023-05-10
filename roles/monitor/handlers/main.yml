@@ -1,0 +1,21 @@
+- name: restart_nullmailer
+  service:
+    name: nullmailer.service
+    state: restarted
+
+- name: restart_smartd
+  service:
+    name: smartd.service
+    state: restarted
+
+- name: restart_sensorsd
+  service:
+    name: "{{ sensors_package }}.service"
+    state: restarted
+  when: ansible_facts['virtualization_role'] != "guest"
+
+- name: restart_logwatch
+  service:
+    name: logwatch.timer
+    state: restarted
+  when: ansible_facts['distribution'] == "Archlinux"

@@ -1,0 +1,48 @@
+---
+# - name: Set OS distribution dependent variables
+#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+# - name: Install packages
+#   ansible.builtin.package:
+#     name: 
+#       - package 
+#     state: present
+#   tags:
+#     - packages
+
+# - name: Install AUR pacakges
+#   kewlfft.aur.aur:
+#     name: 
+#       - 
+#     state: present
+#   tags:
+#     - aur
+#     - packages
+#   become: "yes"
+#   become_user: "{{ aur.builder }}"
+#   when: ansible_facts['distribution'] == "Archlinux"
+
+# - name: Configure 
+#   ansible.builtin.template:
+#     src: 
+#     dest: /
+#     backup: true
+#   notify: 
+
+# - name: Create file
+#   ansible.builtin.copy:
+#     src: 
+#     dest: /
+#     owner: "{{ remote_user.name }}"
+#     group: "{{ remote_user.group }}"
+#     backup: true
+#   notify: 
+
+# - name: Enable and start service
+#   service:
+#     name: .service
+#     enabled: yes
+#     state: started
+
+# - include_tasks: .yml
+#   when: ansible_facts['distribution'] == "DistroName"

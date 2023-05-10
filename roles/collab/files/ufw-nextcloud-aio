@@ -1,0 +1,4 @@
+[nextcloud-all]
+title=Nextcloud (all)
+description=Nextcloud (including Talk)
+ports=80:81/tcp|443/tcp|3478|8443

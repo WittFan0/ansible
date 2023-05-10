@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# taken from https://www.feliciano.tech/blog/get-emailed-when-ubuntu-server-needs-reboot/
+
+if [ -f /var/run/reboot-required ]; then
+    echo "A reboot is required following updates to {{ hostname }}" | mail -s "{{ hostname }} reboot required" {{ remote_user.email }}
+fi

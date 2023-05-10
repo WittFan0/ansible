@@ -1,0 +1,40 @@
+---
+# - name: Set OS distribution dependent variables
+#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install packages
+  ansible.builtin.package:
+    name: 
+      - easytag 
+    state: present
+  tags:
+    - packages
+
+# - name: Install AUR pacakges
+#   kewlfft.aur.aur:
+#     name: 
+#       - 
+#     state: present
+#   tags:
+#     - aur
+#     - packages
+#   become: "yes"
+#   become_user: "{{ aur.builder }}"
+#   when: ansible_facts['distribution'] == "Archlinux"
+
+# - name: Configure 
+#   ansible.builtin.template:
+#     src: 
+#     dest: /
+#     backup: true
+#   notify: 
+
+# - name: Create file
+#   ansible.builtin.copy:
+#     src: 
+#     dest: /
+#     backup: true
+#   notify: 
+
+# - include_tasks: .yml
+#   when: ansible_facts['distribution'] == "DistroName"

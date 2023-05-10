@@ -1,0 +1,47 @@
+---
+# - name: Set OS distribution dependent variables
+#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install graphics packages
+  ansible.builtin.package:
+    name: 
+      - geeqie
+      - fbida
+      - gawk
+      - gphoto2
+      - imagemagick
+      - librsvg
+      - perl-image-exiftool
+      - simple-scan
+    state: present
+  tags:
+    - packages
+
+# - name: Install AUR pacakges
+#   kewlfft.aur.aur:
+#     name: 
+#       - thunar-custom-actions
+#     state: present
+#   tags:
+#     - aur
+#     - packages
+#   become: "yes"
+#   become_user: "{{ aur.builder }}"
+#   when: ansible_facts['distribution'] == "Archlinux"
+
+# - name: Configure 
+#   ansible.builtin.template:
+#     src: 
+#     dest: /
+#     backup: true
+#   notify: 
+
+# - name: Create file
+#   ansible.builtin.copy:
+#     src: 
+#     dest: /
+#     backup: true
+#   notify: 
+
+# - include_tasks: .yml
+#   when: ansible_facts['distribution'] == "DistroName"

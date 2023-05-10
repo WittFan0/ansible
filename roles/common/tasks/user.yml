@@ -1,0 +1,115 @@
+---
+- name: Create user group
+  ansible.builtin.group:
+    name: "{{ remote_user.group }}"
+    gid: "{{ remote_user.uid }}"
+    state: present
+  tags:
+    - user
+
+- name: Create test user group
+  ansible.builtin.group:
+    name: test01
+    gid: 1111
+    state: present
+  tags:
+    - user
+
+- name: Ensure wheel group exists
+  ansible.builtin.group:
+    name: wheel
+    state: present
+  tags:
+    - user
+  when: ansible_facts['distribution'] == "Archlinux"
+
+# # Something in the ansible.builtin.user module breaks login!
+#
+# - name: Create user and assign to group
+#   user:
+#     name: "{{ remote_user.name }}"
+#     # group: "{{ remote_user.group }}"
+#     password: "{{ remote_user.password|password_hash('sha512') }}"
+#     update_password: on_create # --> only set the password for newly created users
+#     shell: "{{ remote_user.shell_path }}"
+#     uid: "{{ remote_user.uid }}"
+#     # groups: sys,floppy,scanner,users,video,lp,audio,adm,{{ os_groups }}
+#     # append: yes   # --> user is not removed from existing groups
+#     generate_ssh_key: true
+#     ssh_key_passphrase: "{{ ssh_key_passphrase }}"
+#     ssh_key_type: ed25519
+#     state: present
+#   tags:
+#     - user
+# 
+# - name: Create test user and assign to group
+#   ansible.builtin.user:
+#     name: test01
+#     group: test01
+#     password: "{{ remote_user.password|password_hash('sha512') }}"
+#     update_password: on_create # --> only set the password for newly created users
+#     shell: "{{ remote_user.shell_path }}"
+#     uid: 1111
+#     # groups: sys,floppy,scanner,users,video,lp,audio,adm,{{ os_groups }}
+#     # append: yes   # --> user is not removed from existing groups
+#     generate_ssh_key: true
+#     ssh_key_passphrase: "{{ ssh_key_passphrase }}"
+#     ssh_key_type: ed25519
+#     state: present
+#   tags:
+#     - user
+
+- name: Allow prime user to run `sudo`
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/20-primeuser
+    line: "{{ remote_user.name }} ALL=(ALL:ALL) ALL"
+    create: yes
+    validate: 'visudo -cf %s'
+
+- name: Add authorized SSH keys
+  ansible.builtin.copy:
+    src: authorized_keys
+    dest: /home/{{ remote_user.name }}/.ssh/authorized_keys
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    force: true
+    backup: no
+
+- name: Add ABCDE config
+  ansible.builtin.copy:
+    src: dotfiles/abcde.conf
+    dest: /home/{{ remote_user.name }}/.abcde.conf
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    backup: yes
+
+- name: Create rclone config directory if it does not exist
+  ansible.builtin.file:
+    path: /home/{{ remote_user.name }}/.config/rclone
+    state: directory
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    mode: '0700'
+
+- name: Create rclone config
+  ansible.builtin.template:
+    src: rclone_conf.j2
+    dest: /home/{{ remote_user.name }}/.config/rclone/rclone.conf
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    backup: no
+    mode: '600'
+
+- name: Create other config files
+  ansible.builtin.copy:
+    src: dotfiles/config/
+    dest: /home/{{ remote_user.name }}/.config/
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    backup: yes
+
+- name: Copy/Download user setup script
+  ansible.builtin.get_url:
+    url: https://github.com/WittFan0/myscripts/raw/main/user-setup.sh
+    dest: /usr/local/sbin/user-setup.sh
+    mode: '0755'

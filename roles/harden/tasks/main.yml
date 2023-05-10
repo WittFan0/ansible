@@ -1,0 +1,95 @@
+- name: Install hardening packages
+  ansible.builtin.package:
+    name: 
+      - ufw
+      - sshguard
+      - firejail
+    state: present
+  tags:
+    - packages
+
+- name: Install endlessh
+  kewlfft.aur.aur:
+    name: endlessh-git
+    state: present
+    update_cache: "yes"
+  tags:
+    - aur
+    - packages
+  become: "yes"
+  become_user: "{{ aur.builder }}"
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Configure UFW for sshguard (ipv4)
+  ansible.builtin.blockinfile:
+    path: /etc/ufw/before.rules
+    insertbefore: COMMIT
+    block: |
+      # hand off control for sshd to sshguard
+      :sshguard - [0:0]
+      -A ufw-before-input -p tcp --dport "{{ ssh_port }}" -j sshguard
+    backup: no
+
+- name: Configure UFW for sshguard (ipv6)
+  ansible.builtin.blockinfile:
+    path: /etc/ufw/before6.rules
+    insertbefore: COMMIT
+    block: |
+      # hand off control for sshd to sshguard
+      :sshguard - [0:0]
+      -A ufw6-before-input -p tcp --dport "{{ ssh_port }}" -j sshguard
+    backup: no
+
+- name: Enable and start firewall
+  service:
+    name: ufw.service
+    enabled: yes
+    state: started
+
+- name: Enable and start sshguard
+  service:
+    name: sshguard.service
+    enabled: yes
+    state: started
+
+- name: Open SSH port
+  ansible.builtin.command: |
+    ufw limit "{{ ssh_port }}"/tcp comment 'Rate limit OpenSSH server'
+  become: true
+
+- name: Open SSH tarpit port
+  ansible.builtin.command: |
+    ufw allow ssh comment 'OpenSSH tarpit'
+  become: true
+
+- name: Open printer administration port
+  ansible.builtin.command: |
+    ufw allow from {{ lan.subnet }} to {{ lan0.ip}} port 631 comment 'CUPS'
+  become: true
+
+- name: Open NFS port
+  ansible.builtin.command: |
+    ufw allow from {{ lan.subnet }} to {{ lan0.ip}} port nfs
+  become: true
+
+- name: Open phpMyAdmin port
+  ansible.builtin.command: |
+    ufw allow 51111 comment 'phpMyAdmin'
+  become: true
+
+- name: Open Piwigo ports
+  ansible.builtin.command: |
+    ufw allow 52080 comment 'Piwigo'
+  become: true
+
+# THIS CAUSES ANSIBLE TO HANG!
+# - name: Enable firewall
+#   ansible.builtin.command: |
+#     ufw enable
+#   become: true
+
+# PROBABLY NEED TO TEST THIS (e.g. SUBVOLUMES, DOCKER, ETC.) BEFORE ENABLING EVERYTHING.
+# - name: Activate firejail
+#   ansible.builtin.command: |
+#     firecfg
+#   become: true

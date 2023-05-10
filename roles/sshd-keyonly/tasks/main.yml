@@ -1,0 +1,30 @@
+- name: Set OS distribution dependent variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install OpenSSH
+  ansible.builtin.package:
+    name: "{{ ssh_package }}"
+    state: present
+
+- name: Create OpenSSH configuration file directory
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    mode: '0755'
+
+# - name: Push OpenSSH daemon configuration file
+#   template:
+#     src: 50-ansible.j2
+#     dest: /etc/ssh/sshd_config.d/50-ansible.conf
+#   notify:
+#     - restart_sshd
+
+- name: Source user OpenSSH configuration files
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^Include '
+    insertbefore: 'BOF'
+    line: Include /etc/ssh/sshd_config.d/*.conf
+  notify:
+    - restart_sshd
+

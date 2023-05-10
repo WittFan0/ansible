@@ -1,0 +1,20 @@
+---
+- name: Install Bash
+  ansible.builtin.package:
+    name:
+      - bash
+      - bash-completion
+    state: present
+  tags:
+    - shell
+
+- name: Install ZSH
+  ansible.builtin.package:
+    name:
+      - zsh
+      - zsh-completions
+      - zsh-syntax-highlighting
+      - zsh-autosuggestions
+    state: present
+  tags:
+    - shell

@@ -1,0 +1,34 @@
+ssh_key_passphrase: "{{ vault_ssh_key_passphrase }}"
+
+base_packages:
+    # - base-devel
+    # - man-pages
+    # - fwupd
+    # - dmidecode
+    - tmux
+    # - rsync
+    # - coreutils
+    # - moreutils
+    # - dateutils
+    - linux-firmware
+    - nano
+    - sudo
+    - xdg-user-dirs
+    - man-db
+    - git
+    - ansible
+    - efibootmgr
+    - cups
+    - zip
+    - unzip
+    - p7zip
+    - unrar
+    - pigz
+
+filesystem_packages:
+    - dosfstools
+    - ntfs-3g
+    - exfat-utils
+    - gparted
+    - btrfs-progs
+

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# START OF USER CHANGABLE VARIABLES
+sender="{{ remote_user.email }}"     ##### MUST BE YOUR EMAIL AT THE SMTP SERVER
+youremail=$sender                  ##### FEEL FREE TO MAKE IT SOMETHING ELSE
+                                   #####   IF YOU HAVE A SECOND EMAIL ADDRESS
+#friendemail=friend@friendsdomain.com
+
+yourname="Yourfirst Yourlast"
+friendname="Friendfirst Friendlast"
+#  END  OF USER CHANGABLE VARIABLES
+
+
+emailfile=myemail.email
+dtime=`date`
+ltlt="<"
+gtgt=">"
+
+echo "Subject: "{{ hostname }}" Nullmailer test at $dtime" > $emailfile
+echo "From: $yourname  $ltlt$sender$gtgt" >> $emailfile
+echo "To: $yourname  $ltlt$youremail$gtgt" >> $emailfile
+# echo "Cc: $friendname $ltlt$friendemail$gtgt" >> $emailfile
+echo "" >> $emailfile
+echo "Sent at $dtime" >> $emailfile
+echo "" >> $emailfile
+echo "$yourname was here" >> $emailfile
+echo "and now is gone" >> $emailfile
+echo "but left his name" >> $emailfile
+echo "to carry on." >> $emailfile
+echo "" >> $emailfile
+echo "This is a second paragraph thats kinda long, really really long, so long that I truly hope that it does the right thing and wraps." >> $emailfile
+echo "" >> $emailfile
+echo "Sincerely" >> $emailfile
+echo "$yourname" >> $emailfile
+
+cat $emailfile | nullmailer-inject -h 

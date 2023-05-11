@@ -1,0 +1,49 @@
+- name: Install print system
+  ansible.builtin.package:
+    name: cups 
+    state: present
+    update_cache: true
+  tags:
+    - packages
+
+- name: Configure print system
+  ansible.builtin.template:
+    src: cupsd_conf.j2
+    dest: /etc/cups/cupsd.conf
+    backup: yes
+  notify: restart_cups
+
+- name: Install Brother printer driver
+  kewlfft.aur.aur:
+    name: 
+      - brother-hll2320d
+    state: present
+  tags:
+    - aur
+    - packages
+  become: "yes"
+  become_user: "{{ aur.builder }}"
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Download Brother printer driver
+  ansible.builtin.unarchive:
+    src: linux-brprinter-installer-2.2.3-1.gz
+    dest: /opt
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Make Brother printer driver installer file executable
+  ansible.builtin.file:
+    path: /opt/linux-brprinter-installer-2.2.3-1
+    mode: '0755'
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Install Brother printer driver
+  ansible.builtin.command: |
+    /opt/linux-brprinter-installer-2.2.3-1
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Enable print system
+  service:
+    name: cups.service
+    enabled: yes
+    state: started

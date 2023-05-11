@@ -49,13 +49,6 @@
   tags:
     - packages
 
-- name: Configure print system
-  ansible.builtin.template:
-    src: cupsd_conf.j2
-    dest: /etc/cups/cupsd.conf
-    backup: yes
-  notify: restart_cups
-
 # - name: Quiet pam_systemd_home.so warnings
 #   ansible.builtin.copy:
 #     src: system-auth
@@ -68,3 +61,4 @@
 - include_tasks: user.yml
 - include_tasks: pacman-aur.yml
   when: ansible_facts['distribution'] == "Archlinux"
+- include_tasks: printer.yml

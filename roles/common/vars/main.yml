@@ -19,7 +19,6 @@ base_packages:
     - man-db
     - ansible
     - efibootmgr
-    - cups
     - zip
     - unzip
     - p7zip

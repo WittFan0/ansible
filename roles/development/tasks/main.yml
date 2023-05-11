@@ -1,6 +1,6 @@
 ---
-# - name: Set OS distribution dependent variables
-#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+- name: Set OS distribution dependent variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install development packages
   ansible.builtin.package:
@@ -8,11 +8,77 @@
       - "{{ base_dev_packages }}"
       - git
       - giggle
-      - "{{ code_editor_packages }}"
       - meld
     state: present
   tags:
     - packages
+
+- name: Install code editor (Arch)
+  ansible.builtin.package:
+    name: 
+      - code
+      - x11-ssh-askpass
+    state: present
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Install VS Code dependencies (apt)
+  become: yes
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - apt-transport-https
+      - gconf2
+      - libasound2
+      - libgtk2.0-0
+      - libxss1
+      - libxcb-dri3-0
+      - libdrm2
+      - libgbm1
+      - libxshmfence1
+    state: present
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Ubuntu"
+
+- name: Create APT keyrings dir
+  become: yes
+  ansible.builtin.file:
+    path: '/etc/apt/keyrings'
+    state: directory
+    mode: 'u=rwx,go=rx'
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Ubuntu"
+
+- name: Install VS Code key (apt)
+  become: yes
+  ansible.builtin.get_url:
+    url: '{{ visual_studio_code_mirror }}/keys/microsoft.asc'
+    dest: '/etc/apt/keyrings/'
+    mode: 'u=rw,go=r'
+    force: yes
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Ubuntu"
+
+- name: Install VS Code repo (apt)
+  ansible.builtin.apt_repository:
+    repo: deb {{ visual_studio_code_mirror }}/repos/vscode stable main
+    filename: vscode
+    state: present
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Ubuntu"
+
+- name: Install VS Code (apt)
+  ansible.builtin.apt:
+    name: code
+    state: present
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Ubuntu"
 
 # - name: Install AUR pacakges
 #   kewlfft.aur.aur:

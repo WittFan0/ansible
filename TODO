@@ -1,5 +1,5 @@
 download myscripts from git
-install printer driver
+install printer driver (move lib32-zlib from distro packages)
 docker directory structure?
 install netdata monitor?
 /etc/grub.d/42_isoboot?

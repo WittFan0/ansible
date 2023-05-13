@@ -1,0 +1,22 @@
+download myscripts from git
+install printer driver
+docker directory structure?
+install netdata monitor?
+/etc/grub.d/42_isoboot?
+mount data directories
+share data directories
+media server | /etc/dnsmasq.d/10-plex.conf | max_user_watches | NFS | SMB
+add directories to $PATH for user
+/etc/skel | environment variables | XDG
+snapper
+grub-btrfs for ubuntu
+sshd no password
+LAN networking | 20-wired-lan.network
+WAN networking | NAT
+bootloader
+create filesystem | fstrim | BTRFS to mkinitcpio | fstab
+optimize users' makepkg.conf
+Switch from cron to systemd timer
+Python encryption warning
+
+combine development and aur roles?

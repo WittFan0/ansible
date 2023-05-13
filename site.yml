@@ -1,28 +1,8 @@
 ---
 - hosts: all
   become: true
+
   pre_tasks:
-    - name: Update package cache and upgrade (arch)
-      community.general.pacman:
-        update_cache: true
-        upgrade: true
-      tags:
-        - packages
-      when: ansible_facts['distribution'] == "Archlinux"
-
-  #   - name: Update package cache and upgrade (debian)
-  #     ansible.builtin.apt: 
-  #       update_cache: yes
-  #       cache_valid_time: 3600  # Only run "update_cache=yes" if the last one is more than 3600 seconds ago
-  #       name: "*"
-  #       state: latest
-  #       autoclean: yes
-  #       autoremove: yes
-  #     tags:
-  #       - packages
-  #     when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-
-  tasks:
     - name: Classify hosts depending on their OS distribution
       group_by:
         key: os_{{ ansible_facts['distribution'] }}
@@ -38,11 +18,6 @@
   become: true
   roles:
     - dnsmasq
-
-# - hosts: docker_host
-#   become: true
-#   roles:
-#     - geerlingguy.docker
 
 - hosts: media_server
   become: true

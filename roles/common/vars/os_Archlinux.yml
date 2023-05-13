@@ -12,8 +12,9 @@ distro_packages:
     - python-requests
     - python-virtualenv
     - lib32-zlib  # needed by Brother printer driver
+    - cronie
 
-os_groups: [network,log,wheel,power,rfkill,storage,optical]
+os_groups: network,log,wheel,power,rfkill,storage,optical
 
 aur:
     builder: aur_builder

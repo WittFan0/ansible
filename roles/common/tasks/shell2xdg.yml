@@ -1,0 +1,42 @@
+- name: Create XDG-compliant skeleton dirs for {{ remote_user.shell }}
+  ansible.builtin.file:
+    path: 
+      - /etc/skel/.config/{{ remote_user.shell }}/
+    state: directory
+    mode: '0755'
+
+- name: Create XDG-compliant skeleton files for {{ remote_user.shell }} 
+  ansible.builtin.command: |
+    [ -f /etc/skel/.{{ remote_user.shell }}_profile ] && mv /etc/skel/.{{ remote_user.shell }}_profile /etc/skel/.config/{{ remote_user.shell }}/profile
+    [ -f /etc/skel/.{{ remote_user.shell }}_logout ] && mv /etc/skel/.{{ remote_user.shell }}_logout /etc/skel/.config/{{ remote_user.shell }}/logout
+    [ -f /etc/skel/.{{ remote_user.shell }}rc ] && mv /etc/skel/.{{ remote_user.shell }}rc /etc/skel/.config/{{ remote_user.shell }}/{{ remote_user.shell }}rc
+  become: true
+
+- name: Create XDG-compliant BASH profile
+  ansible.builtin.copy:
+    src: bash_xdg
+    dest: /etc/profile.d/bash_xdg.sh
+    backup: false
+    mode: '0755'
+  notify: 
+
+- name: Set global environment variables
+  ansible.builtin.blockinfile:
+    path: /etc/security/pam_env.conf
+    block: | 
+      # LJS: Set global environment variables
+      XDG_CONFIG_DIRS DEFAULT=/etc/xdg
+      XDG_DATA_DIRS   DEFAULT=/usr/local/share:/usr/share
+      XDG_CONFIG_HOME DEFAULT=@{HOME}/.config
+      XDG_CACHE_HOME  DEFAULT=@{HOME}/.cache
+      XDG_DATA_HOME   DEFAULT=@{HOME}/.local/share
+      XDG_STATE_HOME  DEFAULT=@{HOME}/.local/state
+      DIFFPROG        DEFAULT=meld
+      EDITOR          DEFAULT=nano
+      SUDO_EDITOR     DEFAULT=nano
+      VISUAL          DEFAULT=nano
+    insertafter: 'EOF'
+    mode: '0644'
+    backup: true
+#   notify: 
+

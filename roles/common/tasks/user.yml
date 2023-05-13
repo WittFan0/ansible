@@ -7,14 +7,6 @@
   tags:
     - user
 
-- name: Create test user group
-  ansible.builtin.group:
-    name: test01
-    gid: 1111
-    state: present
-  tags:
-    - user
-
 - name: Ensure wheel group exists
   ansible.builtin.group:
     name: wheel
@@ -23,41 +15,23 @@
     - user
   when: ansible_facts['distribution'] == "Archlinux"
 
-# # Something in the ansible.builtin.user module breaks login!
-#
-# - name: Create user and assign to group
-#   user:
-#     name: "{{ remote_user.name }}"
-#     # group: "{{ remote_user.group }}"
-#     password: "{{ remote_user.password|password_hash('sha512') }}"
-#     update_password: on_create # --> only set the password for newly created users
-#     shell: "{{ remote_user.shell_path }}"
-#     uid: "{{ remote_user.uid }}"
-#     # groups: sys,floppy,scanner,users,video,lp,audio,adm,{{ os_groups }}
-#     # append: yes   # --> user is not removed from existing groups
-#     generate_ssh_key: true
-#     ssh_key_passphrase: "{{ ssh_key_passphrase }}"
-#     ssh_key_type: ed25519
-#     state: present
-#   tags:
-#     - user
-# 
-# - name: Create test user and assign to group
-#   ansible.builtin.user:
-#     name: test01
-#     group: test01
-#     password: "{{ remote_user.password|password_hash('sha512') }}"
-#     update_password: on_create # --> only set the password for newly created users
-#     shell: "{{ remote_user.shell_path }}"
-#     uid: 1111
-#     # groups: sys,floppy,scanner,users,video,lp,audio,adm,{{ os_groups }}
-#     # append: yes   # --> user is not removed from existing groups
-#     generate_ssh_key: true
-#     ssh_key_passphrase: "{{ ssh_key_passphrase }}"
-#     ssh_key_type: ed25519
-#     state: present
-#   tags:
-#     - user
+- name: Create user and assign to group
+  ansible.builtin.user:
+    name: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    password: "{{ remote_user.password|password_hash('sha512') }}"
+    password_lock: false
+    update_password: on_create # --> only set the password for newly created users
+    shell: "{{ remote_user.shell_path }}"
+    uid: "{{ remote_user.uid }}"
+    groups: sys,floppy,scanner,users,video,lp,audio,adm,{{ os_groups }}
+    append: yes   # --> user is not removed from existing groups
+    generate_ssh_key: true
+    ssh_key_passphrase: "{{ ssh_key_passphrase }}"
+    ssh_key_type: ed25519
+    state: present
+  tags:
+    - user
 
 - name: Allow prime user to run `sudo`
   ansible.builtin.lineinfile:

@@ -5,7 +5,7 @@ remote_user:
     uid: 1000
     group: lance
     shell: bash
-    shell_path: /usr/bin/bash
+    shell_path: /bin/bash  # <-- This must have a matching entry in /etc/shells
     email:  lancestyles1@gmail.com
     password: "{{ vault_user_password }}"
 

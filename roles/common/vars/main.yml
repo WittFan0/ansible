@@ -1,5 +1,7 @@
 ssh_key_passphrase: "{{ vault_ssh_key_passphrase }}"
 
+local_timezone: America/New_York
+
 base_packages:
     # - base-devel
     # - man-pages

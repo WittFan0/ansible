@@ -7,6 +7,40 @@
     name: "{{ hostname }}"
   when: hostname is defined
 
+- name: Set locale
+  ansible.builtin.lineinfile:
+    path: /etc/locale.gen
+    regexp: '^en_US.UTF-8 '
+    line: en_US.UTF-8 UTF-8
+  notify:
+    - generate_locales
+
+- name: Set LANG variable
+  ansible.builtin.lineinfile:
+    path: /etc/locale.conf
+    regexp: '^LANG='
+    line: LANG=en_US.UTF-8
+
+- name: Set system clock 
+  ansible.builtin.command: |
+    [ -f /etc/localtime ] || ln -sf /usr/share/zoneinfo/{{ local_timezone }} /etc/localtime
+    hwclock --systohc --utc
+  become: true
+
+- name: Add hosts
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    block: | 
+      192.168.40.1  router.q.qw  router
+      192.168.40.2  office.q.qw  office
+      192.168.40.4  mythbox.q.qw  mythbox
+      192.168.40.5  taichi.q.qw  taichi
+    insertafter: 'EOF'
+    mode: '0644'
+    backup: true
+
+#   notify: 
+
 # - name: Set kernel parameters
 #   lineinfile:
 #     dest: /etc/default/grub
@@ -19,11 +53,24 @@
 #   tags:
 #     - kernelparams
 
-- name: Copy pacman configuration file
-  ansible.builtin.copy:
-    src: pacman.conf
-    dest: /etc/pacman.conf
+- name: Enable pacman color
+  ansible.builtin.lineinfile:
+    path: /etc/pacman.conf
+    regexp: '^Color'
+    line: Color
     backup: true
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Enable pacman parallel downloads
+  ansible.builtin.lineinfile:
+    path: /etc/pacman.conf
+    regexp: '^ParallelDownloads'
+    line: ParallelDownloads = 5
+    backup: true
+  tags:
+    - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Create pacman hook directory
@@ -33,7 +80,54 @@
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: Install distro base packages
+  - name: Install reflector
+    ansible.builtin.package:
+      name: reflector 
+      state: present
+    tags:
+      - packages
+    when: ansible_facts['distribution'] == "Archlinux"
+
+  - name: Find fastest Ubuntu mirror
+    ansible.builtin.shell: curl -s http://mirrors.ubuntu.com/mirrors.txt | xargs -I {} sh -c 'echo $(curl -r 0-1024000 -s -w %{speed_download} -o /dev/null {}/ls-lR.gz) {}' | sort -g -r | head -1 | awk '{ print $2  }'
+    register: fastest_mirror
+    ignore_errors: true
+    when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+  - name: Update mirror list (Arch)
+    ansible.builtin.command: reflector --country US,Canada --completion-percent 90 --sort rate --latest 20 --protocol https --save /etc/pacman.d/mirrorlist
+    become: true
+    when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Switch to fastest Ubuntu mirror
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list
+    regexp: deb http://us.archive.ubuntu.com/ubuntu
+    replace: deb {{ fastest_mirror }}
+    backup: true
+    when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+  - name: Update package cache and upgrade (Arch)
+    community.general.pacman:
+      update_cache: true
+      upgrade: true
+    tags:
+      - packages
+    when: ansible_facts['distribution'] == "Archlinux"
+
+  - name: Update package cache and upgrade (Debian)
+    ansible.builtin.apt: 
+      update_cache: yes
+      cache_valid_time: 3600  # Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+      name: "*"
+      state: latest
+      autoclean: yes
+      autoremove: yes
+    tags:
+      - packages
+    when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+    
+  - name: Install distro base packages
   ansible.builtin.package:
     name: "{{ distro_packages }}" 
     state: present
@@ -49,14 +143,20 @@
   tags:
     - packages
 
-# - name: Quiet pam_systemd_home.so warnings
-#   ansible.builtin.copy:
-#     src: system-auth
-#     dest: /etc/pam.d/system-auth
-#     backup: true
-#   when: ansible_facts['distribution'] == "Archlinux"
+- name: Quiet pam_systemd_home.so warnings
+  ansible.builtin.copy:
+    src: system-auth
+    dest: /etc/pam.d/system-auth
+    backup: true
+  when: ansible_facts['distribution'] == "Archlinux"
 
-# - include_tasks: shell2xdg.yml
+- name: Install user setup script
+  ansible.builtin.copy:
+    src: user_setup.sh
+    dest: /usr/local/sbin/
+    mode: '0755'
+
+- include_tasks: shell2xdg.yml
 - include_tasks: shell.yml
 - include_tasks: user.yml
 - include_tasks: pacman-aur.yml

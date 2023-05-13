@@ -1,6 +1,17 @@
 - name: Set OS distribution dependent variables
   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
+- name: Install compiling tools
+  ansible.builtin.package:
+    name:
+      - base-devel
+      - pigz
+      - pbzip2
+    state: present
+  tags:
+    - shell
+  when: ansible_facts['distribution'] == "Archlinux"
+
 - name: Push pacman cache cleanup service
   copy: src=paccache.service dest=/etc/systemd/system/paccache.service backup=true
   notify:
@@ -68,11 +79,40 @@
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: Use all cores when compressing packages
+- name: Use all cores when compiling software
   ansible.builtin.lineinfile:
     dest: /etc/makepkg.conf
-    regexp: "^COMPRESSXZ"
-    line: "COMPRESSXZ=(xz -c -z - --threads=0)"
+    regexp: "^MAKEFLAGS="
+    line: MAKEFLAGS="-j$(nproc)"
+    backup: true
+
+- name: Use all cores when compressing packages (gzip)
+  ansible.builtin.lineinfile:
+    dest: /etc/makepkg.conf
+    regexp: "^COMPRESSGZ="
+    line: "COMPRESSGZ=(pigz -c -f -n)"
+    backup: true
+
+- name: Use all cores when compressing packages (bzip2)
+  ansible.builtin.lineinfile:
+    dest: /etc/makepkg.conf
+    regexp: "^COMPRESSBZ2="
+    line: "COMPRESSBZ2=(pbzip2 -c -f)"
+    backup: true
+
+- name: Use all cores when compressing packages (xz)
+  ansible.builtin.lineinfile:
+    dest: /etc/makepkg.conf
+    regexp: "^COMPRESSXZ="
+    line: "COMPRESSXZ=(xz -c -z --threads=0 -)"
+    backup: true
+
+- name: Use all cores when compressing packages (zstd)
+  ansible.builtin.lineinfile:
+    dest: /etc/makepkg.conf
+    regexp: "^COMPRESSZST="
+    line: "COMPRESSZST=(zstd -c -z -q --threads=0 -)"
+    backup: true
 
 - name: Create AUR directory
   file: path=/home/{{ aur.builder }}/{{ aur.dir }}

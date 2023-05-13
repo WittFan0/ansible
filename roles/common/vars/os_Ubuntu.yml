@@ -1,5 +1,6 @@
 distro_packages:
     - aptitude
+    - cron
     - openssh-server
     - grub-efi-amd64-signed
     - gdisk

@@ -1,6 +1,6 @@
 hostname: popos2204vm
 
-kernel_parameters: "quiet consoleblank=60"
+# kernel_parameters: "quiet consoleblank=60"
 
 lan0:
     ip: "{{ lan.base }}.38"

@@ -7,13 +7,13 @@
 #   ansible-galaxy collection install kewlfft.aur
 #   ansible-pull --vault-password-file ~/.vault_pass.txt -U http://github.com/WittFan0/ansible.git
 
-- hosts: localhost
+- hosts: archvm
   connection: local
   
-  vars_prompt:
-    - name: hostname
-      prompt: What is the name of this computer?
-      private: false
+  # vars_prompt:
+  #   - name: hostname
+  #     prompt: What is the name of this computer?
+  #     private: false
 
   pre_tasks:
     - name: Classify hosts depending on their OS distribution

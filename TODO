@@ -1,3 +1,4 @@
+make local arch mirror a variable
 download myscripts from git
 install printer driver (move lib32-zlib from distro packages)
 docker directory structure?

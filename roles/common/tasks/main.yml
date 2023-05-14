@@ -75,6 +75,18 @@
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
+- name: Enable pacman multilib
+  ansible.builtin.blockinfile:
+    path: /etc/pacman.conf
+    block: | 
+      [multilib]
+      Include = /etc/pacman.d/mirrorlist
+    insertafter: 'EOF'
+    backup: true
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux"
+
 - name: Create pacman hook directory
   file: path=/etc/pacman.d/hooks
         state=directory

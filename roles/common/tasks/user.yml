@@ -49,14 +49,6 @@
     force: true
     backup: no
 
-- name: Add ABCDE config
-  ansible.builtin.copy:
-    src: dotfiles/abcde.conf
-    dest: /home/{{ remote_user.name }}/.abcde.conf
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
-    backup: yes
-
 - name: Create rclone config directory if it does not exist
   ansible.builtin.file:
     path: /home/{{ remote_user.name }}/.config/rclone

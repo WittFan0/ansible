@@ -23,7 +23,7 @@
 
 - name: Set system clock 
   ansible.builtin.shell: |
-    [ -f /etc/localtime ] || ln -sf /usr/share/zoneinfo/{{ local_timezone }} /etc/localtime
+    ln -sf /usr/share/zoneinfo/{{ local_timezone }} /etc/localtime
     hwclock --systohc --utc
   become: true
 
@@ -31,6 +31,11 @@
   ansible.builtin.blockinfile:
     path: /etc/hosts
     block: | 
+      127.0.0.1  localhost
+      127.0.1.1  {{ hostname }}
+      ::1        localhost ip6-localhost ip6-loopback
+      ff02::1    ip6-allnodes
+      ff02::2    ip6-allrouters
       192.168.40.1  router.q.qw  router
       192.168.40.2  office.q.qw  office
       192.168.40.4  mythbox.q.qw  mythbox
@@ -38,8 +43,6 @@
     insertafter: 'EOF'
     mode: '0644'
     backup: true
-
-#   notify: 
 
 # - name: Set kernel parameters
 #   lineinfile:

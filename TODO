@@ -21,3 +21,6 @@ Switch from cron to systemd timer
 Python encryption warning
 
 combine development and aur roles?
+loop build /etc/skel/build/
+build dirs for aur_builder
+cups.conf indentation

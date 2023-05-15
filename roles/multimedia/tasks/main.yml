@@ -10,6 +10,14 @@
   tags:
     - packages
 
+- name: Add ABCDE config
+  ansible.builtin.copy:
+    src: dotfiles/abcde.conf
+    dest: /home/{{ remote_user.name }}/.abcde.conf
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    backup: yes
+
 # - name: Install AUR pacakges
 #   kewlfft.aur.aur:
 #     name: 

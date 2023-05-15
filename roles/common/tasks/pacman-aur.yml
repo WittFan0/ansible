@@ -46,12 +46,31 @@
 
 - name: Create skeleton dirs for building software
   ansible.builtin.file:
-    path: 
-      - /etc/skel/build/packages
-      - /etc/skel/build/sources
-      - /etc/skel/build/srcpackages
-      - /etc/skel/build/makepkglogs
-      - /etc/skel/build/makepkg
+    path: /etc/skel/build/packages
+    state: directory
+    mode: '0755'
+
+- name: Create skeleton dirs for building software
+  ansible.builtin.file:
+    path: /etc/skel/build/sources
+    state: directory
+    mode: '0755'
+
+- name: Create skeleton dirs for building software
+  ansible.builtin.file:
+    path: /etc/skel/build/srcpackages
+    state: directory
+    mode: '0755'
+
+- name: Create skeleton dirs for building software
+  ansible.builtin.file:
+    path: /etc/skel/build/makepkglogs
+    state: directory
+    mode: '0755'
+
+- name: Create skeleton dirs for building software
+  ansible.builtin.file:
+    path: /etc/skel/build/makepkg
     state: directory
     mode: '0755'
 

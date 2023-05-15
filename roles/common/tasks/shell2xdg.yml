@@ -30,14 +30,13 @@
     src: bash_xdg
     dest: /etc/profile.d/bash_xdg.sh
     backup: false
-    mode: '0755'
+    mode: '0644'
   notify: 
 
 - name: Set global environment variables
   ansible.builtin.blockinfile:
     path: /etc/security/pam_env.conf
     block: | 
-      # LJS: Set global environment variables
       XDG_CONFIG_DIRS DEFAULT=/etc/xdg
       XDG_DATA_DIRS   DEFAULT=/usr/local/share:/usr/share
       XDG_CONFIG_HOME DEFAULT=@{HOME}/.config

@@ -14,7 +14,3 @@
       - pavucontrol
     state: present
 
-# - name: Install pasystray
-#   ansible.builtin.package:
-#     name: pasystray
-#     state: present

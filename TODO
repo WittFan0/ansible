@@ -25,3 +25,6 @@ loop build /etc/skel/build/
 build dirs for aur_builder
 cups.conf indentation
 disable root ssh login
+enable firewall
+firejail
+is alsa-utils needed?

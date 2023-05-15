@@ -36,15 +36,10 @@
     - development
     - graphics
     - vmhost
+    - sshd-keyonly  # <-- Must come last because it disables root ssh
 
-  become_user: "{{ remote_user.name }}"
-  environment:
-    DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/{{ remote_user.uid }}/bus
-  roles: 
-    - xfce4-customize
-
-  post_tasks:
-    - name: Disable ssh root logins and limit other logins to key-based
-      become: true
-      roles:
-        - sshd-keyonly
+  # become_user: "{{ remote_user.name }}"
+  # environment:
+  #   DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/{{ remote_user.uid }}/bus
+  # roles: 
+  #   - xfce4-customize

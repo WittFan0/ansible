@@ -73,7 +73,6 @@
     src: wallpaper/
     dest: /usr/share/backgrounds/xfce/
     backup: false
-#   notify: 
 
 - name: Install XFCE4 Gradient-black theme
   ansible.builtin.unarchive:

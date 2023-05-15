@@ -12,7 +12,7 @@
 
 - name: Add ABCDE config
   ansible.builtin.copy:
-    src: dotfiles/abcde.conf
+    src: abcde.conf
     dest: /home/{{ remote_user.name }}/.abcde.conf
     owner: "{{ remote_user.name }}"
     group: "{{ remote_user.group }}"

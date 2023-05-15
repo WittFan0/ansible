@@ -1,4 +1,6 @@
 - name: Change the DPI to "96"
+  become: true
+  become_user: "{{ remote_user.name }}"
   community.general.xfconf:
     channel: xsettings
     property: /Xft/DPI
@@ -6,6 +8,8 @@
     value: 96
 
 - name: Customize {{ remote_user.name }}'s wallpaper
+  become: true
+  become_user: "{{ remote_user.name }}"
   community.general.xfconf:
     channel: xfce4-desktop
     property: /backdrop/screen0/monitorVirtual-1/workspace0/last-image
@@ -14,6 +18,8 @@
     state: present
 
 - name: Customize {{ remote_user.name }}'s theme
+  become: true
+  become_user: "{{ remote_user.name }}"
   community.general.xfconf:
     channel: xsettings
     property: /Net/ThemeName
@@ -22,6 +28,8 @@
     state: present
 
 - name: Customize {{ remote_user.name }}'s icons
+  become: true
+  become_user: "{{ remote_user.name }}"
   community.general.xfconf:
     channel: xsettings
     property: /Net/IconThemeName
@@ -30,6 +38,8 @@
     state: present
 
 - name: Load custom actions into {{ remote_user.name }}'s filemanager
+  become: true
+  become_user: "{{ remote_user.name }}"
   ansible.builtin.command: |
     uca-apply
   become: true

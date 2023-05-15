@@ -22,41 +22,29 @@
 
   roles:
     - common
-    - sshd-keyonly
     - geerlingguy.ntp
     - monitor
     - harden  # TODO: Limit to WAN interface
-
-- hosts: router
-  roles:
     - dnsmasq
-
-- hosts: media_server
-  roles:
     - geerlingguy.docker
     - mediasrv
-
-- hosts: collab_server
-  roles:
     - geerlingguy.docker
     - collab
-
-- hosts: workstation
-  roles:
     - sound
     - xfce4
     - multimedia
     - development
     - graphics
-
-- hosts: vmhost
-  roles:
     - vmhost
 
-- hosts: workstation
   become_user: "{{ remote_user.name }}"
   environment:
     DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/{{ remote_user.uid }}/bus
   roles: 
     - xfce4-customize
 
+  post_tasks:
+    - name: Disable ssh root logins and limit other logins to key-based
+      become: true
+      roles:
+        - sshd-keyonly

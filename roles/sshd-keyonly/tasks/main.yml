@@ -12,12 +12,12 @@
     state: directory
     mode: '0755'
 
-# - name: Push OpenSSH daemon configuration file
-#   template:
-#     src: 50-ansible.j2
-#     dest: /etc/ssh/sshd_config.d/50-ansible.conf
-#   notify:
-#     - restart_sshd
+- name: Push OpenSSH daemon configuration file
+  template:
+    src: 50-ansible.j2
+    dest: /etc/ssh/sshd_config.d/50-ansible.conf
+  notify:
+    - restart_sshd
 
 - name: Source user OpenSSH configuration files
   ansible.builtin.lineinfile:

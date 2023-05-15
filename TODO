@@ -24,3 +24,4 @@ combine development and aur roles?
 loop build /etc/skel/build/
 build dirs for aur_builder
 cups.conf indentation
+disable root ssh login

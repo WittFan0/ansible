@@ -14,28 +14,6 @@
       - pavucontrol
     state: present
 
-- name: Enable and start pipewire-pulse user service for {{ remote_user.name }}
-  ansible.builtin.systemd:
-    name: pipewire-pulse.service
-    scope: user
-    state: started
-    enabled: true
-  become: true
-  become_user: "{{ remote_user.name }}"
-  environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ remote_user.uid }}"
-
-- name: Enable and start wireplumber user service for {{ remote_user.name }}
-  ansible.builtin.systemd:
-    name: wireplumber.service
-    scope: user
-    state: started
-    enabled: true
-  become: true
-  become_user: "{{ remote_user.name }}"
-  environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ remote_user.uid }}"
-
 # - name: Install pasystray
 #   ansible.builtin.package:
 #     name: pasystray

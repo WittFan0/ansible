@@ -95,7 +95,8 @@
   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Install reflector
-  ansible.builtin.package:
+  community.general.pacman:
+    update_cache: true
     name: reflector 
     state: present
   tags:

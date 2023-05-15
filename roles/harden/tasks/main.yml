@@ -82,11 +82,10 @@
     ufw allow 52080 comment 'Piwigo'
   become: true
 
-# THIS CAUSES ANSIBLE TO HANG!
-# - name: Enable firewall
-#   ansible.builtin.command: |
-#     ufw enable
-#   become: true
+- name: Enable firewall
+  ansible.builtin.command: |
+    ufw enable
+  become: true
 
 # PROBABLY NEED TO TEST THIS (e.g. SUBVOLUMES, DOCKER, ETC.) BEFORE ENABLING EVERYTHING.
 # - name: Activate firejail

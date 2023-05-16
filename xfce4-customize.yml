@@ -1,0 +1,48 @@
+---
+# This must be run while user's XFCE4 session is running
+# ansible-pull --vault-password-file ~/.vault_pass.txt -U http://github.com/WittFan0/ansible.git xfce4-customize.yml
+
+- hosts: archvm
+  connection: local
+  become: true
+  become_user: "{{ remote_user.name }}"
+  environment:
+    DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/{{ remote_user.uid }}/bus
+  
+  tasks:
+    - name: Change the DPI to "96"
+      community.general.xfconf:
+        channel: xsettings
+        property: /Xft/DPI
+        value_type: int
+        value: 96
+
+    - name: Customize {{ remote_user.name }}'s wallpaper
+      community.general.xfconf:
+        channel: xfce4-desktop
+        property: /backdrop/screen0/monitorVirtual-1/workspace0/last-image
+        value_type: string
+        value: /usr/share/backgrounds/xfce/XFCE_83_No_Logo.png
+        state: present
+
+    - name: Customize {{ remote_user.name }}'s theme
+      community.general.xfconf:
+        channel: xsettings
+        property: /Net/ThemeName
+        value_type: string
+        value: Gradient-black-46
+        state: present
+
+    - name: Customize {{ remote_user.name }}'s icons
+      community.general.xfconf:
+        channel: xsettings
+        property: /Net/IconThemeName
+        value_type: string
+        value: EFDark-IconsCream
+        state: present
+
+    - name: Load custom actions into {{ remote_user.name }}'s filemanager
+      ansible.builtin.command: |
+        uca-apply
+      become: true
+

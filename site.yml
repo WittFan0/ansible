@@ -24,7 +24,6 @@
   roles:
     - geerlingguy.docker
     - mediasrv
-    # - harden  # TODO: Limit to WAN interface
 
 - hosts: collab_server
   become: true
@@ -46,11 +45,7 @@
   roles:
     - vmhost
 
-- hosts: workstation
+- hosts: all
   become: true
-  become_user: "{{ remote_user.name }}"
-  environment:
-    DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/{{ remote_user.uid }}/bus
-  roles: 
-    - xfce4-customize
-
+  roles:
+    - sshd-keyonly  # <-- Must come last because it disables root ssh

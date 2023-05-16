@@ -38,8 +38,3 @@
     - vmhost
     - sshd-keyonly  # <-- Must come last because it disables root ssh
 
-  # become_user: "{{ remote_user.name }}"
-  # environment:
-  #   DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/{{ remote_user.uid }}/bus
-  # roles: 
-  #   - xfce4-customize

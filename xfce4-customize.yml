@@ -44,5 +44,4 @@
     - name: Load custom actions into {{ remote_user.name }}'s filemanager
       ansible.builtin.command: |
         uca-apply
-      become: true
 

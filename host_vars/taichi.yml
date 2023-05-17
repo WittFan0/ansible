@@ -1,9 +1,9 @@
-hostname: office
+hostname: taichi
 
 # kernel_parameters: "quiet consoleblank=60"
 
 lan0:
-    ip: "{{ lan.base }}.2"
+    ip: "{{ lan.base }}.5"
     ifname: enp0s4
 
 wan:

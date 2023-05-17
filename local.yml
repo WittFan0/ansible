@@ -22,20 +22,20 @@
 
   roles:
     - common
-    - geerlingguy.ntp
-    - monitor
-    - harden  # TODO: Limit to WAN interface
-    - dnsmasq
-    - geerlingguy.docker
-    - mediasrv
-    - geerlingguy.docker
-    - collab
-    - sound
-    - xfce4
-    - multimedia
-    - development
-    - graphics
-    - vmhost
-    - gaming
-    - sshd-keyonly  # <-- Must come last because it disables root ssh
+    # - geerlingguy.ntp
+    # - monitor
+    # - harden  # TODO: Limit to WAN interface
+    # - dnsmasq
+    # - geerlingguy.docker
+    # - mediasrv
+    # - geerlingguy.docker
+    # - collab
+    # - sound
+    # - xfce4
+    # - multimedia
+    # - development
+    # - graphics
+    # - vmhost
+    # - gaming
+    # - sshd-keyonly  # <-- Must come last because it disables root ssh
 

@@ -2,30 +2,30 @@ all:
   children:
     hardened:
       hosts:
-        office:
+        taichi:
         archvm:
         mythboxtest:
     collab_server:
       hosts:
-        office:
+        taichi:
         archvm:
         mythboxtest:
     media_server:
       hosts:
-        office:
+        taichi:
         archvm:
         mythboxtest:
     router:
       hosts:
-        office:
+        taichi:
         archvm:
         mythboxtest:
     workstation:
       hosts:
-        office:
+        taichi:
         archvm:
     vmhost:
       hosts:
-        office:
+        taichi:
         archvm:
         mythboxtest:

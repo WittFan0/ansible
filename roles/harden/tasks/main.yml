@@ -85,8 +85,6 @@
     state: enabled
 
 - name: Open phpMyAdmin port
-  ansible.builtin.command: |
-    ufw allow 51111 comment 'phpMyAdmin'
   become: true
   community.general.ufw:
     rule: allow

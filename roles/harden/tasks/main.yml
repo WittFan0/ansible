@@ -1,7 +1,11 @@
+- name: Set OS distribution dependent variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
 - name: Install hardening packages
   ansible.builtin.package:
     name: 
       - ufw
+      - "{{ iptables-nft_package }}"
       - sshguard
       - firejail
     state: present

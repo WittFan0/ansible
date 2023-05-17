@@ -8,7 +8,7 @@
   tags:
     - packages
 
-- name: Install endlessh
+- name: Install endlessh (AUR)
   kewlfft.aur.aur:
     name: endlessh-git
     state: present
@@ -40,12 +40,6 @@
       -A ufw6-before-input -p tcp --dport "{{ ssh_port }}" -j sshguard
     backup: no
 
-- name: Enable and start firewall
-  service:
-    name: ufw.service
-    enabled: yes
-    state: started
-
 - name: Enable and start sshguard
   service:
     name: sshguard.service
@@ -53,39 +47,62 @@
     state: started
 
 - name: Open SSH port
-  ansible.builtin.command: |
-    ufw limit "{{ ssh_port }}"/tcp comment 'Rate limit OpenSSH server'
+  community.general.ufw:
+    rule: limit
+    port: "{{ ssh_port }}"
+    proto: tcp
+    comment: Rate limit OpenSSH server
+    state: enabled
   become: true
 
 - name: Open SSH tarpit port
-  ansible.builtin.command: |
-    ufw allow ssh comment 'OpenSSH tarpit'
   become: true
+  community.general.ufw:
+    rule: allow
+    port: '2222'
+    proto: tcp
+    comment: OpenSSH tarpit
+    state: enabled
 
 - name: Open printer administration port
-  ansible.builtin.command: |
-    ufw allow from {{ lan.subnet }} to {{ lan0.ip}} port 631 comment 'CUPS'
   become: true
+  community.general.ufw:
+    rule: allow
+    src: "{{ lan.subnet }}"
+    dest: "{{ lan0.ip }}"
+    to_port: '631'
+    comment: CUPS
+    state: enabled
 
 - name: Open NFS port
-  ansible.builtin.command: |
-    ufw allow from {{ lan.subnet }} to {{ lan0.ip}} port nfs
   become: true
+  community.general.ufw:
+    rule: allow
+    src: "{{ lan.subnet }}"
+    dest: "{{ lan0.ip }}"
+    to_port: nfs
+    comment: NFS
+    state: enabled
 
 - name: Open phpMyAdmin port
   ansible.builtin.command: |
     ufw allow 51111 comment 'phpMyAdmin'
   become: true
+  community.general.ufw:
+    rule: allow
+    src: "{{ lan.subnet }}"
+    dest: "{{ lan0.ip }}"
+    to_port: '51111'
+    comment: phpMyAdmin
+    state: enabled
 
 - name: Open Piwigo ports
-  ansible.builtin.command: |
-    ufw allow 52080 comment 'Piwigo'
   become: true
-
-- name: Enable firewall
-  ansible.builtin.command: |
-    ufw enable
-  become: true
+  community.general.ufw:
+    rule: allow
+    to_port: '52080'
+    comment: Piwigo
+    state: enabled
 
 # PROBABLY NEED TO TEST THIS (e.g. SUBVOLUMES, DOCKER, ETC.) BEFORE ENABLING EVERYTHING.
 # - name: Activate firejail

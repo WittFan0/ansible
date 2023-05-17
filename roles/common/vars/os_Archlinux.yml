@@ -1,4 +1,4 @@
-pacman_mirror: http://192.168.40.5:8000/
+pacman_mirror: http://192.168.40.199:8000/
 
 distro_packages:
     - base

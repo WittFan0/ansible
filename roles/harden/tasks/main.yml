@@ -68,8 +68,8 @@
   become: true
   community.general.ufw:
     rule: allow
-    src: "{{ lan.subnet }}"
-    dest: "{{ lan0.ip }}"
+    from_ip: "{{ lan.subnet }}"
+    to_ip: "{{ lan0.ip }}"
     to_port: '631'
     comment: CUPS
     state: enabled
@@ -78,8 +78,8 @@
   become: true
   community.general.ufw:
     rule: allow
-    src: "{{ lan.subnet }}"
-    dest: "{{ lan0.ip }}"
+    from_ip: "{{ lan.subnet }}"
+    to_ip: "{{ lan0.ip }}"
     to_port: nfs
     comment: NFS
     state: enabled
@@ -90,8 +90,8 @@
   become: true
   community.general.ufw:
     rule: allow
-    src: "{{ lan.subnet }}"
-    dest: "{{ lan0.ip }}"
+    from_ip: "{{ lan.subnet }}"
+    to_ip: "{{ lan0.ip }}"
     to_port: '51111'
     comment: phpMyAdmin
     state: enabled

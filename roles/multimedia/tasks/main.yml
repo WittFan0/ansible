@@ -1,14 +1,37 @@
 ---
-# - name: Set OS distribution dependent variables
-#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
-
-- name: Install packages
+- name: Install easytag
+  become: true
   ansible.builtin.package:
     name: 
-      - easytag 
+      - easytag
+      - pragha
+      - handbrake
+      - "{{ handbrake_deps_packages }}"
     state: present
   tags:
     - packages
+
+- name: Install abcde (apt)
+  become: true
+  ansible.builtin.apt:
+    name: 
+      - abcde
+    state: present
+  tags:
+    - packages
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Install abcde (AUR)
+  kewlfft.aur.aur:
+    name: 
+      - abcde
+    state: present
+  tags:
+    - aur
+    - packages
+  become: true
+  become_user: "{{ aur.builder }}"
+  when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Add ABCDE config
   ansible.builtin.copy:
@@ -16,33 +39,5 @@
     dest: /home/{{ remote_user.name }}/.abcde.conf
     owner: "{{ remote_user.name }}"
     group: "{{ remote_user.group }}"
-    backup: yes
+    backup: true
 
-# - name: Install AUR pacakges
-#   kewlfft.aur.aur:
-#     name: 
-#       - 
-#     state: present
-#   tags:
-#     - aur
-#     - packages
-#   become: "yes"
-#   become_user: "{{ aur.builder }}"
-#   when: ansible_facts['distribution'] == "Archlinux"
-
-# - name: Configure 
-#   ansible.builtin.template:
-#     src: 
-#     dest: /
-#     backup: true
-#   notify: 
-
-# - name: Create file
-#   ansible.builtin.copy:
-#     src: 
-#     dest: /
-#     backup: true
-#   notify: 
-
-# - include_tasks: .yml
-#   when: ansible_facts['distribution'] == "DistroName"

@@ -20,3 +20,4 @@
 
 - name: reload_systemd_config
   command: systemctl daemon-reload
+  become: true

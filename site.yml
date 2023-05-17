@@ -39,6 +39,7 @@
     - multimedia
     - development
     - graphics
+    - gaming
 
 - hosts: vmhost
   become: true

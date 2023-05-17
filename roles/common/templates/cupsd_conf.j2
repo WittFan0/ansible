@@ -33,35 +33,35 @@ IdleExitTimeout 60
 
 # Restrict access to the server...
 <Location />
- Order allow,deny
- Allow 127.0.0.1
- Allow {{ lan.subnet }}
- </Location>
+  Order allow,deny
+  Allow 127.0.0.1
+  Allow {{ lan.subnet }}
+</Location>
 
 # Restrict access to the admin pages...
 <Location /admin/>
- Order allow,deny
- Allow 127.0.0.1
- Allow {{ lan.subnet }}
- </Location>
+  Order allow,deny
+  Allow 127.0.0.1
+  Allow {{ lan.subnet }}
+</Location>
 
 # Restrict access to configuration files...
 <Location /admin/conf/>
- AuthType Default
- Require user @SYSTEM
- Order allow,deny
- Allow 127.0.0.1
- Allow {{ lan.subnet }}
- </Location>
+  AuthType Default
+  Require user @SYSTEM
+  Order allow,deny
+  Allow 127.0.0.1
+  Allow {{ lan.subnet }}
+</Location>
 
 # Restrict access to log files...
 <Location /admin/log/>
- AuthType Default
- Require user @SYSTEM
- Order allow,deny
- Allow 127.0.0.1
- Allow {{ lan.subnet }}
- </Location>
+  AuthType Default
+  Require user @SYSTEM
+  Order allow,deny
+  Allow 127.0.0.1
+  Allow {{ lan.subnet }}
+</Location>
 
 # Set the default printer/job policies...
 <Policy default>

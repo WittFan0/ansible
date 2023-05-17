@@ -1,0 +1,6 @@
+exiftran_package: exiftran
+
+rsvg-convert_package: librsvg2-bin
+
+exiftool_package: libimage-exiftool-perl
+

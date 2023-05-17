@@ -1,6 +1,6 @@
 ---
-- name: Set OS distribution dependent variables
-  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+# - name: Set OS distribution dependent variables
+#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install packages
   ansible.builtin.package:
@@ -83,32 +83,6 @@
   ansible.builtin.unarchive:
     src: EFDark-IconsCream.tar.gz
     dest: /usr/share/icons/
-
-# - name: Set font
-#   community.general.xfconf:
-#     channel: xsettings
-#     property: /Gtk/FontName
-#     value_type: string
-#     value: System-ui 12
-#     state: present
-
-# - name: Set monospace font
-#   community.general.xfconf:
-#     channel: xsettings
-#     property: /Gtk/MonospaceFontName
-#     value_type: string
-#     value: Monospace 10
-#     state: present
-
-# - name: Configure 
-#   ansible.builtin.template:
-#     src: 
-#     dest: /
-#     backup: true
-#   notify: 
-
-# - include_tasks: .yml
-#   when: ansible_facts['distribution'] == "DistroName"
 
 - name: Set greeter theme
   ansible.builtin.lineinfile:

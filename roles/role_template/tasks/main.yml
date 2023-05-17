@@ -3,12 +3,33 @@
 #   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 # - name: Install packages
+#   become: true
 #   ansible.builtin.package:
 #     name: 
 #       - package 
 #     state: present
 #   tags:
 #     - packages
+
+# - name: Install package (apt)
+#   become: true
+#   ansible.builtin.apt:
+#     name: 
+#       - 
+#     state: present
+#   tags:
+#     - packages
+#   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+# - name: Install package (pacman)
+#   become: true
+#   community.general.pacman:
+#     name: 
+#       -  
+#     state: present
+#   tags:
+#     - packages
+#   when: ansible_facts['distribution'] == "Archlinux"
 
 # - name: Install AUR pacakges
 #   kewlfft.aur.aur:
@@ -18,7 +39,7 @@
 #   tags:
 #     - aur
 #     - packages
-#   become: "yes"
+#   become: true
 #   become_user: "{{ aur.builder }}"
 #   when: ansible_facts['distribution'] == "Archlinux"
 

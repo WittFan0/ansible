@@ -36,5 +36,6 @@
     - development
     - graphics
     - vmhost
+    - gaming
     - sshd-keyonly  # <-- Must come last because it disables root ssh
 

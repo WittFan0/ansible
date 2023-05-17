@@ -1,2 +1,4 @@
-
-
+handbrake_deps_packages: 
+  - libdvdcss
+  - gst-libav
+  - intel-media-sdk

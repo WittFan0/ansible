@@ -1,13 +1,13 @@
 ---
-- name: Install alsa-utils
-  ansible.builtin.package:
-    name: alsa-utils
-    state: present
+# - name: Install alsa-utils
+#   ansible.builtin.package:
+#     name: alsa-utils
+#     state: present
 
 - name: Install Pipewire
   ansible.builtin.package:
     name:
-      - pipewire-audio
+      # - pipewire-audio
       # - pipewire-alsa
       - pipewire-pulse
       # - pipewire-jack

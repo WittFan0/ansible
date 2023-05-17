@@ -5,46 +5,32 @@
 - name: Install packages
   ansible.builtin.package:
     name: 
-      - libvirt
-      - qemu-desktop
+      - "{{ libvirt_QEMU_packages }}"
       - dmidecode
       - gettext
       - virt-manager
+      - vagrant
     state: present
   tags:
     - packages
     - vmhost
 
-# - name: Install AUR pacakges
-#   kewlfft.aur.aur:
-#     name: 
-#       - thunar-custom-actions
-#     state: present
-#   tags:
-#     - aur
-#     - packages
-#   become: "yes"
-#   become_user: "{{ aur.builder }}"
-#   when: ansible_facts['distribution'] == "Archlinux"
+- name: Install package (apt)
+  become: true
+  ansible.builtin.apt:
+    name: 
+      - vagrant-libvirt
+      - libvirt-daemon-system
+      - gir1.2-ayatanaappindicator3-0.1
+      - gir1.2-spiceclientglib-2.0
+      - gir1.2-spiceclientgtk-3.0
+    state: present
+  tags:
+    - packages
+    - vmhost
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
-# - name: Configure 
-#   ansible.builtin.template:
-#     src: 
-#     dest: /
-#     backup: true
-#   notify: 
-
-# - name: Create file
-#   ansible.builtin.copy:
-#     src: 
-#     dest: /
-#     backup: true
-#   notify: 
-
-# - include_tasks: .yml
-#   when: ansible_facts['distribution'] == "DistroName"
-
-# The libvirt group is optional. It is not needed if the user is a member of the wheel group
+# The libvirt group is optional. It is not needed if the user is a member of the wheel group (arch) or sudo group (ubuntu)
 - name: Create libvirt group
   ansible.builtin.group:
     name: libvirt

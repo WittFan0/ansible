@@ -3,6 +3,7 @@
   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install development packages
+  become: true
   ansible.builtin.package:
     name: 
       - "{{ base_dev_packages }}"
@@ -14,6 +15,7 @@
     - packages
 
 - name: Install code editor (Arch)
+  become: true
   ansible.builtin.package:
     name: 
       - code
@@ -24,7 +26,7 @@
   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Install VS Code dependencies (apt)
-  become: yes
+  become: true
   ansible.builtin.apt:
     name:
       - ca-certificates
@@ -40,20 +42,20 @@
     state: present
   tags:
     - packages
-  when: ansible_facts['distribution'] == "Ubuntu"
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Create APT keyrings dir
-  become: yes
+  become: true
   ansible.builtin.file:
     path: '/etc/apt/keyrings'
     state: directory
     mode: 'u=rwx,go=rx'
   tags:
     - packages
-  when: ansible_facts['distribution'] == "Ubuntu"
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Install VS Code key (apt)
-  become: yes
+  become: true
   ansible.builtin.get_url:
     url: '{{ visual_studio_code_mirror }}/keys/microsoft.asc'
     dest: '/etc/apt/keyrings/'
@@ -61,50 +63,24 @@
     force: yes
   tags:
     - packages
-  when: ansible_facts['distribution'] == "Ubuntu"
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Install VS Code repo (apt)
+  become: true
   ansible.builtin.apt_repository:
     repo: deb {{ visual_studio_code_mirror }}/repos/vscode stable main
     filename: vscode
     state: present
   tags:
     - packages
-  when: ansible_facts['distribution'] == "Ubuntu"
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Install VS Code (apt)
+  become: true
   ansible.builtin.apt:
     name: code
     state: present
   tags:
     - packages
-  when: ansible_facts['distribution'] == "Ubuntu"
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
-# - name: Install AUR pacakges
-#   kewlfft.aur.aur:
-#     name: 
-#       - thunar-custom-actions
-#     state: present
-#   tags:
-#     - aur
-#     - packages
-#   become: "yes"
-#   become_user: "{{ aur.builder }}"
-#   when: ansible_facts['distribution'] == "Archlinux"
-
-# - name: Configure 
-#   ansible.builtin.template:
-#     src: 
-#     dest: /
-#     backup: true
-#   notify: 
-
-# - name: Create file
-#   ansible.builtin.copy:
-#     src: 
-#     dest: /
-#     backup: true
-#   notify: 
-
-# - include_tasks: .yml
-#   when: ansible_facts['distribution'] == "DistroName"

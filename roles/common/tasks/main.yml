@@ -21,10 +21,16 @@
     regexp: '^LANG='
     line: LANG=en_US.UTF-8
 
+- name: Set timezone 
+  become: true
+  ansible.builtin.file:
+    src: /usr/share/zoneinfo/{{ local_timezone }}
+    dest: /etc/localtime
+    state: link
+    force: true
+
 - name: Set system clock 
-  ansible.builtin.shell: |
-    ln -sf /usr/share/zoneinfo/{{ local_timezone }} /etc/localtime
-    hwclock --systohc --utc
+  ansible.builtin.command: hwclock --systohc --utc
   become: true
 
 - name: Add hosts

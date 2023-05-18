@@ -5,7 +5,6 @@
   ansible.builtin.package:
     name: 
       - ufw
-      - "{{ iptables-nft_package }}"
       - sshguard
       - firejail
     state: present

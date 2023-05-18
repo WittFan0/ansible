@@ -26,6 +26,8 @@ create filesystem | fstrim | BTRFS to mkinitcpio | fstab
 optimize users' makepkg.conf
 Switch from cron to systemd timer
 Python encryption warning
+The container_default_behavior option will change its default value from "compatibility" to 
+"no_defaults" in community.docker 2.0.0
 
 combine development and aur roles?
 loop build /etc/skel/build/

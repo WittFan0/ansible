@@ -118,10 +118,10 @@
   ignore_errors: true
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
-- name: Update mirror list (Arch)
-  ansible.builtin.command: reflector --country US,Canada --completion-percent 90 --sort rate --latest 20 --protocol https --save /etc/pacman.d/mirrorlist
-  become: true
-  when: ansible_facts['distribution'] == "Archlinux"
+# - name: Update mirror list (Arch)
+#   ansible.builtin.command: reflector --country US,Canada --completion-percent 90 --sort rate --latest 20 --protocol https --save /etc/pacman.d/mirrorlist
+#   become: true
+#   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Enable local package mirror
   ansible.builtin.lineinfile:

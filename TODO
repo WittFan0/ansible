@@ -1,4 +1,8 @@
+use file module to create localtime link
+tie python-docker to geerlingguy.docker
+gitconfig
 cryptsetup
+endlessh for ubuntu
 smartd.conf lineinfile
 nullmailer-remotes lineinfile
 nvidia drivers

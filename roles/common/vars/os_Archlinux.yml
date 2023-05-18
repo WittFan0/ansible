@@ -13,6 +13,7 @@ distro_packages:
     - python-setuptools
     - python-requests
     - python-virtualenv
+    - python-docker
     - lib32-zlib  # needed by Brother printer driver
     - cronie
 

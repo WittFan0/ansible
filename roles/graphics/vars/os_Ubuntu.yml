@@ -1,6 +1,9 @@
-exiftran_package: exiftran
-
-rsvg-convert_package: librsvg2-bin
-
-exiftool_package: libimage-exiftool-perl
-
+graphics_packages: 
+  - geeqie
+  - gawk
+  - gphoto2
+  - imagemagick
+  - simple-scan
+  - exiftran
+  - librsvg2-bin
+  - libimage-exiftool-perl

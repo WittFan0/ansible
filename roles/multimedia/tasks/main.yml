@@ -1,12 +1,11 @@
 ---
-- name: Install easytag
+- name: Set OS distribution dependent variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install multimedia tools and players 
   become: true
   ansible.builtin.package:
-    name: 
-      - easytag
-      - pragha
-      - handbrake
-      - "{{ handbrake_deps_packages }}"
+    name: "{{ mm_packages }}"
     state: present
   tags:
     - packages
@@ -21,17 +20,17 @@
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
-- name: Install abcde (AUR)
-  kewlfft.aur.aur:
-    name: 
-      - abcde
-    state: present
-  tags:
-    - aur
-    - packages
-  become: true
-  become_user: "{{ aur.builder }}"
-  when: ansible_facts['distribution'] == "Archlinux"
+# - name: Install abcde (AUR)  # <-- cant install key for cd-discid dependency
+#   kewlfft.aur.aur:
+#     name: 
+#       - abcde
+#     state: present
+#   tags:
+#     - aur
+#     - packages
+#   become: true
+#   become_user: "{{ aur.builder }}"
+#   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Add ABCDE config
   ansible.builtin.copy:

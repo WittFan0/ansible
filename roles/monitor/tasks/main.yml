@@ -77,9 +77,7 @@
 
 - name: Install sensors
   ansible.builtin.package:
-    name: 
-      - "{{ sensors_package }}"
-      - i2c-tools
+    name: "{{ sensors_package }}"
     state: present
     update_cache: true
   tags:

@@ -7,6 +7,17 @@
       group_by:
         key: os_{{ ansible_facts['distribution'] }}
 
+    - name: Don't try to download db sigs
+      ansible.builtin.lineinfile:
+        path: /etc/pacman.conf
+        regexp: '^SigLevel'
+        line: SigLevel = Required DatabaseNever
+        insertafter: '^\[options\]'
+        backup: true
+      tags:
+        - packages
+      when: ansible_facts['distribution'] == "Archlinux"
+
   roles:
     - common
     - geerlingguy.ntp
@@ -44,6 +55,20 @@
   become: true
   roles:
     - vmhost
+
+- hosts: all
+  become: true
+  tasks:
+    - name: Go back to downloading db sigs
+      ansible.builtin.lineinfile:
+        path: /etc/pacman.conf
+        regexp: '^SigLevel'
+        line: SigLevel = Required DatabaseNever
+        insertafter: '^\[options\]'
+        backup: true
+      tags:
+        - packages
+      when: ansible_facts['distribution'] == "Archlinux"
 
 - hosts: all
   become: true

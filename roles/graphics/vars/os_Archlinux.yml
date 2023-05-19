@@ -1,6 +1,9 @@
-exiftran_package: fbida
-
-rsvg-convert_package: librsvg
-
-exiftool_package: perl-image-exiftool
-
+graphics_packages: 
+  - geeqie
+  - gawk
+  - gphoto2
+  - imagemagick
+  - simple-scan
+  - fbida
+  - librsvg
+  - perl-image-exiftool

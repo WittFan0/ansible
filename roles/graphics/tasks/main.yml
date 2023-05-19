@@ -4,15 +4,7 @@
 
 - name: Install graphics packages
   ansible.builtin.package:
-    name: 
-      - geeqie
-      - "{{ exiftran_package }}"
-      - gawk
-      - gphoto2
-      - imagemagick
-      - "{{ rsvg-convert_package }}"
-      - "{{ exiftool_package }}"
-      - simple-scan
+    name: "{{ graphics_packages }}"
     state: present
   tags:
     - packages

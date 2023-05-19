@@ -1,3 +1,7 @@
-libvirt_QEMU_packages:
+virtualization_packages:
+  - dmidecode
+  - gettext
+  - virt-manager
+  - vagrant
   - qemu-desktop
 

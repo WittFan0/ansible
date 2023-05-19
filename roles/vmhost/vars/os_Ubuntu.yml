@@ -1,4 +1,13 @@
-libvirt_QEMU_packages:
+virtualization_packages:
+  - dmidecode
+  - gettext
+  - virt-manager
+  - vagrant
   - qemu-kvm
   - libvirt-daemon-system
+  - vagrant-libvirt
+  - libvirt-daemon-system
+  - gir1.2-ayatanaappindicator3-0.1
+  - gir1.2-spiceclientglib-2.0
+  - gir1.2-spiceclientgtk-3.0
 

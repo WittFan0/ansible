@@ -1,1 +1,5 @@
-base_dev_packages: base-devel
+base_dev_packages: 
+  - base-devel
+  - git
+  - giggle
+  - meld

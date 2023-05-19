@@ -5,11 +5,7 @@
 - name: Install development packages
   become: true
   ansible.builtin.package:
-    name: 
-      - "{{ base_dev_packages }}"
-      - git
-      - giggle
-      - meld
+    name: "{{ base_dev_packages }}"
     state: present
   tags:
     - packages

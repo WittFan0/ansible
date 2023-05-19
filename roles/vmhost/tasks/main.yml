@@ -1,34 +1,14 @@
 ---
-# - name: Set OS distribution dependent variables
-#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+- name: Set OS distribution dependent variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
-- name: Install packages
+- name: Install virtualization packages
   ansible.builtin.package:
-    name: 
-      - "{{ libvirt_QEMU_packages }}"
-      - dmidecode
-      - gettext
-      - virt-manager
-      - vagrant
+    name: "{{ virtualization_packages }}"
     state: present
   tags:
     - packages
     - vmhost
-
-- name: Install package (apt)
-  become: true
-  ansible.builtin.apt:
-    name: 
-      - vagrant-libvirt
-      - libvirt-daemon-system
-      - gir1.2-ayatanaappindicator3-0.1
-      - gir1.2-spiceclientglib-2.0
-      - gir1.2-spiceclientgtk-3.0
-    state: present
-  tags:
-    - packages
-    - vmhost
-  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 # The libvirt group is optional. It is not needed if the user is a member of the wheel group (arch) or sudo group (ubuntu)
 - name: Create libvirt group

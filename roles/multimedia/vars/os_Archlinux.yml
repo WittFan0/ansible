@@ -1,4 +1,7 @@
-handbrake_deps_packages: 
+mm_packages: 
+  - easytag
+  - pragha
+  - handbrake
   - libdvdcss
   - gst-libav
   - intel-media-sdk

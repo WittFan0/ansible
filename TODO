@@ -7,7 +7,6 @@ smartd.conf lineinfile
 nullmailer-remotes lineinfile
 nvidia drivers
 make local arch mirror a variable
-download myscripts from git
 add directories to $PATH for user
 install printer driver (move lib32-zlib from distro packages)
 docker directory structure?

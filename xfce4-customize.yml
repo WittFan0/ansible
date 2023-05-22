@@ -3,7 +3,7 @@
 # ansible-pull --vault-password-file ~/.vault_pass.txt -U http://github.com/WittFan0/ansible.git xfce4-customize.yml
 
 - hosts: archvm
-  connection: local
+  # connection: local
   become: true
   become_user: "{{ remote_user.name }}"
   environment:

@@ -74,8 +74,44 @@
     group: "{{ remote_user.group }}"
     backup: yes
 
-- name: Copy/Download user setup script
-  ansible.builtin.get_url:
-    url: https://github.com/WittFan0/myscripts/raw/main/user-setup.sh
-    dest: /usr/local/sbin/user-setup.sh
+- name: Create ansible project directory if it does not exist
+  ansible.builtin.file:
+    path: /home/{{ remote_user.name }}/Projects/ansible
+    state: directory
     mode: '0755'
+
+- name: Checkout ansible project from github
+  ansible.builtin.git:
+    repo: https://github.com/WittFan0/ansible.git
+    dest: /home/{{ remote_user.name }}/Projects/ansible
+
+- name: Create myscripts project directory if it does not exist
+  ansible.builtin.file:
+    path: /home/{{ remote_user.name }}/Projects/myscripts
+    state: directory
+    mode: '0755'
+
+- name: Checkout myscripts from github
+  ansible.builtin.git:
+    repo: https://github.com/WittFan0/myscripts.git
+    dest: /home/{{ remote_user.name }}/Projects/myscripts
+
+# - name: Read-write git checkout of ansible project from github
+#   ansible.builtin.git:
+#     repo: git@github.com:WittFan0/ansible.git
+#     dest: /home/{{ remote_user.name }}/Projects
+#     key_file: 
+
+# - name: Read-write git checkout of myscripts from github
+#   ansible.builtin.git:
+#     repo: git@github.com:WittFan0/myscripts.git
+#     dest: /home/{{ remote_user.name }}/Projects
+#     key_file: 
+
+- name: Make {{ remote_user.name }} the owner of the project directory
+  ansible.builtin.file:
+    path: /home/{{ remote_user.name }}/Projects
+    state: directory
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    recurse: true

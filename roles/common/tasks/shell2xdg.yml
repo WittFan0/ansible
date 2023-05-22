@@ -25,13 +25,40 @@
     removes: /etc/skel/.{{ remote_user.shell }}rc
   become: yes
 
-- name: Create XDG-compliant BASH profile
+- name: Create XDG-compliant BASH login shell
   ansible.builtin.copy:
     src: bash_xdg
     dest: /etc/profile.d/bash_xdg.sh
     backup: false
     mode: '0644'
   notify: 
+
+- name: Create XDG-compliant BASH login shell
+  ansible.builtin.copy:
+    src: bash_xdg
+    dest: /etc/skel/.{{ remote_user.shell }}rc
+    backup: false
+    mode: '0644'
+  notify: 
+
+# - name: Create XDG-compliant BASH login shell
+#   ansible.builtin.blockinfile:
+#     path: /etc/skel/.{{ remote_user.shell }}rc
+#     block: | 
+#       _confdir=${XDG_CONFIG_HOME:-$HOME/.config}/bash
+#       _datadir=${XDG_DATA_HOME:-$HOME/.local/share}/bash
+
+#       [[ -r "$_confdir/bashrc" ]] && . "$_confdir/bashrc"
+#       [[ -r "$_confdir/aliases" ]] && . "$_confdir/aliases"
+
+#       [[ ! -d "$_datadir" ]] && mkdir -p "$_datadir"
+#       HISTFILE=$_datadir/history
+
+#       unset _confdir
+#       unset _datadir
+#     insertafter: 'EOF'
+#     mode: '0644'
+#     backup: true
 
 - name: Set global environment variables
   ansible.builtin.blockinfile:

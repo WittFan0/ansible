@@ -27,21 +27,21 @@
 
 - name: Create XDG-compliant BASH login shell
   ansible.builtin.copy:
-    src: bash_xdg
+    src: bashprofile_xdg
     dest: /etc/profile.d/bash_xdg.sh
     backup: false
     mode: '0644'
   notify: 
 
-- name: Create XDG-compliant BASH login shell
+- name: Create XDG-compliant BASH interactive shell
   ansible.builtin.copy:
-    src: bash_xdg
+    src: bashrc_xdg
     dest: /etc/skel/.{{ remote_user.shell }}rc
     backup: false
     mode: '0644'
   notify: 
 
-# - name: Create XDG-compliant BASH login shell
+# - name: Create XDG-compliant BASH interactive shell
 #   ansible.builtin.blockinfile:
 #     path: /etc/skel/.{{ remote_user.shell }}rc
 #     block: | 

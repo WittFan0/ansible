@@ -8,24 +8,27 @@ all:
     collab_server:
       hosts:
         taichiX:
-        archvm:
+        # archvm:
         mythboxtest:
     media_server:
       hosts:
         taichiX:
-        archvm:
+        # archvm:
         mythboxtest:
     router:
       hosts:
         taichiX:
-        archvm:
+        # archvm:
         mythboxtest:
     workstation:
       hosts:
         taichiX:
         archvm:
+    gaming:
+      hosts:
+        archvm:
     vmhost:
       hosts:
         taichiX:
-        archvm:
+        # archvm:
         mythboxtest:

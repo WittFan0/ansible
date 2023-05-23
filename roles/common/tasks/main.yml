@@ -177,6 +177,11 @@
   tags:
     - packages
 
+- name: Unconditionally reboot the machine with all defaults
+  ansible.builtin.reboot:
+  tags:
+    - packages
+
 - name: Quiet pam_systemd_home.so warnings
   ansible.builtin.copy:
     src: system-auth

@@ -1,4 +1,4 @@
-pacman_mirror: http://192.168.40.199:8000/
+pacman_mirror: http://192.168.40.5:8000/
 
 distro_packages:
     - base
@@ -14,6 +14,7 @@ distro_packages:
     - python-requests
     - python-virtualenv
     - python-docker
+    - go  # fails when installed as a dependecy during yay build
     - lib32-zlib  # needed by Brother printer driver
     - cronie
 

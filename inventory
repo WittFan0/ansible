@@ -24,6 +24,11 @@ all:
       hosts:
         taichiX:
         archvm:
+    development:
+      hosts:
+        taichiX:
+        archvm:
+        mythboxtest:
     gaming:
       hosts:
         archvm:

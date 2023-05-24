@@ -50,6 +50,11 @@
     - development
     - graphics
 
+- hosts: development
+  become: true
+  roles:
+    - development
+
 - hosts: gaming
   become: true
   roles:

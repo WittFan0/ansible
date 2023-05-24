@@ -43,9 +43,9 @@
 - name: Create APT keyrings dir
   become: true
   ansible.builtin.file:
-    path: '/etc/apt/keyrings'
+    path: '/etc/apt/trusted.gpg.d/'
     state: directory
-    mode: 'u=rwx,go=rx'
+    mode: '0755'
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
@@ -54,8 +54,8 @@
   become: true
   ansible.builtin.get_url:
     url: '{{ visual_studio_code_mirror }}/keys/microsoft.asc'
-    dest: '/etc/apt/keyrings/'
-    mode: 'u=rw,go=r'
+    dest: '/etc/apt/trusted.gpg.d/'
+    mode: '0644'
     force: yes
   tags:
     - packages

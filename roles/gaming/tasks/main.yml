@@ -1,6 +1,6 @@
 ---
-# - name: Set OS distribution dependent variables
-#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+- name: Set OS distribution dependent variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install packages
   ansible.builtin.package:
@@ -15,6 +15,17 @@
       - timidity++
       - freepats-general-midi
       - soundfont-fluid
+      - lutris
+      - gamemode
+      - gvfs
+      - innoextract
+      - lib32-gamemode
+      - lib32-vkd3d
+      - lib32-vulkan-icd-loader
+      - vkd3d
+      - vulkan-icd-loader
+      - wine
+      - xorg-xgamma
     state: present
   tags:
     - packages
@@ -22,7 +33,8 @@
 - name: Install AUR pacakges
   kewlfft.aur.aur:
     name: 
-      - dosbox-staging
+      - dosbox-staging  # <-- Requires qt6. Is is worth it?
+      - heroic-games-launcher-bin
     state: present
   tags:
     - aur

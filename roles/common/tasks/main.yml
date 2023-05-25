@@ -46,6 +46,7 @@
       192.168.40.2  office.q.qw  office
       192.168.40.4  mythbox.q.qw  mythbox
       192.168.40.5  taichi.q.qw  taichi
+      192.168.40.199  dan.q.qw  dan
     insertafter: 'EOF'
     mode: '0644'
     backup: true
@@ -103,6 +104,15 @@
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
+- name: Get packages from proxy server
+  ansible.builtin.copy:
+    content: Server = http://arch.mirror.constant.com/$repo/os/$arch
+    dest: /etc/pacman.d/mirrorlist
+    backup: yes
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux"
+
 - name: Install reflector
   community.general.pacman:
     update_cache: true
@@ -112,34 +122,34 @@
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: Find fastest Ubuntu mirror
-  ansible.builtin.shell: curl -s http://mirrors.ubuntu.com/mirrors.txt | xargs -I {} sh -c 'echo $(curl -r 0-1024000 -s -w %{speed_download} -o /dev/null {}/ls-lR.gz) {}' | sort -g -r | head -1 | awk '{ print $2  }'
-  register: fastest_mirror
-  ignore_errors: true
-  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+# - name: Find fastest Ubuntu mirror
+#   ansible.builtin.shell: curl -s http://mirrors.ubuntu.com/mirrors.txt | xargs -I {} sh -c 'echo $(curl -r 0-1024000 -s -w %{speed_download} -o /dev/null {}/ls-lR.gz) {}' | sort -g -r | head -1 | awk '{ print $2  }'
+#   register: fastest_mirror
+#   ignore_errors: true
+#   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+# - name: Switch to fastest Ubuntu mirror
+#   ansible.builtin.replace:
+#     path: /etc/apt/sources.list
+#     regexp: deb http://us.archive.ubuntu.com/ubuntu
+#     replace: deb {{ fastest_mirror }}
+#     backup: true
+#   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 # - name: Update mirror list (Arch)
 #   ansible.builtin.command: reflector --country US,Canada --completion-percent 90 --sort rate --latest 20 --protocol https --save /etc/pacman.d/mirrorlist
 #   become: true
 #   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: Enable local package mirror
-  ansible.builtin.lineinfile:
-    path: /etc/pacman.d/mirrorlist
-    line: Server = {{ pacman_mirror }}
-    insertbefore: 'BOF'
-    backup: true
-  tags:
-    - packages
-  when: pacman_mirror is defined and ansible_facts['distribution'] == "Archlinux"
-
-- name: Switch to fastest Ubuntu mirror
-  ansible.builtin.replace:
-    path: /etc/apt/sources.list
-    regexp: deb http://us.archive.ubuntu.com/ubuntu
-    replace: deb {{ fastest_mirror }}
-    backup: true
-  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+# - name: Enable local package mirror
+#   ansible.builtin.lineinfile:
+#     path: /etc/pacman.d/mirrorlist
+#     line: Server = {{ pacman_mirror }}
+#     insertbefore: 'BOF'
+#     backup: true
+#   tags:
+#     - packages
+#   when: pacman_mirror is defined and ansible_facts['distribution'] == "Archlinux"
 
 - name: Update package cache and upgrade (Arch)
   community.general.pacman:

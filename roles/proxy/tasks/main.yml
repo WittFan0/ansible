@@ -1,0 +1,145 @@
+---
+# - name: Set OS distribution dependent variables
+#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install proxy
+  become: true
+  ansible.builtin.package:
+    name: 
+      - squid 
+    state: present
+  tags:
+    - packages
+
+- name: Create proxy cache directory if it does not exist
+  become: true
+  ansible.builtin.file:
+    path: /var/cache/squid
+    owner: proxy
+    group: proxy
+    mode: '0750'
+    state: directory
+
+- name: Create file
+  become: true
+  ansible.builtin.copy:
+    content: |
+      http_access allow all
+      maximum_object_size 256 MB
+      cache_dir aufs /var/cache/squid 10000 16 256
+
+      # refresh pattern for pacman
+      # refresh_pattern \.pkg\.tar\.   0       20%     4320      reload-into-ims
+
+      # refresh pattern for debs and udebs
+      # refresh_pattern deb$   129600 100% 129600
+      # refresh_pattern udeb$   129600 100% 129600
+      # refresh_pattern tar.gz$  129600 100% 129600
+
+      # handle meta-release and changelogs.ubuntu.com special
+      # refresh_pattern changelogs.ubuntu.com/*  0  1% 1
+
+      # refresh_pattern .              0       0%      0
+    dest: /etc/squid/conf.d/50-packagecache.conf
+    # validate: /usr/sbin/squid -k parse
+    backup: false
+  notify: reload_proxy
+
+# - name: Set max file size
+#   ansible.builtin.lineinfile:
+#     dest: /etc/squid/squid.conf
+#     regexp: "^maximum_object_size"
+#     line: maximum_object_size 256 MB
+#     backup: true
+
+# - name: Cache files to disk
+#   ansible.builtin.lineinfile:
+#     dest: /etc/squid/squid.conf
+#     regexp: "^cache_dir"
+#     line: cache_dir aufs /var/cache/squid 10000 16 256
+#     backup: false
+
+- name: Enable and start proxy service
+  become: true
+  service:
+    name: squid.service
+    enabled: yes
+    state: started
+
+- name: Open proxy port
+  become: true
+  community.general.ufw:
+    rule: allow
+    from_ip: "{{ lan.subnet }}"
+    to_ip: "{{ lan0.ip }}"
+    to_port: '3128'
+    comment: proxy
+    state: enabled
+
+
+
+# - name: Install packages
+#   become: true
+#   ansible.builtin.package:
+#     name: 
+#       - package 
+#     state: present
+#   tags:
+#     - packages
+
+# - name: Install package (apt)
+#   become: true
+#   ansible.builtin.apt:
+#     name: 
+#       - 
+#     state: present
+#   tags:
+#     - packages
+#   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+# - name: Install package (pacman)
+#   become: true
+#   community.general.pacman:
+#     name: 
+#       -  
+#     state: present
+#   tags:
+#     - packages
+#   when: ansible_facts['distribution'] == "Archlinux"
+
+# - name: Install AUR pacakges
+#   kewlfft.aur.aur:
+#     name: 
+#       - 
+#     state: present
+#   tags:
+#     - aur
+#     - packages
+#   become: true
+#   become_user: "{{ aur.builder }}"
+#   when: ansible_facts['distribution'] == "Archlinux"
+
+# - name: Configure 
+#   ansible.builtin.template:
+#     src: 
+#     dest: /
+#     backup: true
+#   notify: 
+
+# - name: Create file
+#   ansible.builtin.copy:
+#     src: 
+#     dest: /
+#     owner: "{{ remote_user.name }}"
+#     group: "{{ remote_user.group }}"
+#     backup: true
+#   notify: 
+
+# - name: Enable and start service
+#   service:
+#     name: .service
+#     enabled: yes
+#     state: started
+
+# - include_tasks: .yml
+#   when: ansible_facts['distribution'] == "DistroName"

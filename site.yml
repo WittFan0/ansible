@@ -2,6 +2,11 @@
 - hosts: all
   become: true
 
+  environment:
+    http_proxy: http://dan:3128
+    https_proxy: http://dan:3128
+    ftp_proxy: http://dan:3128
+
   pre_tasks:
     - name: Classify hosts depending on their OS distribution
       group_by:
@@ -28,6 +33,11 @@
   become: true
   roles:
     - dnsmasq
+
+- hosts: proxy
+  become: true
+  roles:
+    - proxy
 
 - hosts: media_server
   become: true

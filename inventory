@@ -32,6 +32,9 @@ all:
     gaming:
       hosts:
         archvm:
+    proxy:
+      hosts:
+        dan:
     vmhost:
       hosts:
         taichiX:

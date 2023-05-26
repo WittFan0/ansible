@@ -1,10 +1,5 @@
 all:
   children:
-    hardened:
-      hosts:
-        taichiX:
-        archvm:
-        mythboxtest:
     collab_server:
       hosts:
         taichiX:
@@ -23,15 +18,18 @@ all:
     workstation:
       hosts:
         taichiX:
-        archvm:
+        # archvm:
     development:
       hosts:
         taichiX:
-        archvm:
+        # archvm:
         mythboxtest:
-    gaming:
+    btrfs:
       hosts:
         archvm:
+    gaming:
+      hosts:
+        # archvm:
     proxy:
       hosts:
         dan:

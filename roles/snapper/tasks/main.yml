@@ -1,0 +1,136 @@
+---
+- name: Set OS distribution dependent variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install btrfs filesystem utilities
+  become: true
+  ansible.builtin.package:
+    name: 
+      - btrfs-progs 
+    state: present
+  tags:
+    - packages
+
+- name: Install snapper pacakges (AUR)
+  kewlfft.aur.aur:
+    name: 
+      - snapper-support
+    state: present
+  tags:
+    - aur
+    - packages
+  become: true
+  become_user: "{{ aur.builder }}"
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Unmount existing {{ root_snapshot_path }} volume 
+  become: true
+  ansible.builtin.command: /usr/bin/umount "{{ root_snapshot_path }}"
+  args:
+    removes: "{{ root_snapshot_path }}"
+
+- name: Remove existing {{ root_snapshot_path }} directory 
+  become: true
+  ansible.builtin.file:
+    path: "{{ root_snapshot_path }}"
+    state: absent
+
+- name: Recreate root configuration for Snapper 
+  become: true
+  ansible.builtin.command: /usr/bin/snapper -c root create-config /
+
+- name: Remove {{ root_snapshot_path }} volume created by snapper install
+  become: true
+  ansible.builtin.command: /usr/bin/btrfs subvolume delete "{{ root_snapshot_path }}"
+  args:
+    removes: "{{ root_snapshot_path }}"
+
+- name: Ensure {{ snapper_group }} group exists
+  become: true
+  ansible.builtin.group:
+    name: "{{ snapper_group }}"
+    state: present
+
+- name: Create new {{ root_snapshot_path }} directory accessible by {{ snapper_group }}
+  become: true
+  ansible.builtin.file:
+    path: "{{ root_snapshot_path }}"
+    state: directory
+    recurse: true
+    group: "{{ snapper_group }}"
+
+- name: Mount {{ root_snapshot_path }} btrfs subvolume
+  become: true
+  ansible.builtin.command: /usr/bin/mount "{{ root_snapshot_path }}"
+
+- name: Change default btrfs subvolume to @ 
+  become: true
+  ansible.builtin.command: /usr/bin/btrfs subvolume set-def 256 /
+
+- name: Allow {{ snapper_group }} group to work with snapper config
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/snapper/configs/root
+    regexp: '^ALLOW_GROUPS='
+    line: ALLOW_GROUPS="{{ snapper_group }}"
+    backup: true
+  notify: restart_snapper
+
+- name: Do not create hourly snapshots
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/snapper/configs/root
+    regexp: '^TIMELINE_CREATE='
+    line: TIMELINE_CREATE="no"
+  notify: restart_snapper
+
+- name: Set limits for hourly timeline cleanup
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/snapper/configs/root
+    regexp: '^TIMELINE_LIMIT_HOURLY='
+    line: TIMELINE_LIMIT_HOURLY="5"
+  notify: restart_snapper
+
+- name: Set limits for daily timeline cleanup
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/snapper/configs/root
+    regexp: '^TIMELINE_LIMIT_DAILY='
+    line: TIMELINE_LIMIT_DAILY="5"
+  notify: restart_snapper
+
+- name: Set limits for monthly timeline cleanup
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/snapper/configs/root
+    regexp: '^TIMELINE_LIMIT_MONTHLY='
+    line: TIMELINE_LIMIT_MONTHLY="0"
+  notify: restart_snapper
+
+- name: Set limits for yearly timeline cleanup
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/snapper/configs/root
+    regexp: '^TIMELINE_LIMIT_YEARLY='
+    line: TIMELINE_LIMIT_YEARLY="0"
+  notify: restart_snapper
+
+- name: Enable and start snapper service
+  become: true
+  service:
+    name: snapperd.service
+    enabled: yes
+    state: started
+
+- name: Enable and start grub-btrfs-snapper service
+  become: true
+  service:
+    name: grub-btrfs-snapper.service
+    enabled: yes
+    state: started
+
+- name: Create initial root snapshot 
+  become: false
+  ansible.builtin.command: /usr/bin/snapper -c root create -d "*** Snapper Installed ***"
+

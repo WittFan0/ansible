@@ -1,0 +1,13 @@
+---
+- name: restart_grub-btrfs-snapper
+  service:
+    name: grub-btrfs-snapper.service
+    state: restarted
+
+- name: restart_snapper
+  service:
+    name: snapperd.service
+    state: restarted
+
+- name: reload_systemd_config
+  command: systemctl daemon-reload

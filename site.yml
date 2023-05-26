@@ -89,7 +89,12 @@
         - packages
       when: ansible_facts['distribution'] == "Archlinux"
 
-- hosts: all
+- hosts: btrfs
   become: true
   roles:
-    - sshd-keyonly  # <-- Must come last because it disables root ssh
+    - snapper
+
+# - hosts: all
+#   become: true
+#   roles:
+#     - sshd-keyonly  # <-- Must come last because it disables root ssh

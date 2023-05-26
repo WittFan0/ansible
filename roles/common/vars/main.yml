@@ -31,4 +31,5 @@ base_packages:
     - exfat-utils
     - rsync
     - rclone
+    - which
 

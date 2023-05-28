@@ -21,6 +21,7 @@
         key: os_{{ ansible_facts['distribution'] }}
 
   roles:
+    - update
     - common
     # - geerlingguy.ntp
     # - monitor
@@ -30,8 +31,7 @@
     # - mediasrv
     # - geerlingguy.docker
     # - collab
-    # - sound
-    # - xfce4
+    # - desktopenv
     # - multimedia
     # - development
     # - graphics

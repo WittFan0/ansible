@@ -35,9 +35,11 @@
     path: "{{ root_snapshot_path }}"
     state: absent
 
-- name: Recreate root configuration for Snapper 
+- name: Create root configuration for Snapper 
   become: true
   ansible.builtin.command: /usr/bin/snapper -c root create-config /
+  args:
+    creates: /etc/snapper/configs/root
 
 - name: Remove {{ root_snapshot_path }} volume created by snapper install
   become: true

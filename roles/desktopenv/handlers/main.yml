@@ -4,3 +4,8 @@
     name: lightdm.service
     state: restarted
 
+- name: restart_sddm
+  service:
+    name: sddm.service
+    state: restarted
+

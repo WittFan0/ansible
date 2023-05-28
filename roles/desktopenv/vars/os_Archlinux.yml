@@ -1,0 +1,92 @@
+xfce_packages: 
+  - xfce4
+  - thunar
+  - gvfs-google
+  - gvfs-nfs
+  - gvfs-smb
+  - mousepad
+  - parole
+  - gst-libav
+  - ristretto
+  - firefox
+  - catfish
+  - thunar-archive-plugin
+  - thunar-media-tags-plugin
+  - xfce4-artwork
+  - xfce4-clipman-plugin
+  - xfce4-cpufreq-plugin
+  - xfce4-cpugraph-plugin
+  - xfce4-diskperf-plugin
+  - xfce4-fsguard-plugin
+  - xfce4-genmon-plugin
+  - xfce4-mount-plugin
+  - xfce4-mpc-plugin
+  - xfce4-netload-plugin
+  - xfce4-notes-plugin
+  - xfce4-notifyd
+  - xfce4-pulseaudio-plugin
+  - xfce4-screensaver
+  - xfce4-screenshooter
+  - xfce4-sensors-plugin
+  - xfce4-smartbookmark-plugin
+  - xfce4-systemload-plugin
+  - xfce4-taskmanager
+  - xfce4-timer-plugin
+  - xfce4-verve-plugin
+  - xfce4-weather-plugin
+  # GTK apps
+  - seahorse
+  - gparted
+  - vinagre
+  - gwakeonlan
+
+xfce_packages_aur:
+  - thunar-custom-actions
+  # - xfce4-sysinfo  # Doesn't build -- Key import error
+  # - xfce4-theme-switcher  # Doesn't start
+  # - cryptkeeper  # requires gtk2
+
+kde_packages: 
+  - phonon-qt5-vlc
+  - plasma-meta
+  - kde-system-meta
+  - sddm-kcm
+  - flatpak-kcm
+  - gwenview
+  - okular
+  - spectacle
+  - audiotube
+  - juk
+  - kmix
+  - plasmatube
+  - kdeconnect
+  - kdenetwork-filesharing
+  - kget
+  - kio-extras
+  - kio-gdrive
+  - kio-zeroconf
+  - krdc
+  - tokodon
+  - ark
+  - filelight
+  - kate
+  - kbackup
+  - kcalc
+  - kclock
+  - kdialog
+  - kfind
+  - kgpg
+  - kwalletmanager
+  - kweather
+  - print-manager
+  - skanpage
+  - sweeper
+  - kvantum-qt5
+  - kvantum-theme-materia
+  - dolphin-plugins
+
+kde_packages_aur:
+  - kde-servicemenus-rootactions
+  - dracula-kde-theme-git
+  - kvantum-theme-arc
+  - kvantum-theme-libadwaita-git

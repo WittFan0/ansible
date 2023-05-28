@@ -1,11 +1,12 @@
 ---
-- name: Set OS distribution dependent variables
-  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+# - name: Set OS distribution dependent variables
+#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install graphics packages
   ansible.builtin.package:
-    name: "{{ graphics_packages }}"
+    name: "{{ gtk_graphics_packages }}"
     state: present
   tags:
     - packages
+  when: desktop_environment != "kde"
 

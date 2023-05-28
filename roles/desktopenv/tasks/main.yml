@@ -1,0 +1,18 @@
+---
+- name: Install sound system
+  ansible.builtin.package:
+    name:
+      - wireplumber
+      - pipewire-pulse
+      - pavucontrol
+    state: present
+  environment: "{{proxy_env}}"
+
+- name: Install XFCE desktop environment
+  ansible.builtin.include_tasks: xfce.yml
+  when: desktop_environment == "xfce"
+
+- name: Install KDE desktop environment
+  ansible.builtin.include_tasks: kde.yml
+  when: desktop_environment == "kde"
+

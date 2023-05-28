@@ -10,3 +10,5 @@ wan:
     ifname: 
 
 ssh_port: 22   # changing this from 22 gets messy. For workaround see https://dmsimard.com/2016/03/15/changing-the-ssh-port-with-ansible/
+
+desktop_environment: kde

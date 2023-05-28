@@ -2,34 +2,3 @@ ssh_key_passphrase: "{{ vault_ssh_key_passphrase }}"
 
 local_timezone: America/New_York
 
-base_packages:
-    # - base-devel
-    # - man-pages
-    # - fwupd
-    # - dmidecode
-    - tmux
-    # - rsync
-    # - coreutils
-    # - moreutils
-    # - dateutils
-    - linux-firmware
-    - nano
-    - sudo
-    - xdg-user-dirs
-    - gparted
-    - btrfs-progs
-    - man-db
-    - ansible
-    - efibootmgr
-    - zip
-    - unzip
-    - p7zip
-    - unrar
-    - pigz
-    - dosfstools
-    - ntfs-3g
-    - exfat-utils
-    - rsync
-    - rclone
-    - which
-

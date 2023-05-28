@@ -1,23 +1,3 @@
-pacman_mirror: http://192.168.40.5:8000/
-
-distro_packages:
-    - base
-    - linux-zen
-    - linux-firmware
-    - openssh
-    - reflector
-    - grub
-    - gptfdisk
-    - archlinux-contrib
-    - pacman-contrib
-    - python-setuptools
-    - python-requests
-    - python-virtualenv
-    - python-docker
-    - go  # fails when installed as a dependecy during yay build
-    - lib32-zlib  # needed by Brother printer driver
-    - cronie
-
 os_groups: network,log,wheel,power,rfkill,storage,optical
 
 aur:

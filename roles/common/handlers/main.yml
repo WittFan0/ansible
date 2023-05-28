@@ -4,11 +4,6 @@
     name: cups.service
     state: restarted
 
-- name: restart_paccache
-  service:
-    name: paccache.timer
-    state: restarted
-
 - name: stop systemd per-user instance
   service:
     name: "user@{{ remote_user.uid }}"
@@ -21,3 +16,4 @@
 - name: reload_systemd_config
   command: systemctl daemon-reload
   become: true
+

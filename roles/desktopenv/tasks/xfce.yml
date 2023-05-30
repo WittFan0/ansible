@@ -8,6 +8,7 @@
     update_cache: true
   tags:
     - packages
+  environment: "{{proxy_env}}"
 
 - name: Install XFCE AUR pacakges
   kewlfft.aur.aur:
@@ -19,6 +20,7 @@
   become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
+  environment: "{{proxy_env}}"
 
 - name: Copy wallpaper
   ansible.builtin.copy:
@@ -35,14 +37,6 @@
   ansible.builtin.unarchive:
     src: EFDark-IconsCream.tar.gz
     dest: /usr/share/icons/
-
-- name: Install packages
-  ansible.builtin.package:
-    name: "{{ greeter_packages }}"
-    state: present
-    update_cache: true
-  tags:
-    - packages
 
 - name: Set greeter GTK theme
   ansible.builtin.lineinfile:
@@ -65,8 +59,3 @@
     regexp: "^background"
     line: "background = /usr/share/backgrounds/xfce/XFCE_83_No_Logo.png"
 
-- name: Enable display manager
-  service:
-    name: lightdm.service
-    enabled: yes
-    state: started

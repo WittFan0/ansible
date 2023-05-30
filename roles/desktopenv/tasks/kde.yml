@@ -20,9 +20,5 @@
   become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
+  environment: "{{proxy_env}}"
 
-- name: Enable display manager
-  service:
-    name: sddm.service
-    enabled: yes
-    state: started

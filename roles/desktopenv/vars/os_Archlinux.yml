@@ -1,4 +1,5 @@
 xfce_packages: 
+  - lightdm
   - xfce4
   - thunar
   - gvfs-google
@@ -48,9 +49,11 @@ xfce_packages_aur:
 
 kde_packages: 
   - phonon-qt5-vlc
+  - ttf-liberation
   - plasma-meta
   - kde-system-meta
   - sddm-kcm
+  - xdg-desktop-portal-kde
   - flatpak-kcm
   - gwenview
   - okular
@@ -84,9 +87,71 @@ kde_packages:
   - kvantum-qt5
   - kvantum-theme-materia
   - dolphin-plugins
+  - firefox
 
 kde_packages_aur:
   - kde-servicemenus-rootactions
   - dracula-kde-theme-git
   - kvantum-theme-arc
   - kvantum-theme-libadwaita-git
+
+gnome_packages:
+  - noto-fonts-emoji
+  - gnome
+  - dconf-editor
+  # - alacarte
+  - gnome-keyring
+  - seahorse-nautilus
+  - seahorse
+  - gwakeonlan
+  - file-roller
+  - gnome-connections
+  - gnome-dictionary
+  - gnome-icon-theme-extras
+  - gnome-notes
+  - gnome-terminal
+  - gnome-tweaks
+  - gnome-mahjongg
+  # - eog-plugins
+  - gvfs-goa
+  - gvfs-google
+  # - gnome-user-share
+  - gnome-backgrounds
+  - gnome-themes-extra
+  # - gnome-shell-extension-appindicator
+  # - gst-plugin-pipewire
+  - nautilus-image-converter
+  # - vinagre
+  - simple-scan
+  - fwupd
+  - system-config-printer
+  - firefox
+  - meld
+
+gnome_packages_aur:
+  # - gnome-shell-extension-sound-output-device-chooser
+  # - gnome-icon-theme  # <-- lots of perl
+  # - gnome-icon-theme-symbolic  # <-- lots of perl
+  # - gnome-shell-extension-freon
+  # - gnome-shell-extension-simple-system-monitor
+  # - gnome-shell-extension-arch-update
+  - nautilus-admin-gtk4
+  - nautilus-code
+  - nautilus-checksums
+  - nautilus-compare
+  # - nautilus-mediainfo # <-- broken
+  - nautilus-bluetooth
+  - nautilus-gnome-disks
+
+nvidia_video_packages: 
+  - nvidia-utils
+  - lib32-nvidia-utils
+
+intel_video_packages: 
+  - vulkan-intel
+  - lib32-vulkan-intel
+
+virtio_video_packages: 
+  - vulkan-virtio
+  - lib32-vulkan-virtio
+

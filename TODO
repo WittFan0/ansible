@@ -1,3 +1,4 @@
+smartcard
 smartd.conf lineinfile
 nullmailer-remotes lineinfile
 lance's makepkg.conf
@@ -9,7 +10,6 @@ nvidia drivers
 mount data directories
 share data directories
 media server | /etc/dnsmasq.d/10-plex.conf | max_user_watches | NFS | SMB
-snapper
 grub-btrfs for ubuntu
 LAN networking | 20-wired-lan.network
 WAN networking | NAT
@@ -28,4 +28,3 @@ docker directory structure?
 install netdata monitor?
 /etc/grub.d/42_isoboot?
 gitconfig?
-make local arch mirror a variable?

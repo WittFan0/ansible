@@ -46,7 +46,6 @@
   roles:
     - desktopenv
     # - multimedia
-    - development
     - graphics
 
 - hosts: development

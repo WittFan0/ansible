@@ -10,6 +10,7 @@
     state: present
   tags:
     - packages
+  environment: "{{proxy_env}}"
 
 - name: Install snapper pacakges (AUR)
   kewlfft.aur.aur:
@@ -22,6 +23,7 @@
   become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
+  environment: "{{proxy_env}}"
 
 - name: Unmount existing {{ root_snapshot_path }} volume 
   become: true

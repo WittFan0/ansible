@@ -9,6 +9,7 @@
     state: present
   tags:
     - packages
+  environment: "{{proxy_env}}"
 
 - name: Install code editor (Arch)
   become: true
@@ -20,6 +21,7 @@
   tags:
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
+  environment: "{{proxy_env}}"
 
 - name: Install VS Code dependencies (apt)
   become: true
@@ -39,6 +41,7 @@
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+  environment: "{{proxy_env}}"
 
 - name: Create APT keyrings dir
   become: true
@@ -60,6 +63,7 @@
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+  environment: "{{proxy_env}}"
 
 - name: Install VS Code repo (apt)
   become: true
@@ -79,4 +83,5 @@
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+  environment: "{{proxy_env}}"
 

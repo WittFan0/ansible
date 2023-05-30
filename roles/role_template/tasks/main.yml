@@ -10,6 +10,7 @@
 #     state: present
 #   tags:
 #     - packages
+#   environment: "{{proxy_env}}"
 
 # - name: Install package (apt)
 #   become: true
@@ -20,6 +21,7 @@
 #   tags:
 #     - packages
 #   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+#   environment: "{{proxy_env}}"
 
 # - name: Install package (pacman)
 #   become: true
@@ -30,6 +32,7 @@
 #   tags:
 #     - packages
 #   when: ansible_facts['distribution'] == "Archlinux"
+#   environment: "{{proxy_env}}"
 
 # - name: Install AUR pacakges
 #   kewlfft.aur.aur:

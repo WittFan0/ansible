@@ -9,6 +9,7 @@
   tags:
     - packages
     - vmhost
+  environment: "{{proxy_env}}"
 
 # The libvirt group is optional. It is not needed if the user is a member of the wheel group (arch) or sudo group (ubuntu)
 - name: Create libvirt group

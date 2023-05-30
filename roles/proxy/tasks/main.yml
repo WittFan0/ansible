@@ -10,6 +10,7 @@
     state: present
   tags:
     - packages
+  environment: "{{proxy_env}}"
 
 - name: Create proxy cache directory if it does not exist
   become: true

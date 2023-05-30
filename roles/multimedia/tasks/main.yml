@@ -19,6 +19,7 @@
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+  environment: "{{proxy_env}}"
 
 # - name: Install abcde (AUR)  # <-- cant install key for cd-discid dependency
 #   kewlfft.aur.aur:

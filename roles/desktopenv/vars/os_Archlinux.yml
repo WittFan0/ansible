@@ -35,6 +35,7 @@ xfce_packages:
   - xfce4-timer-plugin
   - xfce4-verve-plugin
   - xfce4-weather-plugin
+  - pavucontrol
   # GTK apps
   - seahorse
   - gparted
@@ -142,6 +143,21 @@ gnome_packages_aur:
   # - nautilus-mediainfo # <-- broken
   - nautilus-bluetooth
   - nautilus-gnome-disks
+
+sway_packages:
+  - ttf-liberation
+  - sway
+  - bemenu  # <-- Wayland-native alternative to dmenu
+  - dmenu  # <-- Application launcher used in default config
+  - foot  # <-- Terminal emulator used in the default configuration
+  - i3status  # <-- Status line generation
+  - mako  # <-- Lightweight notification daemon
+  - swaybg  # <-- Wallpaper tool for sway
+  - swayidle  # <-- Idle management daemon
+  - swaylock  # <-- Screen locker
+  - waybar  # <-- Highly customizable bar
+
+sway_packages_aur:
 
 nvidia_video_packages: 
   - nvidia-utils

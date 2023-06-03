@@ -7,7 +7,6 @@
     name:
       - wireplumber
       - pipewire-pulse
-      # - pavucontrol
       - pipewire-jack
       # - lib32-pipewire-jack
     state: present
@@ -24,6 +23,10 @@
 - name: Install Gnome desktop environment
   ansible.builtin.include_tasks: gnome.yml
   when: desktop_environment == "gnome"
+
+- name: Install Sway desktop environment
+  ansible.builtin.include_tasks: sway.yml
+  when: desktop_environment == "sway"
 
 - name: Install virtio video packages
   ansible.builtin.package:

@@ -111,10 +111,22 @@
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
+- name: Create package configuration directory
+  file: path=/home/{{ aur.builder }}/.config/pacman
+        state=directory
+        owner="{{ aur.builder }}"
+        group="wheel"
+  tags:
+    - aur
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux"
+
 - name: Configure software packaging
   ansible.builtin.template:
     src: makepkg_conf.j2
     dest: /home/{{ aur.builder }}/.config/pacman/makepkg.conf
+    owner: "{{ aur.builder }}"
+    group: wheel
     backup: true
 
 - name: Install yay

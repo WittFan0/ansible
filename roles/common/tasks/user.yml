@@ -1,4 +1,34 @@
 ---
+- name: Create packages skeleton directory for building software
+  ansible.builtin.file:
+    path: /etc/skel/build/packages
+    state: directory
+    mode: '0755'
+
+- name: Create sources skeleton directory for building software
+  ansible.builtin.file:
+    path: /etc/skel/build/sources
+    state: directory
+    mode: '0755'
+
+- name: Create srcpackages skeleton directory for building software
+  ansible.builtin.file:
+    path: /etc/skel/build/srcpackages
+    state: directory
+    mode: '0755'
+
+- name: Create makepkglogs skeleton directory for building software
+  ansible.builtin.file:
+    path: /etc/skel/build/makepkglogs
+    state: directory
+    mode: '0755'
+
+- name: Create makepkg skeleton directory for building software
+  ansible.builtin.file:
+    path: /etc/skel/build/makepkg
+    state: directory
+    mode: '0755'
+
 - name: Create user group
   ansible.builtin.group:
     name: "{{ remote_user.group }}"

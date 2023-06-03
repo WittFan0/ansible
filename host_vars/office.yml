@@ -3,7 +3,7 @@ hostname: archsrv
 # kernel_parameters: "quiet consoleblank=60"
 
 lan0:
-    ip: "{{ lan.base }}.5"
+    ip: "{{ lan.base }}.2"
     ifname: eno1
 
 wan:

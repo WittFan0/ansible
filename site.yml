@@ -2,22 +2,22 @@
 - hosts: all
   become: true
 
-  environment:
-    http_proxy: http://dan:3128
-    https_proxy: http://dan:3128
-    ftp_proxy: http://dan:3128
-
   pre_tasks:
     - name: Classify hosts depending on their OS distribution
       group_by:
         key: os_{{ ansible_facts['distribution'] }}
 
+- hosts: new_build
   roles:
     - update
     - common
     - geerlingguy.ntp
     - monitor
     - harden  # TODO: Limit to WAN interface
+  environment:
+    http_proxy: http://dan:3128
+    https_proxy: http://dan:3128
+    ftp_proxy: http://dan:3128
 
 - hosts: router
   become: true

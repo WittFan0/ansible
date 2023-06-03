@@ -1,40 +1,52 @@
 all:
   children:
+    new_build:
+      hosts:
+        office:
+        # taichi:
+        archvm:
+        mythboxtest:
     collab_server:
       hosts:
-        taichiX:
+        # taichi:
         # archvm:
         mythboxtest:
     media_server:
       hosts:
-        taichiX:
+        # taichi:
         # archvm:
         mythboxtest:
     router:
       hosts:
-        taichiX:
+        # taichi:
         # archvm:
         mythboxtest:
     workstation:
       hosts:
-        taichiX:
+        # office:
+        # taichi:
         # archvm:
     development:
       hosts:
-        taichiX:
+        # office:
+        # taichi:
         # archvm:
         mythboxtest:
     btrfs:
       hosts:
-        archvm:
+        # office:
+        # archvm:
     gaming:
       hosts:
+        # office:
         # archvm:
     proxy:
       hosts:
+        # archvm:
         dan:
     vmhost:
       hosts:
-        taichiX:
+        # office:
+        # taichi:
         # archvm:
         mythboxtest:

@@ -1,5 +1,7 @@
 base_dev_packages: 
   - base-devel
+  - pigz
+  - pbzip2
   - git
   - giggle
   - meld

@@ -1,17 +1,6 @@
 - name: Set OS distribution dependent variables
   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
-- name: Install compiling tools
-  ansible.builtin.package:
-    name:
-      - base-devel
-      - pigz
-      - pbzip2
-    state: present
-  tags:
-    - shell
-  when: ansible_facts['distribution'] == "Archlinux"
-
 - name: Push pacman cache cleanup service
   copy: src=paccache.service dest=/etc/systemd/system/paccache.service backup=true
   notify:
@@ -35,6 +24,15 @@
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
+- name: Install compiling tools
+  ansible.builtin.package:
+    name:
+      - base-devel
+      - pigz
+      - pbzip2
+    state: present
+  when: ansible_facts['distribution'] == "Archlinux"
+
 - name: Ensure wheel group exists
   ansible.builtin.group:
     name: wheel
@@ -43,36 +41,6 @@
     - aur
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
-
-- name: Create skeleton dirs for building software
-  ansible.builtin.file:
-    path: /etc/skel/build/packages
-    state: directory
-    mode: '0755'
-
-- name: Create skeleton dirs for building software
-  ansible.builtin.file:
-    path: /etc/skel/build/sources
-    state: directory
-    mode: '0755'
-
-- name: Create skeleton dirs for building software
-  ansible.builtin.file:
-    path: /etc/skel/build/srcpackages
-    state: directory
-    mode: '0755'
-
-- name: Create skeleton dirs for building software
-  ansible.builtin.file:
-    path: /etc/skel/build/makepkglogs
-    state: directory
-    mode: '0755'
-
-- name: Create skeleton dirs for building software
-  ansible.builtin.file:
-    path: /etc/skel/build/makepkg
-    state: directory
-    mode: '0755'
 
 - name: Create the `aur_builder` user
   become: yes
@@ -142,6 +110,12 @@
     - aur
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Configure software packaging
+  ansible.builtin.template:
+    src: makepkg_conf.j2
+    dest: /home/{{ aur.builder }}/.config/pacman/makepkg.conf
+    backup: true
 
 - name: Install yay
   kewlfft.aur.aur:

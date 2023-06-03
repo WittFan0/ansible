@@ -11,6 +11,41 @@
     - packages
   environment: "{{proxy_env}}"
 
+- name: Use all cores when compiling software
+  ansible.builtin.lineinfile:
+    dest: /etc/makepkg.conf
+    regexp: "^MAKEFLAGS="
+    line: MAKEFLAGS="-j$(nproc)"
+    backup: true
+
+- name: Use all cores when compressing packages (gzip)
+  ansible.builtin.lineinfile:
+    dest: /etc/makepkg.conf
+    regexp: "^COMPRESSGZ="
+    line: "COMPRESSGZ=(pigz -c -f -n)"
+    backup: true
+
+- name: Use all cores when compressing packages (bzip2)
+  ansible.builtin.lineinfile:
+    dest: /etc/makepkg.conf
+    regexp: "^COMPRESSBZ2="
+    line: "COMPRESSBZ2=(pbzip2 -c -f)"
+    backup: true
+
+- name: Use all cores when compressing packages (xz)
+  ansible.builtin.lineinfile:
+    dest: /etc/makepkg.conf
+    regexp: "^COMPRESSXZ="
+    line: "COMPRESSXZ=(xz -c -z --threads=0 -)"
+    backup: true
+
+- name: Use all cores when compressing packages (zstd)
+  ansible.builtin.lineinfile:
+    dest: /etc/makepkg.conf
+    regexp: "^COMPRESSZST="
+    line: "COMPRESSZST=(zstd -c -z -q --threads=0 -)"
+    backup: true
+
 - name: Install code editor (Arch)
   become: true
   ansible.builtin.package:

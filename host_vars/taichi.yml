@@ -4,7 +4,7 @@ hostname: taichi
 
 lan0:
     ip: "{{ lan.base }}.5"
-    ifname: enp0s4
+    ifname: eno1
 
 wan:
     ifname: 

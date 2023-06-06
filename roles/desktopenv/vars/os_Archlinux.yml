@@ -51,18 +51,94 @@ xfce_packages_aur:
 kde_packages: 
   - phonon-qt5-vlc
   - ttf-liberation
-  - plasma-meta
-  - kde-system-meta
+  - plasma-desktop
+  # - ibus  # <-- (optional) - kimpanel IBUS support
+  # - kaccounts-integration  # <-- (optional) - OpenDesktop integration plugin
+  - kscreen  # <-- (optional) - screen management
+  # - packagekit-qt5  # <-- (optional) - to install new krunner plugins
+  # - scim  # <-- (optional) - kimpanel SCIM support
+  - plasma-wayland-session
+  - bluedevil
+  - breeze-gtk
+  # - discover  # <-- Does not work well on Arch
+  - drkonqi
+  - kde-gtk-config
+  - accountsservice
+  - appstream-qt
+  # - kactivities-stats
+  # - kactivitymanagerd
+  # - kactivities
+  - kcmutils
+  - kdesu
+  - kparts 
+  - kholidays
+  - kio-extras
+  - kio-fuse
+  - knotifyconfig
+  # - kpeople
+  - kpipewire
+  # - kquickcharts
+  - ksystemstats
+  # - ktexteditor
+  # - kuserfeedback
+  # - kwin
+  - libqalculate
+  - milou
+  - oxygen-sounds
+  # - plasma-integration
+  # - prison
+  # - qt5-tools
+  # - xorg-xmessage
+  # - xorg-xrdb
+  # - xorg-xsetroot
+  - appmenu-gtk-module  # <-- (optional) - global menu support for GTK2 and some GTK3 applications
+  # - gpsd  # <-- (optional) - GPS based geolocation
+  # - kdepim-addons  # <-- (optional) - displaying PIM events in the calendar
+  # - networkmanager-qt  # <-- (optional) - IP based geolocation
+  # - plasma-workspace-wallpapers  # <-- (optional) - additional wallpapers
+  - kgamma5
+  - khotkeys
+  - kinfocenter
+  - kscreen
+  - ksshaskpass
+  - kwallet-pam
+  - kwrited
+  - oxygen
+  - oxygen-sounds
+  - plasma-browser-integration
+  - plasma-disks
+  - plasma-firewall
+  # - plasma-nm
+  - plasma-pa
+  - plasma-systemmonitor
+  - plasma-thunderbolt
+  - plasma-vault
+  # - plasma-welcome
+  # - plasma-workspace-wallpapers
   - sddm-kcm
   - xdg-desktop-portal-kde
+  - breeze-grub  # <-- (optional) - Breeze theme for GRUB
+  # - breeze-plymouth  # <-- (optional) - Breeze theme for Plymouth
+  # - plasma-sdk  # <-- (optional) - Development tools
+  - plymouth-kcm  # <-- (optional) - Configure Plymouth from systemsettings
+  - dolphin
+  # - kcron
+  - kde-inotify-survey
+  # - khelpcenter
+  - kio-admin
+  - kjournald
+  - ksystemlog
+  - partitionmanager
   - flatpak-kcm
+  - konsole
   - gwenview
   - okular
   - spectacle
-  - audiotube
+  # - audiotube  # <-- does not appear to work
   - juk
-  - kmix
-  - plasmatube
+  # - kmix  # <-- does not appear to work
+  # - plasmatube   # <-- works, but requires mpv
+  - kaffeine
   - kdeconnect
   - kdenetwork-filesharing
   - kget
@@ -104,6 +180,7 @@ gnome_packages:
   - gnome-keyring
   - seahorse-nautilus
   - seahorse
+  - gparted
   - gwakeonlan
   - file-roller
   - gnome-connections

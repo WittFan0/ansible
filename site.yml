@@ -45,7 +45,7 @@
   become: true
   roles:
     - desktopenv
-    # - multimedia
+    # - ripping
     - graphics
 
 - hosts: development

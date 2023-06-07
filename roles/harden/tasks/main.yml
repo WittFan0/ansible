@@ -4,13 +4,16 @@
       - ufw
       - sshguard
       - firejail
+      - pcsc-tools
     state: present
   tags:
     - packages
 
-- name: Install endlessh (AUR)
+- name: Install endlessh and smartcard (AUR)
   kewlfft.aur.aur:
-    name: endlessh-git
+    name: 
+      - endlessh-git
+      - coolkey
     state: present
     update_cache: "yes"
   tags:
@@ -19,6 +22,17 @@
   become: "yes"
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Unpack DoD root certificates into /opt
+  ansible.builtin.unarchive:
+    src: unclass-certificates_pkcs7_DoD.zip
+    dest: /opt/
+
+- name: Enable and start smartcard service
+  service: 
+    name: pcscd.service
+    enabled: yes
+    state: started
 
 - name: Configure UFW for sshguard (ipv4)
   ansible.builtin.blockinfile:

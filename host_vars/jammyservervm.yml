@@ -12,3 +12,5 @@ wan:
 ssh_port: 22   # changing this from 22 gets messy. For workaround see https://dmsimard.com/2016/03/15/changing-the-ssh-port-with-ansible/
 
 desktop_environment: none
+
+ntp_tinker_panic: true  # <-- Enable tinker panic, which is useful when running NTP in a VM.

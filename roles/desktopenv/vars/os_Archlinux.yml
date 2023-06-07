@@ -118,7 +118,7 @@ kde_packages:
   - sddm-kcm
   - xdg-desktop-portal-kde
   - breeze-grub  # <-- (optional) - Breeze theme for GRUB
-  # - breeze-plymouth  # <-- (optional) - Breeze theme for Plymouth
+  - breeze-plymouth  # <-- (optional) - Breeze theme for Plymouth
   # - plasma-sdk  # <-- (optional) - Development tools
   - plymouth-kcm  # <-- (optional) - Configure Plymouth from systemsettings
   - dolphin
@@ -126,7 +126,7 @@ kde_packages:
   - kde-inotify-survey
   # - khelpcenter
   - kio-admin
-  - kjournald
+  # - kjournald  # <-- Using Ksystemlog instead
   - ksystemlog
   - partitionmanager
   - flatpak-kcm
@@ -158,6 +158,7 @@ kde_packages:
   - kgpg
   - kwalletmanager
   - kweather
+  - kompare
   - print-manager
   - skanpage
   - sweeper
@@ -168,6 +169,7 @@ kde_packages:
 
 kde_packages_aur:
   - kde-servicemenus-rootactions
+  - kde-servicemenus-komparemenu
   - dracula-kde-theme-git
   - kvantum-theme-arc
   - kvantum-theme-libadwaita-git

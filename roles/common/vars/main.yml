@@ -1,4 +1,11 @@
 ssh_key_passphrase: "{{ vault_ssh_key_passphrase }}"
 
-local_timezone: America/New_York
+ntp_timezone: America/New_York
+
+ntp_restrict:
+  - "127.0.0.1"
+  - "::1"
+  - "{{ lan.subnet }}"
+
+ntp_cron_handler_enabled: true  # <-- restart the cron daemon after the timezone has changed.
 

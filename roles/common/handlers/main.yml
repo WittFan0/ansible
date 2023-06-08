@@ -17,3 +17,8 @@
   command: systemctl daemon-reload
   become: true
 
+- name: restart_resolved
+  service:
+    name: systemd-resolved.service
+    state: restarted
+

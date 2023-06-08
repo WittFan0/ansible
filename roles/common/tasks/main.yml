@@ -21,17 +21,22 @@
     regexp: '^LANG='
     line: LANG=en_US.UTF-8
 
-- name: Set timezone 
-  become: true
-  ansible.builtin.file:
-    src: /usr/share/zoneinfo/{{ local_timezone }}
-    dest: /etc/localtime
-    state: link
-    force: true
+# geerlingguy.ntp will overwrite timezone
+- name: Set timezone to {{ ntp_timezone }}
+  community.general.timezone:
+    name: "{{ ntp_timezone }}"
 
-- name: Set system clock 
-  ansible.builtin.command: hwclock --systohc --utc
-  become: true
+# - name: Set timezone 
+#   become: true
+#   ansible.builtin.file:
+#     src: /usr/share/zoneinfo/{{ ntp_timezone }}
+#     dest: /etc/localtime
+#     state: link
+#     force: true
+
+# - name: Set system clock 
+#   ansible.builtin.command: hwclock --systohc --utc
+#   become: true
 
 # - name: Set kernel parameters
 #   lineinfile:
@@ -58,6 +63,7 @@
     dest: /usr/local/sbin/
     mode: '0755'
 
+- include_tasks: discovery.yml
 - include_tasks: shell2xdg.yml
 - include_tasks: shell.yml
 - include_tasks: user.yml

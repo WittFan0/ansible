@@ -3,3 +3,8 @@
     name: dnsmasq.service
     state: restarted
 
+- name: restart_resolved
+  service:
+    name: systemd-resolved.service
+    state: restarted
+

@@ -1,3 +1,19 @@
+- name: Create resolved.conf directory if it does not exist
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+    mode: '0755'
+
+- name: Stop systemd-resolved DNS services
+  ansible.builtin.copy:
+    content: |
+      [Resolve]
+      DNSStubListener=no
+    dest: /etc/systemd/resolved.conf.d/99-dnsmasq.conf
+    mode: '0644'
+    backup: no
+  notify: restart_resolved
+
 - name: Install DNS, DHCP and TFTP servers
   ansible.builtin.package:
     name: dnsmasq
@@ -5,6 +21,13 @@
     update_cache: true
   tags:
     - packages
+
+- name: Provide systemd-resolved domain name resolution for software that reads /etc/resolv.conf directly 
+  ansible.builtin.file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
 
 - name: Create hosts file for DNS server
   ansible.builtin.template:
@@ -95,26 +118,6 @@
     mode: '0644'
     backup: no
   notify: restart_dnsmasq
-
-- name: Create resolved.conf directory if it does not exist
-  ansible.builtin.file:
-    path: /etc/systemd/resolved.conf.d
-    state: directory
-    mode: '0755'
-
-- name: Stop systemd-resolved from binding to port 53
-  ansible.builtin.copy:
-    content: |
-      [Resolve]
-      DNSStubListener=no
-    dest: /etc/systemd/resolved.conf.d/99-dnsmasq.conf
-    mode: '0644'
-    backup: no
-
-- name: Restart systemd-resolved
-  service:
-    name: systemd-resolved.service
-    state: restarted
 
 - name: Open nameserver port
   ansible.builtin.command: |

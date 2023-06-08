@@ -22,3 +22,23 @@
   when: ansible_facts['distribution'] == "Archlinux"
   environment: "{{proxy_env}}"
 
+- name: Create settings file for kdesu if it doesn't exist
+  ansible.builtin.file:
+    path: /home/{{ remote_user.name }}/.config/
+    state: directory
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    mode: '0755'
+    recurse: false
+
+- name: Have kdesu use sudo instead of su
+  ansible.builtin.copy:
+    content: |
+      [super-user-command]
+      super-user-command=sudo
+    dest: /home/{{ remote_user.name }}/.config/kdesurc
+    mode: '0644'
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    backup: true
+

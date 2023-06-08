@@ -1,0 +1,56 @@
+---
+- name: Create resolved.conf directory if it does not exist
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+    mode: '0755'
+
+- name: Stop systemd-resolved mDNS and Link-Local Multicast Name Resolution services
+  ansible.builtin.copy:
+    content: |
+      [Resolve]
+      MulticastDNS=no
+      LLMNR=no
+    dest: /etc/systemd/resolved.conf.d/98-avahi.conf
+    mode: '0644'
+    backup: no
+  notify: restart_resolved
+
+- name: Install NSS module for Multicast DNS name resolution (pacman)
+  community.general.pacman:
+    update_cache: true
+    name: 
+      - nss-mdns
+      - dbus-python
+      - python-gobject
+      - gtk3
+      - qt5-base
+    state: present
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Install NSS module for Multicast DNS name resolution (apt)
+  become: true
+  ansible.builtin.apt:
+    name: libnss-mdns
+    state: present
+  tags:
+    - packages
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+  
+- name: Enable service discovery
+  service:
+    name: avahi-daemon.service
+    enabled: yes
+    state: started
+
+- name: Open port for service discovery
+  community.general.ufw:
+    rule: allow
+    port: '5353'
+    proto: udp
+    comment: Avahi service discovery
+    state: enabled
+  become: true
+

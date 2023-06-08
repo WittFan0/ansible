@@ -67,18 +67,3 @@
     state: started
   when: desktop_environment == "gnome"
 
-- name: Enable service discovery
-  service:
-    name: avahi-daemon.service
-    enabled: yes
-    state: started
-
-- name: Open port for service discovery
-  community.general.ufw:
-    rule: allow
-    port: '5353'
-    proto: udp
-    comment: Avahi service discovery
-    state: enabled
-  become: true
-

@@ -7,6 +7,11 @@
       group_by:
         key: os_{{ ansible_facts['distribution'] }}
 
+- hosts: btrfs
+  become: true
+  roles:
+    - btrfs
+
 - hosts: new_build
   roles:
     - update
@@ -63,6 +68,11 @@
   roles:
     - vmhost
 
+- hosts: btrfs
+  become: true
+  roles:
+    - snapper
+
 - hosts: all
   become: true
   tasks:
@@ -82,12 +92,5 @@
         remove: yes
       when: ansible_facts['distribution'] == "Archlinux"
 
-- hosts: btrfs
-  become: true
-  roles:
-    - snapper
-
-# - hosts: all
-#   become: true
-#   roles:
-#     - sshd-keyonly  # <-- Must come last because it disables root ssh
+  # roles:
+  #   - sshd-keyonly  # <-- Must come last because it disables root ssh

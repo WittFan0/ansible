@@ -66,17 +66,6 @@
 - hosts: all
   become: true
   tasks:
-    - name: Go back to downloading db sigs
-      ansible.builtin.lineinfile:
-        path: /etc/pacman.conf
-        regexp: '^SigLevel'
-        line: SigLevel = Required DatabaseNever
-        insertafter: '^\[options\]'
-        backup: true
-      tags:
-        - packages
-      when: ansible_facts['distribution'] == "Archlinux"
-
     - name: Remove sudo-less pacman permission for `aur_builder`
       ansible.builtin.file:
         path: /etc/sudoers.d/11-install-aur_builder

@@ -2,17 +2,6 @@
 - name: Set OS distribution dependent variables
   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
-- name: Don't try to download db sigs
-  ansible.builtin.lineinfile:
-    path: /etc/pacman.conf
-    regexp: '^SigLevel'
-    line: SigLevel = Required DatabaseNever
-    insertafter: '^\[options\]'
-    backup: true
-  tags:
-    - packages
-  when: ansible_facts['distribution'] == "Archlinux"
-
 - name: Add hosts
   ansible.builtin.blockinfile:
     path: /etc/hosts

@@ -1,6 +1,6 @@
 os_groups: network,log,wheel,power,rfkill,storage,optical
 
 aur:
-    builder: aur_builder
+    builder: aur_builder  # <-- BEWARE:  This user will automatically be deleted at the end of the ansible run!
     dir: aur
 

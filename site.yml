@@ -77,6 +77,22 @@
         - packages
       when: ansible_facts['distribution'] == "Archlinux"
 
+    - name: Remove sudo-less pacman permission for `aur_builder`
+      ansible.builtin.file:
+        path: /etc/sudoers.d/11-install-aur_builder
+        state: absent
+      tags:
+        - aur
+        - packages
+      when: ansible_facts['distribution'] == "Archlinux"
+
+    - name: Remove 'aur_builder' user
+      ansible.builtin.user:
+        name: "{{ aur.builder }}"
+        state: absent
+        remove: yes
+      when: ansible_facts['distribution'] == "Archlinux"
+
 - hosts: btrfs
   become: true
   roles:

@@ -9,7 +9,11 @@
 
 - hosts: archvm
   connection: local
-  
+  environment:
+    http_proxy: http://dan:3128
+    https_proxy: http://dan:3128
+    ftp_proxy: http://dan:3128
+
   # vars_prompt:
   #   - name: hostname
   #     prompt: What is the name of this computer?
@@ -37,5 +41,23 @@
     # - graphics
     # - vmhost
     # - gaming
+    # - snapper
     # - sshd-keyonly  # <-- Must come last because it disables root ssh
 
+  post_tasks:
+    - name: Remove sudo-less pacman permission for `aur_builder`
+      ansible.builtin.file:
+        path: /etc/sudoers.d/11-install-aur_builder
+        state: absent
+      tags:
+        - aur
+        - packages
+      when: ansible_facts['distribution'] == "Archlinux"
+
+    - name: Remove 'aur_builder' user
+      ansible.builtin.user:
+        name: "{{ aur.builder }}"
+        state: absent
+        remove: yes
+      when: ansible_facts['distribution'] == "Archlinux"
+      

@@ -116,6 +116,15 @@
     comment: Piwigo
     state: enabled
 
+- name: Open port for service discovery
+  community.general.ufw:
+    rule: allow
+    port: '5353'
+    proto: udp
+    comment: Avahi service discovery
+    state: enabled
+  become: true
+
 # PROBABLY NEED TO TEST THIS (e.g. SUBVOLUMES, DOCKER, ETC.) BEFORE ENABLING EVERYTHING.
 # - name: Activate firejail
 #   ansible.builtin.command: |

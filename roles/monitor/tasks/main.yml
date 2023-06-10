@@ -94,7 +94,7 @@
 
 - name: Enable and start sensors daemon
   service:
-    name: "{{ sensors_package }}.service"
+    name: "{{ sensors_service }}"
     enabled: yes
     state: started
   when: ansible_facts['virtualization_role'] != "guest"

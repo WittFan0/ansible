@@ -2,4 +2,6 @@ sensors_package:
   - i2c-tools
   - lm-sensors
 
+sensors_service: lm-sensors.service
+
 nullmailer_owner: "mail"

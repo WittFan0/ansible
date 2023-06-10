@@ -29,6 +29,12 @@
     state: directory
     mode: '0755'
 
+- name: Create skeleton directory for game files
+  ansible.builtin.file:
+    path: /etc/skel/Games/
+    state: directory
+    mode: '0755'
+
 - name: Create user group
   ansible.builtin.group:
     name: "{{ remote_user.group }}"

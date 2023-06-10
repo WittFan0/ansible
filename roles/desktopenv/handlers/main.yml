@@ -9,3 +9,6 @@
     name: sddm.service
     state: restarted
 
+- name: recreate_initial_ramdisk
+  command: mkinitcpio -P 
+

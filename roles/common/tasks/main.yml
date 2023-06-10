@@ -38,17 +38,37 @@
 #   ansible.builtin.command: hwclock --systohc --utc
 #   become: true
 
-# - name: Set kernel parameters
-#   lineinfile:
-#     dest: /etc/default/grub
-#     regexp: '^GRUB_CMDLINE_LINUX_DEFAULT'
-#     state: present
-#     line: 'GRUB_CMDLINE_LINUX_DEFAULT="{{ kernel_parameters }}"'
-#   when: kernel_parameters is defined and bootloader == 'grub'
-#   notify:
-#     - rebuild grub
-#   tags:
-#     - kernelparams
+- name: Set bootloader resolution
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: '^GRUB_GFXMODE'
+    line: 'GRUB_GFXMODE="{{ grub_gfxmode }}"'
+    state: present
+  when: grub_gfxmode is defined # and bootloader == 'grub'
+  notify:
+    - rebuild-grub
+
+- name: Allow the kernel use the same resolution used by grub
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: '^GRUB_GFXPAYLOAD_LINUX'
+    line: GRUB_GFXPAYLOAD_LINUX=keep
+    state: present
+  # when: bootloader == 'grub'
+  notify:
+    - rebuild-grub
+
+- name: Set kernel parameters
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT'
+    state: present
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="{{ kernel_parameters }}"'
+  when: kernel_parameters is defined # and bootloader == 'grub'
+  notify:
+    - rebuild-grub
+  tags:
+    - kernelparams
 
 - name: Quiet pam_systemd_home.so warnings
   ansible.builtin.copy:

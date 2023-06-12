@@ -11,13 +11,6 @@
     removes: /etc/skel/.{{ remote_user.shell }}_profile
   become: yes
 
-- name: Create XDG-compliant skeleton files for {{ remote_user.shell }}_logout 
-  ansible.builtin.command: /usr/bin/mv /etc/skel/.{{ remote_user.shell }}_logout /etc/skel/.config/{{ remote_user.shell }}/logout
-  args:
-    creates: /etc/skel/.config/{{ remote_user.shell }}/logout
-    removes: /etc/skel/.{{ remote_user.shell }}_logout
-  become: yes
-
 - name: Create XDG-compliant skeleton files for {{ remote_user.shell }}rc
   ansible.builtin.command: /usr/bin/mv /etc/skel/.{{ remote_user.shell }}rc /etc/skel/.config/{{ remote_user.shell }}/{{ remote_user.shell }}rc
   args:
@@ -25,7 +18,7 @@
     removes: /etc/skel/.{{ remote_user.shell }}rc
   become: yes
 
-- name: Create XDG-compliant BASH login shell
+- name: Create global XDG-compliant BASH login shell
   ansible.builtin.copy:
     src: bashprofile_xdg
     dest: /etc/profile.d/bash_xdg.sh
@@ -33,32 +26,44 @@
     mode: '0644'
   notify: 
 
-- name: Create XDG-compliant BASH interactive shell
-  ansible.builtin.copy:
-    src: bashrc_xdg
-    dest: /etc/skel/.{{ remote_user.shell }}rc
-    backup: false
-    mode: '0644'
-  notify: 
-
-# - name: Create XDG-compliant BASH interactive shell
-#   ansible.builtin.blockinfile:
-#     path: /etc/skel/.{{ remote_user.shell }}rc
-#     block: | 
-#       _confdir=${XDG_CONFIG_HOME:-$HOME/.config}/bash
-#       _datadir=${XDG_DATA_HOME:-$HOME/.local/share}/bash
-
-#       [[ -r "$_confdir/bashrc" ]] && . "$_confdir/bashrc"
-#       [[ -r "$_confdir/aliases" ]] && . "$_confdir/aliases"
-
-#       [[ ! -d "$_datadir" ]] && mkdir -p "$_datadir"
-#       HISTFILE=$_datadir/history
-
-#       unset _confdir
-#       unset _datadir
-#     insertafter: 'EOF'
+# - name: Create local XDG-compliant BASH login shell
+#   ansible.builtin.copy:
+#     src: bashprofile_xdg
+#     dest: /etc/skel/.{{ remote_user.shell }}_profile
+#     backup: false
 #     mode: '0644'
-#     backup: true
+#   notify: 
+
+- name: Create global XDG-compliant BASH interactive shell
+  ansible.builtin.blockinfile:
+    path: /etc/{{ remote_user.shell }}.{{ remote_user.shell }}rc
+    block: | 
+      _confdir=${XDG_CONFIG_HOME:-$HOME/.config}/bash
+      _datadir=${XDG_DATA_HOME:-$HOME/.local/share}/bash
+
+      [[ -r "$_confdir/bashrc" ]] && . "$_confdir/bashrc"
+      [[ -r "$_confdir/aliases" ]] && . "$_confdir/aliases"
+
+      [[ ! -d "$_datadir" ]] && mkdir -p "$_datadir"
+      HISTFILE=$_datadir/history
+
+      unset _confdir
+      unset _datadir
+
+      # bind the up and down arrow keys to search through Bash's history
+      bind '"\e[A": history-search-backward'
+      bind '"\e[B": history-search-forward'
+    insertafter: 'EOF'
+    mode: '0644'
+    backup: true
+
+# - name: Create local XDG-compliant BASH interactive shell
+#   ansible.builtin.copy:
+#     src: bashrc_xdg
+#     dest: /etc/skel/.{{ remote_user.shell }}rc
+#     backup: false
+#     mode: '0644'
+#   notify: 
 
 - name: Set global environment variables
   ansible.builtin.blockinfile:
@@ -74,6 +79,7 @@
       EDITOR          DEFAULT=nano
       SUDO_EDITOR     DEFAULT=nano
       VISUAL          DEFAULT=nano
+      HISTCONTROL     DEFAULT=ignoreboth
     insertafter: 'EOF'
     mode: '0644'
     backup: true

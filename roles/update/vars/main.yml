@@ -28,4 +28,4 @@ base_packages:
     - which
     - tree
     - cryfs
-
+    - etckeeper

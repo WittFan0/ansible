@@ -16,3 +16,7 @@ HISTFILE=$_datadir/history
 
 unset _confdir
 unset _datadir
+
+# bind the up and down arrow keys to search through Bash's history
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'

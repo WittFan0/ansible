@@ -113,6 +113,7 @@ kde_packages:
   - plasma-systemmonitor
   - plasma-thunderbolt
   - plasma-vault
+  - plasma5-applets-thermal-monitor
   # - plasma-welcome
   # - plasma-workspace-wallpapers
   - sddm-kcm
@@ -201,6 +202,7 @@ gnome_packages:
   # - gnome-shell-extension-appindicator
   # - gst-plugin-pipewire
   - nautilus-image-converter
+  - sensors-applet
   # - vinagre
   - simple-scan
   - fwupd
@@ -212,7 +214,7 @@ gnome_packages_aur:
   # - gnome-shell-extension-sound-output-device-chooser
   # - gnome-icon-theme  # <-- lots of perl
   # - gnome-icon-theme-symbolic  # <-- lots of perl
-  # - gnome-shell-extension-freon
+  - gnome-shell-extension-freon
   # - gnome-shell-extension-simple-system-monitor
   # - gnome-shell-extension-arch-update
   - nautilus-admin-gtk4

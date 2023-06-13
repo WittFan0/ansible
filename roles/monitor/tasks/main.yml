@@ -83,6 +83,19 @@
   tags:
     - packages
     
+- name: Download sensors config file
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ sensors_conf_url }}"
+    dest: '/etc/sensors.d/'
+    mode: '0644'
+    force: yes
+  tags:
+    - packages
+  when: sensors_conf_url is defined
+  notify: restart_sensorsd
+  environment: "{{proxy_env}}"
+
 - name: Create sensors config file
   ansible.builtin.shell: |
     modprobe i2c_dev
@@ -90,6 +103,7 @@
     modprobe drivetemp
     sensors-detect --auto
   become: true
+  when: sensors_conf_url is not defined
   notify: restart_sensorsd
 
 - name: Enable and start sensors daemon

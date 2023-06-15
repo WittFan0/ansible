@@ -70,14 +70,19 @@
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: Install reflector
-  community.general.pacman:
-    update_cache: true
-    name: reflector 
-    state: present
-  tags:
-    - packages
-  when: ansible_facts['distribution'] == "Archlinux"
+# - name: Install reflector
+#   community.general.pacman:
+#     update_cache: true
+#     name: reflector 
+#     state: present
+#   tags:
+#     - packages
+#   when: ansible_facts['distribution'] == "Archlinux"
+
+# - name: Update mirror list (Arch)
+#   ansible.builtin.command: reflector --country US,Canada --completion-percent 90 --sort rate --latest 20 --protocol https --save /etc/pacman.d/mirrorlist
+#   become: true
+#   when: ansible_facts['distribution'] == "Archlinux"
 
 # - name: Find fastest Ubuntu mirror
 #   ansible.builtin.shell: curl -s http://mirrors.ubuntu.com/mirrors.txt | xargs -I {} sh -c 'echo $(curl -r 0-1024000 -s -w %{speed_download} -o /dev/null {}/ls-lR.gz) {}' | sort -g -r | head -1 | awk '{ print $2  }'
@@ -92,21 +97,6 @@
 #     replace: deb {{ fastest_mirror }}
 #     backup: true
 #   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-
-# - name: Update mirror list (Arch)
-#   ansible.builtin.command: reflector --country US,Canada --completion-percent 90 --sort rate --latest 20 --protocol https --save /etc/pacman.d/mirrorlist
-#   become: true
-#   when: ansible_facts['distribution'] == "Archlinux"
-
-# - name: Enable local package mirror
-#   ansible.builtin.lineinfile:
-#     path: /etc/pacman.d/mirrorlist
-#     line: Server = {{ pacman_mirror }}
-#     insertbefore: 'BOF'
-#     backup: true
-#   tags:
-#     - packages
-#   when: pacman_mirror is defined and ansible_facts['distribution'] == "Archlinux"
 
 - name: Update package cache and upgrade (Arch)
   community.general.pacman:

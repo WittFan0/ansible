@@ -46,6 +46,8 @@
       - gvfs
       - innoextract
       - lib32-gamemode
+      - lib32-libva
+      - lib32-libcanberra
       - lib32-vkd3d
       - vkd3d
       - wine

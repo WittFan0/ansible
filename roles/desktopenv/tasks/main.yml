@@ -46,6 +46,18 @@
   when: ansible_facts['virtualization_role'] != "guest"
   environment: "{{proxy_env}}"
 
+- name: Enable Nvidia hardware video acceleration (Arch)
+  kewlfft.aur.aur:
+    name: libva-nvidia-driver
+    state: present
+  tags:
+    - aur
+    - packages
+  become: true
+  become_user: "{{ aur.builder }}"
+  when: ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
+  environment: "{{proxy_env}}"
+
 - name: Remove kms from initial ramdisk (Arch) - Nvidia requirement
   ansible.builtin.copy:
     dest: /etc/mkinitcpio.conf.d/nvidia.conf
@@ -57,7 +69,7 @@
   notify:  # <-- Handlers are executed in the order they are defined in the handlers section, not in the order listed in the notify statement.
     - reboot_system
     - recreate_initial_ramdisk
-  when: ansible_facts['distribution'] == "Archlinux" && ansible_facts['virtualization_role'] != "guest"
+  when: ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
 - name: Rebuild initial ramdisk if necessary and reboot
   ansible.builtin.meta: flush_handlers

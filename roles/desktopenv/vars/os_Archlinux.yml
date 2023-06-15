@@ -243,6 +243,7 @@ sway_packages_aur:
 nvidia_video_packages: 
   - nvidia-utils
   - lib32-nvidia-utils
+  - libva-utils
 
 intel_video_packages: 
   - vulkan-intel

@@ -85,11 +85,25 @@
         - packages
       when: ansible_facts['distribution'] == "Archlinux"
 
-    - name: Remove 'aur_builder' user
+    - name: Remove 'aur_builder' user 
       ansible.builtin.user:
         name: "{{ aur.builder }}"
         state: absent
         remove: yes
+      when: ansible_facts['distribution'] == "Archlinux"
+
+    - name: Install reflector
+      community.general.pacman:
+        update_cache: true
+        name: reflector 
+        state: present
+      tags:
+        - packages
+      when: ansible_facts['distribution'] == "Archlinux"
+
+    - name: Update mirror list (Arch)
+      ansible.builtin.command: reflector --country US,Canada --completion-percent 90 --sort rate --latest 20 --protocol https --save /etc/pacman.d/mirrorlist
+      become: true
       when: ansible_facts['distribution'] == "Archlinux"
 
   # roles:

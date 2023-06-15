@@ -1,13 +1,13 @@
-smartcard
+mount data directories
+add (btrfs) to binaries section of mkinitcpio.conf (ubuntu)
+disable root login
 smartd.conf lineinfile
 nullmailer-remotes lineinfile
-lance's makepkg.conf
 add directories to $PATH for user
 install printer driver (move lib32-zlib from distro packages)
 tie python-docker to geerlingguy.docker
 endlessh for ubuntu
 nvidia drivers
-mount data directories
 share data directories
 media server | /etc/dnsmasq.d/10-plex.conf | max_user_watches | NFS | SMB
 grub-btrfs for ubuntu

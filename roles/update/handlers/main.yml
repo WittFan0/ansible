@@ -1,8 +1,3 @@
 ---
-- name: restart_paccache
-  service:
-    name: paccache.timer
-    state: restarted
-
 - name: reboot_system
   ansible.builtin.reboot:

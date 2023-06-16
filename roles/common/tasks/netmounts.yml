@@ -1,0 +1,36 @@
+---
+- name: Install remote mounting programs
+  become: true
+  ansible.builtin.package:
+    name: 
+      - "{{ nfs-client }}" 
+    state: present
+  tags:
+    - packages
+  environment: "{{proxy_env}}"
+
+- name: Create directories for remote shares
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop: 
+    - /mnt/movies
+    - /mnt/television
+    - /mnt/home_movies-orig
+    - /mnt/music
+    - /mnt/photos
+    - /mnt/router/sda1
+
+- name: Add fstab entries for remote shares
+  ansible.builtin.blockinfile:
+    path: /etc/fstab
+    block: |
+      //router/sda1                  /mnt/router/sda1                     cifs  _netdev,credentials=/etc/samba/.tplinkcredentials,uid=1000,gid=499,iocharset=utf8,file_mode=0664,dir_mode=0775,vers=2.0,noauto  0  0
+
+      mythbox:/movies	               /mnt/movies                          nfs   rsize=8192,wsize=8192,timeo=14,noauto
+      mythbox:/television	           /mnt/television                      nfs   rsize=8192,wsize=8192,timeo=14,noauto
+      mythbox:/home_movies-orig      /mnt/home_movies-orig                nfs   rsize=8192,wsize=8192,timeo=14,noauto
+      mythbox:/music                 /mnt/music                           nfs   rsize=8192,wsize=8192,timeo=14,noauto
+      mythbox:/photos                /mnt/photos                          nfs   rsize=8192,wsize=8192,timeo=14,noauto
+  notify: reload_systemd_config

@@ -83,6 +83,7 @@
     dest: /usr/local/sbin/
     mode: '0755'
 
+- include_tasks: netmounts.yml
 - include_tasks: discovery.yml
 - include_tasks: shell2xdg.yml
 - include_tasks: shell.yml

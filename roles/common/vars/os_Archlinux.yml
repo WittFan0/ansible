@@ -4,3 +4,6 @@ aur:
     builder: aur_builder  # <-- BEWARE:  This user will automatically be deleted at the end of the ansible run!
     dir: aur
 
+nfs-client:
+  - nfs-utils
+  

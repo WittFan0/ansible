@@ -172,6 +172,12 @@ kde_packages_aur:
   - kde-servicemenus-rootactions
   - kde-servicemenus-komparemenu
   - dracula-kde-theme-git
+  - dracula-gtk-theme
+  - dracula-icons-git
+  # - dracula-cursors-git  # <-- included in dracula-gtk-theme?
+  # - dracula-grub-theme-git  # <-- deosn't work well with nvidia?
+  - plymouth-theme-dracula-git
+  - konsole-dracula-git
   - kvantum-theme-arc
   - kvantum-theme-libadwaita-git
 

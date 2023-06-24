@@ -2,6 +2,9 @@
 - name: Set OS distribution dependent variables
   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
+- name: Set desktop environment dependent variables
+  include_vars: "os_{{ desktop_environment }}.yml"
+
 - name: Install sound system
   ansible.builtin.package:
     name:
@@ -12,21 +15,30 @@
     state: present
   environment: "{{proxy_env}}"
 
-- name: Install XFCE desktop environment
-  ansible.builtin.include_tasks: xfce.yml
-  when: desktop_environment == "xfce"
+- name: Add wallpapers
+  ansible.builtin.copy:
+    src: wallpaper/
+    dest: "{{ wallpaper-dir }}"
+    backup: false
 
-- name: Install KDE desktop environment
-  ansible.builtin.include_tasks: kde.yml
-  when: desktop_environment == "kde"
+- name: Install {{ desktop_environment }} desktop environment
+  ansible.builtin.include_tasks: {{ desktop_environment }}.yml
 
-- name: Install Gnome desktop environment
-  ansible.builtin.include_tasks: gnome.yml
-  when: desktop_environment == "gnome"
+# - name: Install XFCE desktop environment
+#   ansible.builtin.include_tasks: xfce.yml
+#   when: desktop_environment == "xfce"
 
-- name: Install Sway desktop environment
-  ansible.builtin.include_tasks: sway.yml
-  when: desktop_environment == "sway"
+# - name: Install KDE desktop environment
+#   ansible.builtin.include_tasks: kde.yml
+#   when: desktop_environment == "kde"
+
+# - name: Install Gnome desktop environment
+#   ansible.builtin.include_tasks: gnome.yml
+#   when: desktop_environment == "gnome"
+
+# - name: Install Sway desktop environment
+#   ansible.builtin.include_tasks: sway.yml
+#   when: desktop_environment == "sway"
 
 - name: Install virtio video packages
   ansible.builtin.package:
@@ -88,24 +100,30 @@
 - name: Rebuild initial ramdisk if necessary and reboot
   ansible.builtin.meta: flush_handlers
 
-- name: Enable Lightdm display manager
+- name: Enable {{ display-mgr }} display manager
   service:
-    name: lightdm.service
+    name: {{ display-mgr }}.service
     enabled: yes
     state: started
-  when: desktop_environment == "xfce"
 
-- name: Enable SDDM display manager
-  service:
-    name: sddm.service
-    enabled: yes
-    state: started
-  when: desktop_environment == "kde"
+# - name: Enable LightDM display manager
+#   service:
+#     name: lightdm.service
+#     enabled: yes
+#     state: started
+#   when: desktop_environment == "xfce"
 
-- name: Enable Gnome display manager
-  service:
-    name: gdm.service
-    enabled: yes
-    state: started
-  when: desktop_environment == "gnome"
+# - name: Enable SDDM display manager
+#   service:
+#     name: sddm.service
+#     enabled: yes
+#     state: started
+#   when: desktop_environment == "kde"
+
+# - name: Enable Gnome display manager
+#   service:
+#     name: gdm.service
+#     enabled: yes
+#     state: started
+#   when: desktop_environment == "gnome"
 

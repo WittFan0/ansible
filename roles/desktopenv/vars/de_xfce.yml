@@ -1,0 +1,3 @@
+display-mgr: lightdm
+
+wallpaper-dir: /usr/share/xfce4/backdrops/

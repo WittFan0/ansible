@@ -22,12 +22,6 @@
   when: ansible_facts['distribution'] == "Archlinux"
   environment: "{{proxy_env}}"
 
-- name: Copy wallpaper
-  ansible.builtin.copy:
-    src: wallpaper/
-    dest: /usr/share/backgrounds/xfce/
-    backup: false
-
 - name: Install XFCE4 Gradient-black theme
   ansible.builtin.unarchive:
     src: Gradient-black-46.1.tar.gz

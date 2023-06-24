@@ -15,11 +15,22 @@
     state: present
   environment: "{{proxy_env}}"
 
+- name: Create wallpaper directory if it doesn't exist
+  ansible.builtin.file:
+    path: "{{ wallpaper-dir }}"
+    state: directory
+    mode: '0755'
+
 - name: Add wallpapers
   ansible.builtin.copy:
     src: wallpaper/
     dest: "{{ wallpaper-dir }}"
     backup: false
+
+- name: Unarchive Dracula wallpapers into {{ wallpaper-dir }}
+  ansible.builtin.unarchive:
+    src: dracula-wallpaper.zip
+    dest: "{{ wallpaper-dir }}"
 
 - name: Install {{ desktop_environment }} desktop environment
   ansible.builtin.include_tasks: {{ desktop_environment }}.yml

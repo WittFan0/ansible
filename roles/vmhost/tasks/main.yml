@@ -29,3 +29,41 @@
     name: libvirtd.service
     enabled: yes
     state: started
+
+- name: Create script to view IOMMU groups
+  ansible.builtin.copy:
+    content: |
+      #!/bin/bash
+      shopt -s nullglob
+      for g in $(find /sys/kernel/iommu_groups/* -maxdepth 0 -type d | sort -V); do
+          echo "IOMMU Group ${g##*/}:"
+          for d in $g/devices/*; do
+              echo -e "\t$(lspci -nns ${d##*/})"
+          done;
+      done;
+    dest: /usr/local/sbin/view_iommu.sh
+    mode: '0755'
+
+- name: Bind vfio-pci to GPU device ID
+  ansible.builtin.copy:
+    content: |
+      options vfio-pci ids={{ passthrough_gpu_pci_id }}
+    dest: /etc/modprobe.d/vfio.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: passthrough_gpu_pci_id is defined
+
+- name: Force vfio-pci to load before the graphics drivers have a chance to bind to the card (Arch)
+  ansible.builtin.copy:
+    dest: /etc/mkinitcpio.conf.d/vfio.conf
+    content: MODULES=(vfio_pci vfio vfio_iommu_type1 i915)
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+  notify:  # <-- Handlers are executed in the order they are defined in the handlers section, not in the order listed in the notify statement.
+    - reboot_system
+    - recreate_initial_ramdisk
+  when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
+

@@ -1,8 +1,7 @@
 ---
-- name: restart_libvirt
-  service:
-    name: 
-      - libvirtd.service
-      - virtlogd.service
-    state: restarted
+- name: recreate_initial_ramdisk
+  command: mkinitcpio -P 
+
+- name: reboot_system
+  ansible.builtin.reboot:
 

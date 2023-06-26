@@ -3,10 +3,11 @@
     src: ufw-plexmediacenter
     dest: /etc/ufw/applications.d/plexmediaserver
     backup: yes
-  notify: restart_ufw
 
 - name: Open Plex ports
-  ansible.builtin.command: |
-    ufw allow plexmediaserver comment 'Plex'
+  community.general.ufw:
+    rule: allow
+    name: plexmediaserver
+    comment: Plex
   become: true
 

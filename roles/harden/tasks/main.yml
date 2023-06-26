@@ -63,7 +63,7 @@
 - name: Open SSH port
   community.general.ufw:
     rule: limit
-    port: "{{ ssh_port }}"
+    to_port: "{{ ssh_port }}"
     proto: tcp
     comment: Rate limit OpenSSH server
     state: enabled
@@ -73,7 +73,7 @@
   become: true
   community.general.ufw:
     rule: allow
-    port: '2222'
+    to_port: '2222'
     proto: tcp
     comment: OpenSSH tarpit
     state: enabled
@@ -84,7 +84,7 @@
     rule: allow
     from_ip: "{{ lan.subnet }}"
     to_ip: "{{ lan0.ip }}"
-    to_port: '631'
+    to_port: ipp
     comment: CUPS
     state: enabled
 
@@ -119,7 +119,9 @@
 - name: Open port for service discovery
   community.general.ufw:
     rule: allow
-    port: '5353'
+    from_ip: "{{ lan.subnet }}"
+    to_ip: "{{ lan0.ip }}"
+    to_port: mdns
     proto: udp
     comment: Avahi service discovery
     state: enabled

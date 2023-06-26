@@ -23,10 +23,11 @@
     src: ufw-nextcloud-aio
     dest: /etc/ufw/applications.d/nextcloud-aio
     backup: yes
-  notify: restart_ufw
 
 - name: Open Nexcloud ports
-  ansible.builtin.command: |
-    ufw allow nextcloud-all comment 'Nextcloud all-in-one'
+  community.general.ufw:
+    rule: allow
+    name: nextcloud-all
+    comment: Nextcloud all-in-one
   become: true
 

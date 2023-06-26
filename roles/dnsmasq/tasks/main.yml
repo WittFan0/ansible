@@ -119,19 +119,22 @@
     backup: no
   notify: restart_dnsmasq
 
-- name: Open nameserver port
-  ansible.builtin.command: |
-    ufw allow from {{ lan.subnet }} to {{ lan0.ip}} port 53 comment 'DNS'
+- name: Accept DHCP requests
+  community.general.ufw:
+    rule: allow
+    to_port: 67:68
+    proto: udp
+    comment: DHCP
   become: true
 
-- name: Open Netboot port
-  ansible.builtin.command: |
-    ufw allow bootps comment 'DHCP'
-  become: true
-
-- name: Open DHCP port
-  ansible.builtin.command: |
-    ufw allow from {{ lan.subnet }} to {{ lan0.ip}} port 68:69 proto udp comment 'Netboot'
+- name: Accept tftp queries from {{ lan.subnet }} for network booting
+  community.general.ufw:
+    rule: allow
+    from_ip: "{{ lan.subnet }}"
+    to_port: tftp
+    to_ip: "{{ lan0.ip}}"
+    proto: udp
+    comment: Netboot
   become: true
 
 - name: Enable and start DNS, DHCP and TFTP servers

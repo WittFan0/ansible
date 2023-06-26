@@ -27,6 +27,11 @@
     dest: "{{ wallpaper-dir }}"
     backup: false
 
+# - name: Clone Dracula wallpapers from github
+#   ansible.builtin.git:
+#     repo: 'https://github.com/dracula/wallpaper.git'
+#     dest: "{{ wallpaper-dir }}"
+
 - name: Unarchive Dracula wallpapers into {{ wallpaper-dir }}
   ansible.builtin.unarchive:
     src: dracula-wallpaper.zip

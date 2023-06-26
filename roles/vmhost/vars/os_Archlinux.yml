@@ -1,7 +1,10 @@
 virtualization_packages:
+  - iptables-nft
+  - dnsmasq
   - dmidecode
   - gettext
   - virt-manager
   - vagrant
   - qemu-desktop
+  - edk2-ovmf
 

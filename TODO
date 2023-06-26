@@ -16,6 +16,7 @@ WAN networking | NAT
 bootloader
 create filesystem | fstrim | BTRFS to mkinitcpio | fstab
 Switch from cron to systemd timer
+get dracula wallpapers from git
 Python encryption warning
 
 combine development and aur roles?

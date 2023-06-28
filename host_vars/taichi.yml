@@ -17,4 +17,7 @@ desktop_environment: kde
 
 sensors_conf_url: https://github.com/lm-sensors/lm-sensors/raw/f63be94d93adc80840d80fa0c52844a986d958e9/configs/ASRock/Z390_Taichi.conf
 
+gpu_vid_nodedev: pci_0000_01_00_0
+gpu_aud_nodedev: pci_0000_01_00_1
+
 # passthrough_gpu_pci_id: 10de:2182

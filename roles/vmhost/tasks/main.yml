@@ -24,6 +24,46 @@
     usermod -a -G libvirt {{ remote_user.name }}
   become: true
 
+- name: Create directory for libvirt hooks
+  ansible.builtin.file:
+    path: /etc/libvirt/hooks/qemu.d/
+    state: directory
+    mode: '0755'
+
+- name: Download libvirt hook for running a command on startup or shutdown of a VM
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/PassthroughPOST/VFIO-Tools/master/libvirt_hooks/qemu
+    dest: /etc/libvirt/hooks/qemu
+    mode: '0755'
+
+- name: Create directory for libvirt VM startup hooks
+  ansible.builtin.file:
+    path: /etc/libvirt/hooks/qemu.d/passthrough_gaming/prepare/begin/
+    state: directory
+    mode: '0755'
+
+- name: Create scripts to run on startup of a VM
+  ansible.builtin.template:
+    src: start_sh.j2
+    dest: /etc/libvirt/hooks/qemu.d/passthrough_gaming/prepare/begin/start.sh
+    mode: '0755'
+  notify: restart_dnsmasq
+  when: gpu_vid_nodedev is defined and gpu_aud_nodedev is defined
+
+- name: Create directory for libvirt VM shutdown hooks
+  ansible.builtin.file:
+    path: /etc/libvirt/hooks/qemu.d/passthrough_gaming/release/end/
+    state: directory
+    mode: '0755'
+
+- name: Create scripts to run on shutdown of a VM
+  ansible.builtin.template:
+    src: revert_sh.j2
+    dest: /etc/libvirt/hooks/qemu.d/passthrough_gaming/release/end/revert.sh
+    mode: '0644'
+  notify: restart_dnsmasq
+  when: gpu_vid_nodedev is defined and gpu_aud_nodedev is defined
+
 - name: Enable and start libvirt
   service:
     name: libvirtd.service

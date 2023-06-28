@@ -42,22 +42,24 @@
     group: "{{ remote_user.group }}"
     backup: true
 
-- name: Create SSDM config directory if it doesn't exist
-  ansible.builtin.file:
-    path: /etc/sddm.conf.d/
-    state: directory
-    mode: '0755'
+# # *** SDDP support for Wayland is not yet fully functional ***
 
-- name: Configure SDDM to use Wayland
-  ansible.builtin.copy:
-    content: |
-      [General]
-      DisplayServer=wayland
-      GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
+# - name: Create SSDM config directory if it doesn't exist
+#   ansible.builtin.file:
+#     path: /etc/sddm.conf.d/
+#     state: directory
+#     mode: '0755'
 
-      [Wayland]
-      CompositorCommand=kwin_wayland --no-lockscreen
-    dest: /etc/sddm.conf.d/10-wayland.conf
-    mode: '0644'
-    backup: false
+# - name: Configure SDDM to use Wayland
+#   ansible.builtin.copy:
+#     content: |
+#       [General]
+#       DisplayServer=wayland
+#       GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
+
+#       [Wayland]
+#       CompositorCommand=kwin_wayland --no-lockscreen
+#     dest: /etc/sddm.conf.d/10-wayland.conf
+#     mode: '0644'
+#     backup: false
 

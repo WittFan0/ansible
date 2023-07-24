@@ -20,4 +20,6 @@ sensors_conf_url: https://github.com/lm-sensors/lm-sensors/raw/f63be94d93adc8084
 gpu_vid_nodedev: pci_0000_01_00_0
 gpu_aud_nodedev: pci_0000_01_00_1
 
-# passthrough_gpu_pci_id: 10de:2182
+grub_root_uuid: 84dadd8d-a899-4bd4-8a35-fd1ef0e48d16
+
+# passthrough_gpu_pci_id: 10de:2182,10de:1aeb,10de:1aec,10de:1aed

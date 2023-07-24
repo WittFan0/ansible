@@ -8,3 +8,5 @@ virtualization_packages:
   - qemu-desktop
   - edk2-ovmf
 
+grub_boot_conf_dest: '/boot/grub/grub.cfg'
+grub_mkconfig_command: 'grub-mkconfig'

@@ -2,6 +2,13 @@
 - name: Set OS distribution dependent variables
   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
+- name: Provide systemd-resolved domain name resolution for libvirt 
+  ansible.builtin.file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+
 - name: Install virtualization packages
   ansible.builtin.package:
     name: "{{ virtualization_packages }}"
@@ -87,17 +94,28 @@
 - name: Bind vfio-pci to GPU device ID
   ansible.builtin.copy:
     content: |
+      # Leave second GPU unbound so it can be passed through to a VM.
+      # If modesetting the Nvidia driver, uncomment the vfio-pci option
+      # below instead of passing arguments to the kernel. Kernel arguments
+      # won't work because they are read too late to take effect.
       options vfio-pci ids={{ passthrough_gpu_pci_id }}
-    dest: /etc/modprobe.d/vfio.conf
+
+      # softdep option below is not needed since the vfio-pci module is built into the initramfs
+      # softdep drm pre: vfio-pci
+    dest: /etc/modprobe-vfio.conf
     owner: root
     group: root
     mode: '0644'
-  when: passthrough_gpu_pci_id is defined
+  when: passthrough_gpu_pci_id is defined and ansible_facts['virtualization_role'] != "guest"
 
 - name: Force vfio-pci to load before the graphics drivers have a chance to bind to the card (Arch)
   ansible.builtin.copy:
-    dest: /etc/mkinitcpio.conf.d/vfio.conf
-    content: MODULES=(vfio_pci vfio vfio_iommu_type1 i915)
+    dest: /etc/mkinitcpio-vfio.conf
+    content: 
+      BINARIES=(btrfs)
+      MODULES=(vfio_pci vfio vfio_iommu_type1)
+      FILES="/etc/modprobe-vfio.conf"
+      HOOKS=(base udev autodetect modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs)
     owner: root
     group: root
     mode: '0644'
@@ -107,3 +125,33 @@
     - recreate_initial_ramdisk
   when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
+- name: Create initramfs preset for GPU passthrough (Arch)
+  ansible.builtin.copy:
+    dest: /etc/mkinitcpio.d/linux-zen-vfio.preset
+    content: 
+      # mkinitcpio preset file for the 'linux-zen' package
+
+      PRESETS=('vfio')
+
+      vfio_kver="/boot/vmlinuz-linux-zen"
+      vfio_microcode=(/boot/*-ucode.img)
+      vfio_config="/etc/mkinitcpio-vfio.conf"
+      vfio_image="/boot/initramfs-linux-zen-vfio.img"
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+  notify:  # <-- Handlers are executed in the order they are defined in the handlers section, not in the order listed in the notify statement.
+    - reboot_system
+    - recreate_initial_ramdisk
+  when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
+
+- name: Create VFIO boot menu entry
+  ansible.builtin.template:
+    src: arch_btrfs_21_linux_zen_vfio.j2
+    dest: /etc/grub.d/21_linux_zen_vfio
+    mode: '0755'
+  notify:  # <-- Handlers are executed in the order they are defined in the handlers section, not in the order listed in the notify statement.
+    - reboot_system
+    - reinstall_grub
+  when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"

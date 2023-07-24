@@ -99,14 +99,14 @@
     - recreate_initial_ramdisk
   when: ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
-- name: Create a directory for smooth plymouth transition
+- name: Create a configuration directory for display manager service
   ansible.builtin.file:
     path: /etc/systemd/system/display-manager.service.d/
     state: directory
     mode: '0755'
   when: desktop_environment != "gnome"
 
-- name: Create a directory for smooth plymouth transition
+- name: Configure nearly smooth plymouth transition
   ansible.builtin.copy:
     src: plymouth.conf
     dest: /etc/systemd/system/display-manager.service.d/plymouth.conf

@@ -110,10 +110,10 @@ kde_packages:
   - plasma-firewall
   # - plasma-nm
   - plasma-pa
+  - plasma5-applets-thermal-monitor # <-- only plasmoid I can find that shows nvidia temp
   - plasma-systemmonitor
   - plasma-thunderbolt
   - plasma-vault
-  - plasma5-applets-thermal-monitor
   # - plasma-welcome
   # - plasma-workspace-wallpapers
   - sddm-kcm
@@ -146,6 +146,7 @@ kde_packages:
   - kio-extras
   - kio-gdrive
   - kio-zeroconf
+  - libvncserver
   - krdc
   - tokodon
   - ark
@@ -156,7 +157,8 @@ kde_packages:
   - kclock
   - kdialog
   - kfind
-  - kgpg
+  # - kgpg  <-- keeps prompting for initial config?
+  - kleopatra
   - kwalletmanager
   - kweather
   - kompare

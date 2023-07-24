@@ -53,6 +53,9 @@
       # bind the up and down arrow keys to search through Bash's history
       bind '"\e[A": history-search-backward'
       bind '"\e[B": history-search-forward'
+
+      GPG_TTY=$(tty)
+      export GPG_TTY
     insertafter: 'EOF'
     mode: '0644'
     backup: true

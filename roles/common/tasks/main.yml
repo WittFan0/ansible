@@ -77,6 +77,13 @@
     backup: true
   when: ansible_facts['distribution'] == "Archlinux"
 
+- name: Provide systemd-resolved domain name resolution for software that reads /etc/resolv.conf directly 
+  ansible.builtin.file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+
 - name: Install user setup script
   ansible.builtin.copy:
     src: user-setup.sh

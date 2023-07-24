@@ -58,7 +58,7 @@
 #       GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
 
 #       [Wayland]
-#       CompositorCommand=kwin_wayland --no-lockscreen
+#       CompositorCommand=kwin_wayland --no-lockscreen --no-kactivities --no-global-shortcuts --lock --drm --locale1
 #     dest: /etc/sddm.conf.d/10-wayland.conf
 #     mode: '0644'
 #     backup: false

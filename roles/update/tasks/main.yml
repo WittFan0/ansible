@@ -137,6 +137,12 @@
     - packages
   notify: reboot_system
 
+- name: Enable power profiles
+  service:
+    name: power-profiles-daemon.service
+    enabled: yes
+    state: started
+
 - name: Reboot if necessary
   meta: flush_handlers
   tags:

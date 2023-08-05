@@ -102,6 +102,14 @@
 
       # softdep option below is not needed since the vfio-pci module is built into the initramfs
       # softdep drm pre: vfio-pci
+
+      # Nested Virtualization will allow some more performant features of sandboxing to work properly
+      options kvm_amd nested=1
+      options kvm_amd npt=1
+      options kvm_intel nested=1
+
+      # ignoring Model Specific Registers will prevent some hiccups that may occur on specific system calls
+      options kvm ignore_msrs=1
     dest: /etc/modprobe-vfio.conf
     owner: root
     group: root

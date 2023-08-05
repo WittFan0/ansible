@@ -12,6 +12,7 @@ base_packages:
     - power-profiles-daemon
     - nano
     - sudo
+    - htop
     - xdg-user-dirs
     - btrfs-progs
     - man-db

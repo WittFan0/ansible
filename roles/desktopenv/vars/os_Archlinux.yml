@@ -58,6 +58,7 @@ kde_packages:
   # - packagekit-qt5  # <-- (optional) - to install new krunner plugins
   # - scim  # <-- (optional) - kimpanel SCIM support
   - plasma-wayland-session
+  - system-config-printer
   - bluedevil
   - breeze-gtk
   # - discover  # <-- Does not work well on Arch

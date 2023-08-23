@@ -13,17 +13,17 @@
     backup: yes
   notify: restart_cups
 
-- name: Install Brother printer driver
-  kewlfft.aur.aur:
-    name: 
-      - brother-hll2320d
-    state: present
-  tags:
-    - aur
-    - packages
-  become: "yes"
-  become_user: "{{ aur.builder }}"
-  when: ansible_facts['distribution'] == "Archlinux"
+# - name: Install Brother printer driver  # <-- Doesn't work. 32-bit library problem?
+#   kewlfft.aur.aur:
+#     name: 
+#       - brother-hll2320d
+#     state: present
+#   tags:
+#     - aur
+#     - packages
+#   become: "yes"
+#   become_user: "{{ aur.builder }}"
+#   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Download Brother printer driver
   ansible.builtin.unarchive:

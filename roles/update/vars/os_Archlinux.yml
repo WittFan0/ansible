@@ -13,6 +13,6 @@ distro_packages:
     - python-virtualenv
     - python-docker
     - go  # fails when installed as a dependecy during yay build
-    - lib32-zlib  # needed by Brother printer driver
+    # - lib32-zlib  # needed by Brother printer driver, but Brother printer driver isn't working
     - cronie
 

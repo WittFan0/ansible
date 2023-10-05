@@ -169,6 +169,7 @@ kde_packages:
   - kvantum-qt5
   - kvantum-theme-materia
   - dolphin-plugins
+  - intel-media-sdk  # <-- wayland hardware video acceleration on Intel GPUs (Broadwell to Rocket Lake)
   - firefox
 
 kde_packages_aur:

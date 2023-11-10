@@ -171,6 +171,9 @@ kde_packages:
   - dolphin-plugins
   - intel-media-sdk  # <-- wayland hardware video acceleration on Intel GPUs (Broadwell to Rocket Lake)
   - firefox
+  - cantarell-fonts # <-- optional dependency for dracula-kde-theme-git
+  - ttf-roboto # <-- optional dependency for dracula-kde-theme-git
+  - ttf-ubuntu-font-family # <-- optional dependency for dracula-kde-theme-git
 
 kde_packages_aur:
   - kde-servicemenus-rootactions

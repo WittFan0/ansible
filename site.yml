@@ -13,6 +13,7 @@
     - btrfs
 
 - hosts: new_build
+  become: true
   roles:
     - update
     - common

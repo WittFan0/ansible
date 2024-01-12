@@ -38,7 +38,7 @@
     dest: "{{ wallpaper-dir }}"
 
 - name: Install {{ desktop_environment }} desktop environment
-  ansible.builtin.include_tasks: {{ desktop_environment }}.yml
+  ansible.builtin.include_tasks: "{{ desktop_environment }}.yml"
 
 # - name: Install XFCE desktop environment
 #   ansible.builtin.include_tasks: xfce.yml
@@ -118,7 +118,7 @@
 
 - name: Enable {{ display-mgr }} display manager
   service:
-    name: {{ display-mgr }}.service
+    name: "{{ display-mgr }}.service"
     enabled: yes
     state: started
 

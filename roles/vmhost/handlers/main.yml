@@ -3,8 +3,7 @@
   command: mkinitcpio -P 
 
 - name: reinstall_grub
-  command: {{grub-mkconfig}} -o {{grub_boot_conf_dest}} 
+  command: "{{grub-mkconfig}} -o {{grub_boot_conf_dest}}"
 
 - name: reboot_system
   ansible.builtin.reboot:
-

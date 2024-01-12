@@ -2,40 +2,40 @@ all:
   children:
     new_build:
       hosts:
-        office:
+        # office:
         # taichi:
-        archvm:
-        mythboxtest:
+        # archvm:
+        # mythboxtest:
     collab_server:
       hosts:
         # taichi:
         # archvm:
-        mythboxtest:
+        # mythboxtest:
     media_server:
       hosts:
         # taichi:
         # archvm:
-        mythboxtest:
+        # mythboxtest:
     router:
       hosts:
         # taichi:
         # archvm:
-        mythboxtest:
+        # mythboxtest:
     workstation:
       hosts:
         # office:
         # taichi:
-        archvm:
+        # archvm:
     development:
       hosts:
         # office:
         # taichi:
         # archvm:
-        mythboxtest:
+        # mythboxtest:
     btrfs:
       hosts:
         # office:
-        archvm:
+        # archvm:
     gaming:
       hosts:
         # office:
@@ -49,4 +49,4 @@ all:
         # office:
         # taichi:
         # archvm:
-        mythboxtest:
+        # mythboxtest:

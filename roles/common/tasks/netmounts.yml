@@ -3,7 +3,7 @@
   become: true
   ansible.builtin.package:
     name: 
-      - "{{ nfs-client }}" 
+      - "{{ nfs_client }}" 
     state: present
   tags:
     - packages

@@ -1,2 +1,5 @@
 os_groups: [sudo,dip,plugdev]
 
+nfs_client:
+  - nfs-common
+  

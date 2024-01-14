@@ -61,7 +61,7 @@
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: Get packages from proxy server
+- name: Get packages from proxy server (Arch)
   ansible.builtin.copy:
     content: Server = http://arch.mirror.constant.com/$repo/os/$arch
     dest: /etc/pacman.d/mirrorlist
@@ -69,6 +69,19 @@
   tags:
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Get packages from proxy server (Debian)
+  ansible.builtin.copy:
+    content: |
+      Acquire {
+        HTTP::proxy "http://dan:3128";
+        HTTPS::proxy "http://dan:3128";
+      }
+    dest: /etc/apt/apt.conf.d/10proxy.conf
+    backup: yes
+  tags:
+    - packages
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 # - name: Install reflector
 #   community.general.pacman:

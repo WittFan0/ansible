@@ -25,9 +25,8 @@ base_packages:
     - pigz
     - dosfstools
     - ntfs-3g
-    - exfat-utils
+    - exfatprogs
     - rclone
-    - which
     - tree
     - cryfs
     - etckeeper

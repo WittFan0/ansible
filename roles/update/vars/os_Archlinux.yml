@@ -8,6 +8,7 @@ distro_packages:
     - gptfdisk
     - archlinux-contrib
     - pacman-contrib
+    - which
     - python-setuptools
     - python-requests
     - python-virtualenv

@@ -2,8 +2,7 @@
 - name: Install remote mounting programs
   become: true
   ansible.builtin.package:
-    name: 
-      - "{{ nfs_client }}" 
+    name: "{{ nfs_client_packages }}" 
     state: present
   tags:
     - packages

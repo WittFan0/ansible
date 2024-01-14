@@ -9,10 +9,6 @@
     name: "user@{{ remote_user.uid }}"
     state: stopped
 
-- name: generate_locales
-  ansible.builtin.command: locale-gen
-  become: true
-
 - name: reload_systemd_config
   command: systemctl daemon-reload
   become: true

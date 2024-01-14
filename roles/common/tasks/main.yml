@@ -7,19 +7,23 @@
     name: "{{ hostname }}"
   when: hostname is defined
 
+- name: generate_locales
+  ansible.builtin.command: locale-gen en_US en_US.UTF-8
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
 - name: Set locale
   ansible.builtin.lineinfile:
     path: /etc/locale.gen
     regexp: '^en_US.UTF-8 '
     line: en_US.UTF-8 UTF-8
-  notify:
-    - generate_locales
+  when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Set LANG variable
   ansible.builtin.lineinfile:
     path: /etc/locale.conf
     regexp: '^LANG='
     line: LANG=en_US.UTF-8
+  when: ansible_facts['distribution'] == "Archlinux"
 
 # geerlingguy.ntp will overwrite timezone
 - name: Set timezone to {{ ntp_timezone }}

@@ -11,7 +11,7 @@ nvidia drivers
 share data directories
 media server | /etc/dnsmasq.d/10-plex.conf | max_user_watches | NFS | SMB
 grub-btrfs for ubuntu
-LAN networking | 20-wired-lan.network
+LAN networking | create /etc/systemd/network/2* files
 WAN networking | NAT
 bootloader
 create filesystem | fstrim | BTRFS to mkinitcpio | fstab

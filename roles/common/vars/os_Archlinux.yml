@@ -6,4 +6,9 @@ aur:
 
 nfs_client_packages:
   - nfs-utils
-  
+ 
+zsh_packages:
+  - zsh
+  - zsh-completions
+  - zsh-syntax-highlighting
+  - zsh-autosuggestions

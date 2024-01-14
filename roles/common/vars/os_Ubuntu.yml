@@ -2,4 +2,8 @@ os_groups: [sudo,dip,plugdev]
 
 nfs_client_packages:
   - nfs-common
-  
+
+zsh_packages:
+  - zsh
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting

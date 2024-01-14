@@ -10,11 +10,7 @@
 
 - name: Install ZSH
   ansible.builtin.package:
-    name:
-      - zsh
-      - zsh-completions
-      - zsh-syntax-highlighting
-      - zsh-autosuggestions
+    name: "{{ zsh_packages }}"
     state: present
   tags:
     - shell

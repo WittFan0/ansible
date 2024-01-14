@@ -1,11 +1,14 @@
 virtualization_packages:
-  - iptables-nft
-  - dnsmasq
-  - dmidecode
-  - gettext
+  - iptables-nft    # required for default NAT networking
+  - dnsmasq         # required for default NAT/DHCP for guests
+  - dmidecode       # DMI system info support
+  - gettext         # required for libvirt-guests.service
+  - openbsd-netcat  # for remote management over SSH
+  - libvirt
   - virt-manager
+  - base-devel      # Needed to install the Vagrant libvirt provider plugin
   - vagrant
-  - qemu-desktop
+  - qemu-desktop    # QEMU/KVM support
   - edk2-ovmf
 
 grub_boot_conf_dest: '/boot/grub/grub.cfg'

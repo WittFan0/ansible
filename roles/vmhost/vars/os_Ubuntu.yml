@@ -1,6 +1,7 @@
 virtualization_packages:
   - dmidecode
   - gettext
+  - ssh-askpass  # lets us manage KVM Virtual Machines on a remote server
   - virt-manager
   - vagrant
   - qemu-kvm
@@ -10,4 +11,3 @@ virtualization_packages:
   - gir1.2-ayatanaappindicator3-0.1
   - gir1.2-spiceclientglib-2.0
   - gir1.2-spiceclientgtk-3.0
-

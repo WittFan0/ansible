@@ -18,6 +18,18 @@
     - vmhost
   environment: "{{proxy_env}}"
 
+- name: Create kvm group
+  ansible.builtin.group:
+    name: kvm
+    state: present
+  tags:
+    - vmhost
+
+- name: Add prime user to kvm group
+  ansible.builtin.command: |
+    usermod -a -G kvm {{ remote_user.name }}
+  become: true
+
 # The libvirt group is optional. It is not needed if the user is a member of the wheel group (arch) or sudo group (ubuntu)
 - name: Create libvirt group
   ansible.builtin.group:
@@ -30,6 +42,13 @@
   ansible.builtin.command: |
     usermod -a -G libvirt {{ remote_user.name }}
   become: true
+
+- name: Create directory for libvirt images
+  ansible.builtin.file:
+    path: /var/lib/libvirt/images
+    state: directory
+    group: kvm
+    mode: '0770'
 
 - name: Create directory for libvirt hooks
   ansible.builtin.file:
@@ -76,6 +95,16 @@
     name: libvirtd.service
     enabled: yes
     state: started
+
+- name: Add libvirt plugin provider to Vagrant  # libvirtd.service must be running for this to work
+  ansible.builtin.command: |
+    vagrant plugin install vagrant-libvirt
+  become: false
+
+- name: Allow vagrant boxes to work with different providers  # libvirtd.service must be running for this to work
+  ansible.builtin.command: |
+    vagrant plugin install vagrant-mutate
+  become: false
 
 - name: Create script to view IOMMU groups
   ansible.builtin.copy:

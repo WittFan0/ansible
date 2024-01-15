@@ -9,6 +9,13 @@
   tags:
     - packages
 
+- name: Install smartcard service (Debian)
+  ansible.builtin.apt:
+    name: pcscd
+    state: present
+  tags:
+    - packages
+
 - name: Install endlessh and smartcard (AUR)
   kewlfft.aur.aur:
     name: 
@@ -19,7 +26,7 @@
   tags:
     - aur
     - packages
-  become: "yes"
+  become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
 

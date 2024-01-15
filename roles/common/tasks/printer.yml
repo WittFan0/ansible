@@ -1,6 +1,6 @@
 - name: Install print system
   ansible.builtin.package:
-    name: cups 
+    name: "{{ printing_packages }}"
     state: present
     update_cache: true
   tags:
@@ -13,7 +13,7 @@
     backup: yes
   notify: restart_cups
 
-- name: Install Brother printer driver  # <-- Doesn't work for printing to Brother printer over network. Use IPP instead.
+- name: Install Brother printer driver (Arch) # <-- Doesn't work for printing to Brother printer over network. Use IPP instead.
   kewlfft.aur.aur:
     name: 
       - brother-hll2320d
@@ -21,26 +21,37 @@
   tags:
     - aur
     - packages
-  become: "yes"
+  become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: Download Brother printer driver
+# # These pacakges won't install becasue they are for an i386 architecture
+# - name: Install hll2320dlpr package from the internet (Debian)
+#   ansible.builtin.apt:
+#     deb: https://download.brother.com/pub/com/linux/linux/packages/hll2320dlpr-3.2.0-1.i386.deb
+
+# - name: Install hll2320dcupswrapper package from the internet (Debian)
+#   ansible.builtin.apt:
+#     deb: https://download.brother.com/pub/com/linux/linux/packages/hll2320dcupswrapper-3.2.0-1.i386.deb
+
+- name: Get Brother printer driver (Debian)
   ansible.builtin.unarchive:
-    src: linux-brprinter-installer-2.2.3-1.gz
+    src: linux-brprinter-installer-2.2.3-1.tar.gz
     dest: /opt
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
-- name: Make Brother printer driver installer file executable
+- name: Make Brother printer driver installer file executable (Debian)
   ansible.builtin.file:
     path: /opt/linux-brprinter-installer-2.2.3-1
     mode: '0755'
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
-- name: Install Brother printer driver
-  ansible.builtin.command: |
-    /opt/linux-brprinter-installer-2.2.3-1
-  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+# # Because the installation script is interactive, 
+# # it cannot be run using ansible.
+# - name: Install Brother printer driver (Debian)
+#   ansible.builtin.command: |
+#     /opt/linux-brprinter-installer-2.2.3-1 HL-L2320D
+#   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Enable print system
   service:

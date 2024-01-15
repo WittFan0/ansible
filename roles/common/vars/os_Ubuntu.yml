@@ -1,5 +1,10 @@
-os_groups: [sudo,dip,plugdev]
+os_groups: sudo,dip,plugdev
 
+printing_packages:
+  - cups
+  - lpr
+  - libusb-0.1-4
+  
 nfs_client_packages:
   - nfs-common
 

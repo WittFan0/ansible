@@ -1,8 +1,13 @@
-os_groups: network,log,wheel,power,rfkill,storage,optical
+os_groups: network,log,wheel,power,rfkill,storage,optical,scanner
 
 aur:
     builder: aur_builder  # <-- BEWARE:  This user will automatically be deleted at the end of the ansible run!
     dir: aur
+
+printing_packages:
+  - cups
+  - lpr
+  - libusb
 
 nfs_client_packages:
   - nfs-utils

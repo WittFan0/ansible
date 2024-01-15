@@ -60,7 +60,7 @@
     update_password: on_create # --> only set the password for newly created users
     shell: "{{ remote_user.shell_path }}"
     uid: "{{ remote_user.uid }}"
-    groups: sys,floppy,scanner,users,video,lp,audio,adm,{{ os_groups }}
+    groups: sys,floppy,users,video,lp,audio,adm,{{ os_groups }}
     append: yes   # --> user is not removed from existing groups
     generate_ssh_key: true
     ssh_key_passphrase: "{{ ssh_key_passphrase }}"

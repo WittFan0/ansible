@@ -43,7 +43,7 @@
   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Create the `aur_builder` user
-  become: yes
+  become: true
   ansible.builtin.user:
     name: "{{ aur.builder }}"
     create_home: yes
@@ -55,7 +55,7 @@
   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Allow the `aur_builder` user to run `sudo pacman` without a password
-  become: yes
+  become: true
   ansible.builtin.lineinfile:
     path: /etc/sudoers.d/11-install-aur_builder
     line: "{{ aur.builder }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
@@ -65,41 +65,6 @@
     - aur
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
-
-- name: Use all cores when compiling software
-  ansible.builtin.lineinfile:
-    dest: /etc/makepkg.conf
-    regexp: "^MAKEFLAGS="
-    line: MAKEFLAGS="-j$(nproc)"
-    backup: true
-
-- name: Use all cores when compressing packages (gzip)
-  ansible.builtin.lineinfile:
-    dest: /etc/makepkg.conf
-    regexp: "^COMPRESSGZ="
-    line: "COMPRESSGZ=(pigz -c -f -n)"
-    backup: true
-
-- name: Use all cores when compressing packages (bzip2)
-  ansible.builtin.lineinfile:
-    dest: /etc/makepkg.conf
-    regexp: "^COMPRESSBZ2="
-    line: "COMPRESSBZ2=(pbzip2 -c -f)"
-    backup: true
-
-- name: Use all cores when compressing packages (xz)
-  ansible.builtin.lineinfile:
-    dest: /etc/makepkg.conf
-    regexp: "^COMPRESSXZ="
-    line: "COMPRESSXZ=(xz -c -z --threads=0 -)"
-    backup: true
-
-- name: Use all cores when compressing packages (zstd)
-  ansible.builtin.lineinfile:
-    dest: /etc/makepkg.conf
-    regexp: "^COMPRESSZST="
-    line: "COMPRESSZST=(zstd -c -z -q --threads=0 -)"
-    backup: true
 
 - name: Create AUR directory
   file: path=/home/{{ aur.builder }}/{{ aur.dir }}
@@ -138,7 +103,7 @@
   tags:
     - aur
     - packages
-  become: "yes"
+  become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
 

@@ -3,6 +3,7 @@
   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Provide systemd-resolved domain name resolution for libvirt 
+  become: true
   ansible.builtin.file:
     src: /run/systemd/resolve/stub-resolv.conf
     dest: /etc/resolv.conf
@@ -10,6 +11,7 @@
     force: true
 
 - name: Install virtualization packages
+  become: true
   ansible.builtin.package:
     name: "{{ virtualization_packages }}"
     state: present
@@ -19,6 +21,7 @@
   environment: "{{proxy_env}}"
 
 - name: Create kvm group
+  become: true
   ansible.builtin.group:
     name: kvm
     state: present
@@ -32,6 +35,7 @@
 
 # The libvirt group is optional. It is not needed if the user is a member of the wheel group (arch) or sudo group (ubuntu)
 - name: Create libvirt group
+  become: true
   ansible.builtin.group:
     name: libvirt
     state: present
@@ -44,6 +48,7 @@
   become: true
 
 - name: Create directory for libvirt images
+  become: true
   ansible.builtin.file:
     path: /var/lib/libvirt/images
     state: directory
@@ -51,24 +56,28 @@
     mode: '0770'
 
 - name: Create directory for libvirt hooks
+  become: true
   ansible.builtin.file:
     path: /etc/libvirt/hooks/qemu.d/
     state: directory
     mode: '0755'
 
 - name: Download libvirt hook for running a command on startup or shutdown of a VM
+  become: true
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/PassthroughPOST/VFIO-Tools/master/libvirt_hooks/qemu
     dest: /etc/libvirt/hooks/qemu
     mode: '0755'
 
 - name: Create directory for libvirt VM startup hooks
+  become: true
   ansible.builtin.file:
     path: /etc/libvirt/hooks/qemu.d/passthrough_gaming/prepare/begin/
     state: directory
     mode: '0755'
 
 - name: Create scripts to run on startup of a VM
+  become: true
   ansible.builtin.template:
     src: start_sh.j2
     dest: /etc/libvirt/hooks/qemu.d/passthrough_gaming/prepare/begin/start.sh
@@ -77,12 +86,14 @@
   when: gpu_vid_nodedev is defined and gpu_aud_nodedev is defined
 
 - name: Create directory for libvirt VM shutdown hooks
+  become: true
   ansible.builtin.file:
     path: /etc/libvirt/hooks/qemu.d/passthrough_gaming/release/end/
     state: directory
     mode: '0755'
 
 - name: Create scripts to run on shutdown of a VM
+  become: true
   ansible.builtin.template:
     src: revert_sh.j2
     dest: /etc/libvirt/hooks/qemu.d/passthrough_gaming/release/end/revert.sh
@@ -91,6 +102,7 @@
   when: gpu_vid_nodedev is defined and gpu_aud_nodedev is defined
 
 - name: Enable and start libvirt
+  become: true
   service:
     name: libvirtd.service
     enabled: yes
@@ -107,6 +119,7 @@
   become: false
 
 - name: Create script to view IOMMU groups
+  become: true
   ansible.builtin.copy:
     content: |
       #!/bin/bash
@@ -121,6 +134,7 @@
     mode: '0755'
 
 - name: Bind vfio-pci to GPU device ID
+  become: true
   ansible.builtin.copy:
     content: |
       # Leave second GPU unbound so it can be passed through to a VM.
@@ -146,6 +160,7 @@
   when: passthrough_gpu_pci_id is defined and ansible_facts['virtualization_role'] != "guest"
 
 - name: Force vfio-pci to load before the graphics drivers have a chance to bind to the card (Arch)
+  become: true
   ansible.builtin.copy:
     dest: /etc/mkinitcpio-vfio.conf
     content: 
@@ -163,6 +178,7 @@
   when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
 - name: Create initramfs preset for GPU passthrough (Arch)
+  become: true
   ansible.builtin.copy:
     dest: /etc/mkinitcpio.d/linux-zen-vfio.preset
     content: 
@@ -184,6 +200,7 @@
   when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
 - name: Create VFIO boot menu entry
+  become: true
   ansible.builtin.template:
     src: arch_btrfs_21_linux_zen_vfio.j2
     dest: /etc/grub.d/21_linux_zen_vfio
@@ -192,3 +209,5 @@
     - reboot_system
     - reinstall_grub
   when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
+
+- include_tasks: lanbridge.yml

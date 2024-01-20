@@ -164,7 +164,7 @@
   tags:
     - aur
     - packages
-  become: "yes"
+  become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
   environment: "{{proxy_env}}"

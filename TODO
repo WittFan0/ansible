@@ -1,5 +1,10 @@
+Python encryption warning
+
+replace discontinued notracking blocklists
+router.yml playbook
+roll hardening into services being hardened
+use local DNS
 mount data directories
-add (btrfs) to binaries section of mkinitcpio.conf (ubuntu)
 disable root login
 smartd.conf lineinfile
 nullmailer-remotes lineinfile
@@ -11,15 +16,13 @@ nvidia drivers
 share data directories
 media server | /etc/dnsmasq.d/10-plex.conf | max_user_watches | NFS | SMB
 grub-btrfs for ubuntu
-LAN networking | create /etc/systemd/network/2* files
+LAN networking | Bridge networking | create /etc/systemd/network/2* files
 WAN networking | NAT
 bootloader
+add (btrfs) to binaries section of mkinitcpio.conf (ubuntu)
 create filesystem | fstrim | BTRFS to mkinitcpio | fstab
 Switch from cron to systemd timer
 get dracula wallpapers from git
-Python encryption warning
-
-combine development and aur roles?
 loop build /etc/skel/build/
 build dirs for aur_builder
 enable firewall

@@ -3,22 +3,14 @@
   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Add hosts
-  ansible.builtin.blockinfile:
+  ansible.builtin.lineinfile:
     path: /etc/hosts
-    block: | 
-      127.0.0.1  localhost
-      127.0.1.1  {{ hostname }}
-      ::1        localhost ip6-localhost ip6-loopback
-      ff02::1    ip6-allnodes
-      ff02::2    ip6-allrouters
-      192.168.40.1  router.q.qw  router
-      192.168.40.2  office.q.qw  office
-      192.168.40.4  mythbox.q.qw  mythbox
-      192.168.40.5  taichi.q.qw  taichi
-      192.168.40.199  dan.q.qw  dan
+    line: 192.168.40.8  dan.q.qw  dan
     insertafter: 'EOF'
     mode: '0644'
     backup: true
+  tags:
+    - packages
 
 - name: Enable pacman color
   ansible.builtin.lineinfile:

@@ -1,22 +1,32 @@
+---
 - name: Create XDG-compliant skeleton dirs for {{ remote_user.shell }}
   ansible.builtin.file:
     path: /etc/skel/.config/{{ remote_user.shell }}/
     state: directory
     mode: '0755'
+  when: remote_user.shell is defined
+  tags:
+    - shell
 
 - name: Create XDG-compliant skeleton files for {{ remote_user.shell }}_profile 
   ansible.builtin.command: /usr/bin/mv /etc/skel/.{{ remote_user.shell }}_profile /etc/skel/.config/{{ remote_user.shell }}/profile
   args:
     creates: /etc/skel/.config/{{ remote_user.shell }}/profile
     removes: /etc/skel/.{{ remote_user.shell }}_profile
-  become: yes
+  become: true
+  when: remote_user.shell is defined
+  tags:
+    - shell
 
 - name: Create XDG-compliant skeleton files for {{ remote_user.shell }}rc
   ansible.builtin.command: /usr/bin/mv /etc/skel/.{{ remote_user.shell }}rc /etc/skel/.config/{{ remote_user.shell }}/{{ remote_user.shell }}rc
   args:
     creates: /etc/skel/.config/{{ remote_user.shell }}/{{ remote_user.shell }}rc
     removes: /etc/skel/.{{ remote_user.shell }}rc
-  become: yes
+  when: remote_user.shell is defined
+  become: true
+  tags:
+    - shell
 
 - name: Create global XDG-compliant BASH login shell
   ansible.builtin.copy:
@@ -24,19 +34,22 @@
     dest: /etc/profile.d/bash_xdg.sh
     backup: false
     mode: '0644'
-  notify: 
+  tags:
+    - shell
 
 # - name: Create local XDG-compliant BASH login shell
 #   ansible.builtin.copy:
 #     src: bashprofile_xdg
-#     dest: /etc/skel/.{{ remote_user.shell }}_profile
+#     dest: /etc/skel/.bash_profile
 #     backup: false
 #     mode: '0644'
+#   tags:
+#     - shell
 #   notify: 
 
 - name: Create global XDG-compliant BASH interactive shell
   ansible.builtin.blockinfile:
-    path: /etc/{{ remote_user.shell }}.{{ remote_user.shell }}rc
+    path: /etc/bash.bashrc
     block: | 
       _confdir=${XDG_CONFIG_HOME:-$HOME/.config}/bash
       _datadir=${XDG_DATA_HOME:-$HOME/.local/share}/bash
@@ -62,6 +75,9 @@
     insertafter: 'EOF'
     mode: '0644'
     backup: true
+  when: remote_user.shell  == "bash"
+  tags:
+    - shell
 
 # - name: Create local XDG-compliant BASH interactive shell
 #   ansible.builtin.copy:
@@ -69,6 +85,8 @@
 #     dest: /etc/skel/.{{ remote_user.shell }}rc
 #     backup: false
 #     mode: '0644'
+#   tags:
+#     - shell
 #   notify: 
 
 - name: Set global environment variables
@@ -89,5 +107,24 @@
     insertafter: 'EOF'
     mode: '0644'
     backup: true
+  tags:
+    - shell
 #   notify: 
 
+- name: Install Bash
+  ansible.builtin.package:
+    name:
+      - bash
+      - bash-completion
+    state: present
+  tags:
+    - shell
+  when: remote_user.shell == "bash"
+
+- name: Install ZSH
+  ansible.builtin.package:
+    name: "{{ zsh_packages }}"
+    state: present
+  tags:
+    - shell
+  when: remote_user.shell == "zsh"

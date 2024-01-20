@@ -1,0 +1,1 @@
+os_groups: network,log,wheel,power,rfkill,storage,optical,scanner

@@ -1,5 +1,3 @@
-ssh_key_passphrase: "{{ vault_ssh_key_passphrase }}"
-
 ntp_timezone: America/New_York
 
 ntp_restrict:

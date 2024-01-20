@@ -1,0 +1,5 @@
+---
+- name: restart_cups
+  service:
+    name: cups.service
+    state: restarted

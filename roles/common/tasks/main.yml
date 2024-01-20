@@ -94,11 +94,11 @@
     dest: /usr/local/sbin/
     mode: '0755'
 
-- include_tasks: netmounts.yml
+- include_tasks: local_dns.yml
+- include_tasks: lanmounts.yml
 - include_tasks: discovery.yml
 - include_tasks: shell2xdg.yml
-- include_tasks: shell.yml
-- include_tasks: user.yml
+  when: remote_user.shell is defined
+- include_tasks: user_skel.yml
 - include_tasks: pacman-aur.yml
   when: ansible_facts['distribution'] == "Archlinux"
-- include_tasks: printer.yml

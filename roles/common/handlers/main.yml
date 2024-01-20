@@ -1,9 +1,4 @@
 ---
-- name: restart_cups
-  service:
-    name: cups.service
-    state: restarted
-
 - name: stop systemd per-user instance
   service:
     name: "user@{{ remote_user.uid }}"

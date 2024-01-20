@@ -1,0 +1,1 @@
+ssh_key_passphrase: "{{ vault_ssh_key_passphrase }}"

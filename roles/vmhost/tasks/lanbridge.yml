@@ -1,0 +1,60 @@
+---
+- name: Create network bridge
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [NetDev]
+      Name=br0
+      Kind=bridge
+      MACAddress={{ lan0.mac }}
+    dest: /etc/systemd/network/25-create-bridge-br0.netdev
+    backup: true
+
+- name: Bind ethernet to network bridge
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [Match]
+      Name={{ lan0.ifname }}
+
+      [Network]
+      Bridge=br0
+    dest: /etc/systemd/network/26-bind-ethernet-to-bridge-br0.network
+    backup: true
+
+- name: Configure bridge
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [Match]
+      Name=br0
+
+      [Address]
+      Address={{ lan0.ip }}/24
+
+      [Route]
+      Gateway={{ lan.gateway }}
+      GatewayOnLink=true
+
+      [Network]
+      DNS=192.168.40.4
+    dest: /etc/systemd/network/27-config-bridge-br0.network
+    backup: true
+
+- name: Create custom qemu config allowing {{ remote_user.name }} to connect VM guests to br0
+  become: true
+  ansible.builtin.copy:
+    content: 'allow br0'
+    dest: /etc/qemu/{{ remote_user.name }}.conf
+    owner: root
+    group: "{{ remote_user.group }}"
+    mode: '0640'
+    backup: true
+
+- name: Source {{ remote_user.name }}'s qemu custom config
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/qemu/bridge.conf
+    line: include /etc/qemu/{{ remote_user.name }}.conf
+    backup: true
+

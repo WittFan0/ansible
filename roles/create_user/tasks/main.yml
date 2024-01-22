@@ -41,8 +41,8 @@
     validate: 'visudo -cf %s'
 
 - name: Add authorized SSH keys
-  ansible.builtin.copy:
-    src: authorized_keys
+  ansible.builtin.template:
+    src: authorized_keys.j2
     dest: /home/{{ remote_user.name }}/.ssh/authorized_keys
     owner: "{{ remote_user.name }}"
     group: "{{ remote_user.group }}"

@@ -58,12 +58,14 @@
     backup: no
   notify: restart_dnsmasq
 
-- name: Add cron job for refreshing DNS blacklist
-  ansible.builtin.copy:
-    src: dns-blacklist-update
-    dest: /etc/cron.daily/dns-blacklist-update
-    mode: '0755'
-    backup: no
+# # Blackilst is no longer being maintained
+# # TODO: Find a DNS blacklist replacement
+# - name: Add cron job for refreshing DNS blacklist
+#   ansible.builtin.copy:
+#     src: dns-blacklist-update
+#     dest: /etc/cron.daily/dns-blacklist-update
+#     mode: '0755'
+#     backup: no
 
 - name: Create PXE directory if it does not exist
   ansible.builtin.file:

@@ -62,7 +62,7 @@
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: Get packages from proxy server (Debian)
+- name: Use proxy for retreiving apt packages (Debian)
   ansible.builtin.copy:
     content: |
       Acquire {
@@ -71,6 +71,16 @@
       }
     dest: /etc/apt/apt.conf.d/10proxy.conf
     backup: yes
+  tags:
+    - packages
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Switch to cacheable http apt sources
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list
+    regexp: 'http?://([A-Za-z0-9]+(\.[A-Za-z0-9]+)+)/ubuntu/'
+    replace: 'http://mirrors.edge.kernel.org/ubuntu/'
+    backup: true
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]

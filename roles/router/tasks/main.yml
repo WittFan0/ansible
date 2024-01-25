@@ -66,7 +66,7 @@
   # notify: reload_ufw  # <-- UFW isn't running yet
 
 # Use the wireless nic as a wi-fi access point
-- include_tasks: wap.yml
+- ansible.builtin.include_tasks: wap.yml
   when: wap.ifname is defined
 
 

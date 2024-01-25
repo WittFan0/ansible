@@ -3,12 +3,12 @@
 # not in the order listed in the notify statement.
 
 - name: restart_
-  service:
+  ansible.builtin.service:
     name: .service
     state: restarted
 
 - name: recreate_initial_ramdisk
-  command: mkinitcpio -P
+  ansible.builtin.command: mkinitcpio -P
 
 - name: reboot_system
   ansible.builtin.reboot:

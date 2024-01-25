@@ -1,14 +1,14 @@
 ---
 - name: restart_lightdm
-  service:
+  ansible.builtin.service:
     name: lightdm.service
     state: restarted
 
 - name: restart_sddm
-  service:
+  ansible.builtin.service:
     name: sddm.service
     state: restarted
 
 - name: recreate_initial_ramdisk
-  command: mkinitcpio -P 
+  ansible.builtin.command: mkinitcpio -P 
 

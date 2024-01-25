@@ -1,9 +1,9 @@
 ---
 - name: Set OS distribution dependent variables
-  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Set desktop environment dependent variables
-  include_vars: "os_{{ desktop_environment }}.yml"
+  ansible.builtin.include_vars: "os_{{ desktop_environment }}.yml"
 
 - name: Install sound system
   ansible.builtin.package:
@@ -118,27 +118,27 @@
   ansible.builtin.meta: flush_handlers
 
 - name: Enable {{ display-mgr }} display manager
-  service:
+  ansible.builtin.service:
     name: "{{ display-mgr }}.service"
     enabled: yes
     state: started
 
 # - name: Enable LightDM display manager
-#   service:
+#   ansible.builtin.service:
 #     name: lightdm.service
 #     enabled: yes
 #     state: started
 #   when: desktop_environment == "xfce"
 
 # - name: Enable SDDM display manager
-#   service:
+#   ansible.builtin.service:
 #     name: sddm.service
 #     enabled: yes
 #     state: started
 #   when: desktop_environment == "kde"
 
 # - name: Enable Gnome display manager
-#   service:
+#   ansible.builtin.service:
 #     name: gdm.service
 #     enabled: yes
 #     state: started

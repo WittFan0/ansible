@@ -40,7 +40,7 @@
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
   
 - name: Enable service discovery
-  service:
+  ansible.builtin.service:
     name: avahi-daemon.service
     enabled: yes
     state: started

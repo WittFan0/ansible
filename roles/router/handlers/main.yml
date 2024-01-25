@@ -1,9 +1,9 @@
 ---
 - name: update_sysctl
-  command: sysctl -p
+  ansible.builtin.command: sysctl -p
 
 - name: reload_ufw
-  command: ufw reload
+  ansible.builtin.command: ufw reload
 
 # systemctl_daemon-reload must come before restart_systemd-networkd.
 # Handlers are executed in the order they are listed below,

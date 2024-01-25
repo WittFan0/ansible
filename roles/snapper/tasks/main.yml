@@ -1,6 +1,6 @@
 ---
 - name: Set OS distribution dependent variables
-  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install btrfs filesystem utilities
   become: true
@@ -122,14 +122,14 @@
 
 - name: Enable and start snapper service
   become: true
-  service:
+  ansible.builtin.service:
     name: snapperd.service
     enabled: yes
     state: started
 
 - name: Enable and start grub-btrfs-snapper service
   become: true
-  service:
+  ansible.builtin.service:
     name: grub-btrfs-snapper.service
     enabled: yes
     state: started

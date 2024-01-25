@@ -1,9 +1,9 @@
 ---
 - name: restart_proxy
-  service:
+  ansible.builtin.service:
     name: squid.service
     state: restarted
 
 - name: reload_proxy
-  command: squid -k reconfigure
+  ansible.builtin.command: squid -k reconfigure
   

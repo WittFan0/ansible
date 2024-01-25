@@ -1,6 +1,6 @@
 ---
 # - name: Set OS distribution dependent variables
-#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+#   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 # - name: Install packages
 #   become: true
@@ -63,10 +63,10 @@
 #   notify: 
 
 # - name: Enable and start service
-#   service:
+#   ansible.builtin.service:
 #     name: .service
 #     enabled: yes
 #     state: started
 
-# - include_tasks: .yml
+# - ansible.builtin.include_tasks: .yml
 #   when: ansible_facts['distribution'] == "DistroName"

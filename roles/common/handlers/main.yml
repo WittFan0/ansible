@@ -1,15 +1,15 @@
 ---
 - name: stop systemd per-user instance
-  service:
+  ansible.builtin.service:
     name: "user@{{ remote_user.uid }}"
     state: stopped
 
 - name: reload_systemd_config
-  command: systemctl daemon-reload
+  ansible.builtin.command: systemctl daemon-reload
   become: true
 
 - name: restart_resolved
-  service:
+  ansible.builtin.service:
     name: systemd-resolved.service
     state: restarted
 

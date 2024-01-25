@@ -1,5 +1,5 @@
 - name: Set OS distribution dependent variables
-  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install nullmailer
   ansible.builtin.package:
@@ -46,7 +46,7 @@
     mode: '0755'
 
 - name: Enable and start nullmailer
-  service:
+  ansible.builtin.service:
     name: nullmailer.service
     enabled: yes
     state: started
@@ -107,7 +107,7 @@
   notify: restart_sensorsd
 
 - name: Enable and start sensors daemon
-  service:
+  ansible.builtin.service:
     name: "{{ sensors_service }}"
     enabled: yes
     state: started
@@ -135,7 +135,7 @@
   notify: restart_logwatch
 
 - name: Enable and start logwatch timer
-  service:
+  ansible.builtin.service:
     name: logwatch.timer
     enabled: yes
     state: started

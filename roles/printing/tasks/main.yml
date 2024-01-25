@@ -1,6 +1,6 @@
 ---
 - name: Set OS distribution dependent variables
-  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install print system
   ansible.builtin.package:
@@ -58,7 +58,7 @@
 #   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Enable print system
-  service:
+  ansible.builtin.service:
     name: cups.service
     enabled: yes
     state: started

@@ -140,7 +140,7 @@
   become: true
 
 - name: Enable and start DNS, DHCP and TFTP servers
-  service:
+  ansible.builtin.service:
     name: dnsmasq.service
     enabled: yes
     state: started

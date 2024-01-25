@@ -1,6 +1,6 @@
 ---
 - name: Set OS distribution dependent variables
-  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Set the hostname
   hostname:
@@ -94,11 +94,11 @@
     dest: /usr/local/sbin/
     mode: '0755'
 
-- include_tasks: local_dns.yml
-- include_tasks: lanmounts.yml
-- include_tasks: discovery.yml
-- include_tasks: shell2xdg.yml
+- ansible.builtin.include_tasks: local_dns.yml
+- ansible.builtin.include_tasks: lanmounts.yml
+- ansible.builtin.include_tasks: discovery.yml
+- ansible.builtin.include_tasks: shell2xdg.yml
   when: remote_user.shell is defined
-- include_tasks: user_skel.yml
-- include_tasks: pacman-aur.yml
+- ansible.builtin.include_tasks: user_skel.yml
+- ansible.builtin.include_tasks: pacman-aur.yml
   when: ansible_facts['distribution'] == "Archlinux"

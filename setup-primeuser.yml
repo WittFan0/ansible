@@ -1,6 +1,6 @@
 ---
 # - name: Set OS distribution dependent variables
-#   include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+#   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - hosts: archvm
   # connection: local
@@ -34,81 +34,3 @@
       ansible.builtin.git:
         repo: https://github.com/WittFan0/myscripts.git
         dest: /home/{{ remote_user.name }}/Projects/myscripts
-
-    # - name: Read-write git checkout of ansible project from github
-    #   ansible.builtin.git:
-    #     repo: git@github.com:WittFan0/ansible.git
-    #     dest: /home/{{ remote_user.name }}/Projects
-    #     key_file: 
-
-    # - name: Read-write git checkout of myscripts from github
-    #   ansible.builtin.git:
-    #     repo: git@github.com:WittFan0/myscripts.git
-    #     dest: /home/{{ remote_user.name }}/Projects
-    #     key_file: 
-
-    # - name: Install packages
-    #   become: true
-    #   ansible.builtin.package:
-    #     name: 
-    #       - package 
-    #     state: present
-    #   tags:
-    #     - packages
-
-    # - name: Install package (apt)
-    #   become: true
-    #   ansible.builtin.apt:
-    #     name: 
-    #       - 
-    #     state: present
-    #   tags:
-    #     - packages
-    #   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-
-    # - name: Install package (pacman)
-    #   become: true
-    #   community.general.pacman:
-    #     name: 
-    #       -  
-    #     state: present
-    #   tags:
-    #     - packages
-    #   when: ansible_facts['distribution'] == "Archlinux"
-
-    # - name: Install AUR pacakges
-    #   kewlfft.aur.aur:
-    #     name: 
-    #       - 
-    #     state: present
-    #   tags:
-    #     - aur
-    #     - packages
-    #   become: true
-    #   become_user: "{{ aur.builder }}"
-    #   when: ansible_facts['distribution'] == "Archlinux"
-
-    # - name: Configure 
-    #   ansible.builtin.template:
-    #     src: 
-    #     dest: /
-    #     backup: true
-    #   notify: 
-
-    # - name: Create file
-    #   ansible.builtin.copy:
-    #     src: 
-    #     dest: /
-    #     owner: "{{ remote_user.name }}"
-    #     group: "{{ remote_user.group }}"
-    #     backup: true
-    #   notify: 
-
-    # - name: Enable and start service
-    #   service:
-    #     name: .service
-    #     enabled: yes
-    #     state: started
-
-    # - include_tasks: .yml
-    #   when: ansible_facts['distribution'] == "DistroName"

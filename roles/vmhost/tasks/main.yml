@@ -1,6 +1,6 @@
 ---
 - name: Set OS distribution dependent variables
-  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Provide systemd-resolved domain name resolution for libvirt 
   become: true
@@ -103,7 +103,7 @@
 
 - name: Enable and start libvirt
   become: true
-  service:
+  ansible.builtin.service:
     name: libvirtd.service
     enabled: yes
     state: started
@@ -210,4 +210,4 @@
     - reinstall_grub
   when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
-- include_tasks: lanbridge.yml
+- ansible.builtin.include_tasks: lanbridge.yml

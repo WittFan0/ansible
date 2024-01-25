@@ -1,6 +1,6 @@
 ---
 - name: Set OS distribution dependent variables
-  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install wireless packages
   become: true
@@ -38,7 +38,7 @@
     backup: true
   notify: restart_wpa_supplicant
 
-- include_tasks: ../../vmhost/tasks/lanbridge.yml
+- ansible.builtin.include_tasks: ../../vmhost/tasks/lanbridge.yml
 
 - name: Create a directory for {{ wap.ifname }} config file
   ansible.builtin.file:

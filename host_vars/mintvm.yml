@@ -5,6 +5,7 @@ hostname: mintvm
 lan0:
     ip: "{{ lan.base }}.39"
     ifname: 
+    mac: 02:00:00:00:01:02
 
 wan:
     ifname: 

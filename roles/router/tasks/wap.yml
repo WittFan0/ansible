@@ -1,0 +1,85 @@
+---
+- name: Set OS distribution dependent variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install wireless packages
+  become: true
+  ansible.builtin.package:
+    name: "{{ wap_packages }}"
+    state: present
+  tags:
+    - packages
+  environment: "{{proxy_env}}"
+
+# Config from https://raspberrypi.stackexchange.com/questions/98511/configuring-raspberry-pi-as-router-wifi-and-ethernet-bridge/98551#98551
+- name: Configure wpa_supplicant for access point
+  become: true
+  ansible.builtin.copy:
+    content: |
+      country=US
+      ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+      update_config=1
+
+      network={
+          ssid="keepout-test"
+          mode=2
+          #frequency=2412  # <-- Channel 1
+          frequency=2437  # <-- Channel 6
+          #frequency=2442  # <-- Channel 7
+          #frequency=2462  # <-- Channel 11
+          #key_mgmt=NONE   # uncomment this for an open hotspot
+          # delete next 3 lines if key_mgmt=NONE
+          key_mgmt=WPA-PSK
+          proto=RSN WPA
+          psk="{{ vault_wpa_password }}
+      }
+    dest: /etc/wpa_supplicant/wpa_supplicant-{{ wap.ifname }}.conf
+    mode: '0600'
+    backup: true
+  notify: restart_wpa_supplicant
+
+- include_tasks: ../../vmhost/tasks/lanbridge.yml
+
+- name: Create a directory for {{ wap.ifname }} config file
+  ansible.builtin.file:
+    path: /etc/systemd/system/wpa_supplicant@{{ wap.ifname }}.service.d/
+    state: directory
+    mode: '0755'
+
+- name: Tell wpa_supplicant to connect {{ wap.ifname }} to the bridge
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [Service]
+      ExecStartPre=/sbin/iw dev %i set type __ap
+      ExecStartPre=/bin/ip link set %i master br0
+
+      ExecStart=
+      ExecStart=/sbin/wpa_supplicant -c/etc/wpa_supplicant/wpa_supplicant-%I.conf -Dnl80211,wext -i%I -bbr0
+
+      ExecStopPost=-/bin/ip link set %i nomaster
+      ExecStopPost=-/sbin/iw dev %i set type managed
+    dest: /etc/systemd/system/wpa_supplicant@{{ wap.ifname }}.service.d/override.conf
+    backup: true
+  notify: restart_wpa_supplicant
+
+
+
+# - name: rfkill unblock wlan
+#   ansible.builtin.command: rfkill unblock wlan
+
+
+
+- name: Configure wan interface
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [Match]
+      Name={{ wan.ifname }}
+
+      [Network]
+      DHCP=yes
+      MulticastDNS=yes
+    dest: /etc/systemd/network/15-wan.network
+    backup: true
+  notify: [router:systemctl_daemon-reload, router:restart_systemd-networkd]

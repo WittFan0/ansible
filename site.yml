@@ -24,7 +24,12 @@
     https_proxy: http://dan:3128
     ftp_proxy: http://dan:3128
 
-- hosts: router
+- hosts: printing
+  become: true
+  roles:
+    - printing
+
+- hosts: lan_controller
   become: true
   roles:
     - geerlingguy.ntp
@@ -53,6 +58,7 @@
     - desktopenv
     # - ripping
     - graphics
+#    when: desktop_environment is defined  <-- ERROR! 'when' is not a valid attribute for a Play
 
 - hosts: development
   become: true
@@ -63,6 +69,7 @@
   become: true
   roles:
     - gaming
+#   when: desktop_environment is defined  <-- ERROR! 'when' is not a valid attribute for a Play
 
 - hosts: vmhost
   become: true
@@ -73,6 +80,12 @@
   become: true
   roles:
     - snapper
+
+- hosts: router
+  become: true
+  roles:
+    - router
+#   when: wan.ifname is defined  <-- ERROR! 'when' is not a valid attribute for a Play
 
 - hosts: all
   become: true
@@ -106,6 +119,10 @@
       ansible.builtin.command: reflector --country US,Canada --completion-percent 90 --sort rate --latest 20 --protocol https --save /etc/pacman.d/mirrorlist
       become: true
       when: ansible_facts['distribution'] == "Archlinux"
+
+    # - name: Enable firewall
+    #   ansible.builtin.command: ufw enable
+    #   become: true
 
   # roles:
   #   - sshd-keyonly  # <-- Must come last because it disables root ssh

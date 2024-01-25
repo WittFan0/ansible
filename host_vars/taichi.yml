@@ -7,6 +7,7 @@ grub_gfxmode: 2560x1440x32,1920x1080x32,1440x900x32,1280x1024x32,1024x768x32,aut
 lan0:
     ip: "{{ lan.base }}.5"
     ifname: eno1
+    mac: 70:85:c2:d3:e5:fa
 
 wan:
     ifname: 

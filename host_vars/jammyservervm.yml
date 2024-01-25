@@ -5,6 +5,7 @@ hostname: jammyservervm
 lan0:
     ip: "{{ lan.base }}.35"
     ifname: enp0s4
+    mac: 02:00:00:00:01:05
 
 wan:
     ifname: 

@@ -1,0 +1,3 @@
+wap_packages:
+    - iw
+    - wpa_supplicant

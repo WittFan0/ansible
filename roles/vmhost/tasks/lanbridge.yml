@@ -7,10 +7,11 @@
       Name=br0
       Kind=bridge
       MACAddress={{ lan0.mac }}
-    dest: /etc/systemd/network/25-create-bridge-br0.netdev
+    dest: /etc/systemd/network/02-create-bridge-br0.netdev
     backup: true
+  notify: [vmhost:systemctl_daemon-reload, vmhost:restart_systemd-networkd]
 
-- name: Bind ethernet to network bridge
+- name: Bind {{ lan0.ifname }} to network bridge
   become: true
   ansible.builtin.copy:
     content: |
@@ -19,8 +20,9 @@
 
       [Network]
       Bridge=br0
-    dest: /etc/systemd/network/26-bind-ethernet-to-bridge-br0.network
+    dest: /etc/systemd/network/20-bind-ethernet-to-bridge-br0.network
     backup: true
+  notify: [vmhost:systemctl_daemon-reload, vmhost:restart_systemd-networkd]
 
 - name: Configure bridge
   become: true
@@ -37,9 +39,29 @@
       GatewayOnLink=true
 
       [Network]
-      DNS=192.168.40.4
-    dest: /etc/systemd/network/27-config-bridge-br0.network
+      MulticastDNS=yes
+      IPMasquerade=yes
+      DHCPServer=yes
+
+      [DHCPServer]
+      DNS=1.1.1.1 1.0.0.1 208.67.222.222 208.67.220.220
+    dest: /etc/systemd/network/25-config-bridge-br0.network
     backup: true
+  notify: [vmhost:systemctl_daemon-reload, vmhost:restart_systemd-networkd]
+
+- name: Configure routing between internet facing {{ wan.ifname }} and br0
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [Match]
+      Name={{ wan.ifname }}
+
+      [Network]
+      DHCP=yes
+      MulticastDNS=yes
+    dest: /etc/systemd/network/04-{{ wan.ifname }}.network
+    backup: true
+  notify: [vmhost:systemctl_daemon-reload, vmhost:restart_systemd-networkd]
 
 - name: Create custom qemu config allowing {{ remote_user.name }} to connect VM guests to br0
   become: true
@@ -57,4 +79,3 @@
     path: /etc/qemu/bridge.conf
     line: include /etc/qemu/{{ remote_user.name }}.conf
     backup: true
-

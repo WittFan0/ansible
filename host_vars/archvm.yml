@@ -1,10 +1,12 @@
 hostname: archvm
+ansible_user: root
 
 # kernel_parameters: "quiet consoleblank=60"
 
 lan0:
     ip: "{{ lan.base }}.31"
     ifname: enp0s4
+    mac: 02:00:00:00:01:09
     # ip2: "{{ ansible_facts["eth0"]["ipv4"]["address"] }}"
 
 wan:

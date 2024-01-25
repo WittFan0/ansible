@@ -1,0 +1,73 @@
+---
+- name: Install firewall
+  ansible.builtin.package:
+    name: ufw
+    state: present
+  tags:
+    - packages
+
+- name: Allow packet forwarding
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/default/ufw
+    regexp: '^DEFAULT_FORWARD_POLICY'
+    line: DEFAULT_FORWARD_POLICY="ACCEPT"
+    backup: true
+  # notify: reload_ufw  # <-- UFW isn't running yet
+
+- name: Enable ipv4 forwarding
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^net.ipv4.ip_forward'
+    line: net.ipv4.ip_forward = 1
+    backup: true
+  notify: update_sysctl
+
+- name: Enable ipv6 forwarding
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^net.ipv6.conf.all.forwarding'
+    line: net.ipv6.conf.all.forwarding = 1
+    backup: true
+  notify: update_sysctl
+
+# add rules that computers in Internal network can connect to external
+# network or internet via router pc acting as a gateway
+- name: Configure IP masquerading and forward necessary ports
+  ansible.builtin.blockinfile:
+    path: /etc/ufw/before.rules
+    insertbefore: "EOF"
+    block: |
+      #
+      
+      # NAT table rules
+      *nat
+      :PREROUTING ACCEPT [0:0]
+      :POSTROUTING ACCEPT [0:0]
+
+      # Xbox port forwardings
+      -A PREROUTING -i {{ wan.ifname }} --dport 53 -j DNAT --to-destination {{ xbox_ip }}
+      -A PREROUTING -i {{ wan.ifname }} --dport 3074 -j DNAT --to-destination {{ xbox_ip }}
+      -A PREROUTING -i {{ wan.ifname }} -p udp --dport 4500 -j DNAT --to-destination {{ xbox_ip }}
+      -A PREROUTING -i {{ wan.ifname }} -p udp --dport 3544 -j DNAT --to-destination {{ xbox_ip }}
+      -A PREROUTING -i {{ wan.ifname }} -p udp --dport 500 -j DNAT --to-destination {{ xbox_ip }}
+      -A PREROUTING -i {{ wan.ifname }} -p udp --dport 88 -j DNAT --to-destination {{ xbox_ip }}
+      -A PREROUTING -i {{ wan.ifname }} -p tcp --dport 80 -j DNAT --to-destination {{ xbox_ip }}
+
+      # Masquerade traffic exiting through {{ wan.ifname }} interface
+      -A POSTROUTING -s {{ lan.base }}.0/24 -o {{ wan.ifname }} -j MASQUERADE
+
+      # don't delete the 'COMMIT' line or these nat table rules won't
+      # be processed
+      COMMIT
+    backup: yes
+  # notify: reload_ufw  # <-- UFW isn't running yet
+
+# Use the wireless nic as a wi-fi access point
+- include_tasks: wap.yml
+  when: wap.ifname is defined
+
+
+# TODO: Define a gateway on each system that isn't the router pc

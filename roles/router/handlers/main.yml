@@ -1,12 +1,9 @@
 ---
-- name: recreate_initial_ramdisk
-  command: mkinitcpio -P 
+- name: update_sysctl
+  command: sysctl -p
 
-- name: reinstall_grub
-  command: "{{grub-mkconfig}} -o {{grub_boot_conf_dest}}"
-
-- name: reboot_system
-  ansible.builtin.reboot:
+- name: reload_ufw
+  command: ufw reload
 
 # systemctl_daemon-reload must come before restart_systemd-networkd.
 # Handlers are executed in the order they are listed below,

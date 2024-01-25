@@ -5,6 +5,7 @@ hostname: popos2204vm
 lan0:
     ip: "{{ lan.base }}.38"
     ifname: 
+    mac: 02:00:00:00:01:01
 
 wan:
     ifname: 

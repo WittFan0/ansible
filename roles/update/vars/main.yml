@@ -16,6 +16,7 @@ base_packages:
     - xdg-user-dirs
     - btrfs-progs
     - man-db
+    - ansible-lint
     - ansible
     - efibootmgr
     - zip

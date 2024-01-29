@@ -1,0 +1,18 @@
+hostname: beelink
+
+# kernel_parameters: "quiet consoleblank=60"
+
+lan0:
+    ip: "{{ lan.base }}.9"
+    ifname: enp1s0
+    mac: 84:39:be:68:69:ab
+
+wan: 
+    ifname: enxee129fdc4453
+
+wap:
+    ifname: wlp2s0
+
+ssh_port: 22   # changing this from 22 gets messy. For workaround see https://dmsimard.com/2016/03/15/changing-the-ssh-port-with-ansible/
+
+# desktop_environment: none

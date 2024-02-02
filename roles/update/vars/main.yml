@@ -27,7 +27,6 @@ base_packages:
     - dosfstools
     - ntfs-3g
     - exfatprogs
-    - rclone
     - tree
     - cryfs
     - etckeeper

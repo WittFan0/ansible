@@ -1,5 +1,7 @@
-nfs_client_packages:
+mount_client_packages:
   - nfs-common
+  - rclone
+  - davfs2
 
 zsh_packages:
   - zsh

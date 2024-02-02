@@ -66,6 +66,40 @@
     backup: no
     mode: '600'
 
+- name: Create Nextcloud storage directory if it does not exist
+  ansible.builtin.file:
+    path: /home/{{ remote_user.name }}/nextcloud
+    state: directory
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    mode: '0750'
+
+- name: Create davfs2 config directory if it does not exist
+  ansible.builtin.file:
+    path: /home/{{ remote_user.name }}/.davfs2
+    state: directory
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    mode: '0755'
+
+- name: Allow davfs2 to use local secrets
+  ansible.builtin.lineinfile:
+    path: /home/{{ remote_user.name }}/.davfs2/davfs2.conf
+    regexp: '^secrets '
+    line: secrets  ~/.davfs2/secrets # user config file only
+    create: yes
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+
+- name: Create davfs2 secrets
+  ansible.builtin.lineinfile:
+    path: /home/{{ remote_user.name }}/.davfs2/secrets
+    line: /home/{{ remote_user.name }}/nextcloud  {{ remote_user.name }}  {{ vault_nextcloud_davfs_password }}
+    create: yes
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    mode: '600'
+
 - name: Create other config files
   ansible.builtin.copy:
     src: dotfiles/config/

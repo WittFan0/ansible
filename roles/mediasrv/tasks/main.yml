@@ -1,3 +1,12 @@
+---
+- name: Install firewall
+  ansible.builtin.package:
+    name: ["ufw"]
+    state: present
+    update_cache: true
+  tags:
+    - packages
+
 - name: Configure Plex firewall exception
   ansible.builtin.copy:
     src: ufw-plexmediacenter

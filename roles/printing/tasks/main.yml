@@ -2,6 +2,15 @@
 - name: Set OS distribution dependent variables
   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
+- name: Open printer administration port
+  become: true
+  community.general.ufw:
+    rule: allow
+    from_ip: "{{ lan.subnet }}"
+    to_ip: "{{ lan0.ip }}"
+    to_port: ipp
+    comment: CUPS
+
 - name: Install print system
   ansible.builtin.package:
     name: "{{ printing_packages }}"

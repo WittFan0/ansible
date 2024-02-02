@@ -73,7 +73,6 @@
     to_port: "{{ ssh_port }}"
     proto: tcp
     comment: Rate limit OpenSSH server
-    state: enabled
   become: true
 
 - name: Open SSH tarpit port
@@ -83,17 +82,6 @@
     to_port: '2222'
     proto: tcp
     comment: OpenSSH tarpit
-    state: enabled
-
-- name: Open printer administration port
-  become: true
-  community.general.ufw:
-    rule: allow
-    from_ip: "{{ lan.subnet }}"
-    to_ip: "{{ lan0.ip }}"
-    to_port: ipp
-    comment: CUPS
-    state: enabled
 
 - name: Open NFS port
   become: true
@@ -103,7 +91,6 @@
     to_ip: "{{ lan0.ip }}"
     to_port: nfs
     comment: NFS
-    state: enabled
 
 - name: Open phpMyAdmin port
   become: true
@@ -113,7 +100,6 @@
     to_ip: "{{ lan0.ip }}"
     to_port: '51111'
     comment: phpMyAdmin
-    state: enabled
 
 - name: Open Piwigo ports
   become: true
@@ -121,7 +107,6 @@
     rule: allow
     to_port: '52080'
     comment: Piwigo
-    state: enabled
 
 - name: Open port for service discovery
   community.general.ufw:
@@ -131,7 +116,6 @@
     to_port: mdns
     proto: udp
     comment: Avahi service discovery
-    state: enabled
   become: true
 
 # PROBABLY NEED TO TEST THIS (e.g. SUBVOLUMES, DOCKER, ETC.) BEFORE ENABLING EVERYTHING.

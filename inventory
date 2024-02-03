@@ -5,48 +5,86 @@ all:
         # office:
         # taichi:
         # archvm:
+        # beelink:
         # mythboxtest:
+        # mythboxtest-vagrant:
+        # tc:
+    printing:
+      hosts:
+        # office:
+        # taichi:
+        # archvm:
+        # beelink:
+        # mythboxtest:
+        # mythboxtest-vagrant:
+        # tc
     collab_server:
       hosts:
         # taichi:
         # archvm:
+        # beelink:
         # mythboxtest:
+        # mythboxtest-vagrant:
+        # tc
     media_server:
       hosts:
         # taichi:
         # archvm:
+        # beelink:
         # mythboxtest:
+        # mythboxtest-vagrant:
+        # tc
+    lan_controller:
+      hosts:
+        # taichi:
+        # archvm:
+        # beelink:
+        # mythboxtest:
+        # mythboxtest-vagrant:
+        # tc
     router:
       hosts:
         # taichi:
         # archvm:
+        # beelink:
         # mythboxtest:
+        # mythboxtest-vagrant:
+        # tc
     workstation:
       hosts:
         # office:
         # taichi:
         # archvm:
+        # tc
     development:
       hosts:
         # office:
         # taichi:
         # archvm:
         # mythboxtest:
+        # tc
     btrfs:
       hosts:
         # office:
         # archvm:
+        # tc
     gaming:
       hosts:
+        # taichi:
         # office:
         # archvm:
     proxy:
       hosts:
         # archvm:
-        dan:
+        # tc
+        # dan:
+        # beelink:
+        # mythboxtest:
+        # mythboxtest-vagrant:
     vmhost:
       hosts:
         # office:
         # taichi:
         # archvm:
         # mythboxtest:
+        # tc

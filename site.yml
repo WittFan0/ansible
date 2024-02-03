@@ -1,18 +1,21 @@
 ---
-- hosts: all
+- name: Play for pushing ansible plays from server 
+  hosts: all
   become: true
 
   pre_tasks:
     - name: Classify hosts depending on their OS distribution
-      group_by:
+      ansible.builtin.group_by:
         key: os_{{ ansible_facts['distribution'] }}
 
-- hosts: btrfs
+- name: BTRFS roles
+  hosts: btrfs
   become: true
   roles:
     - btrfs
 
-- hosts: new_build
+- name: New build roles
+  hosts: new_build
   become: true
   roles:
     - update
@@ -24,35 +27,41 @@
     https_proxy: "{{ proxy_env }}"
     ftp_proxy: "{{ proxy_env }}"
 
-- hosts: printing
+- name: Printing role
+  hosts: printing
   become: true
   roles:
     - printing
 
-- hosts: lan_controller
+- name: LAN controller roles
+  hosts: lan_controller
   become: true
   roles:
     - geerlingguy.ntp
     - dnsmasq
 
-- hosts: proxy
+- name: Proxy role
+  hosts: proxy
   become: true
   roles:
     - proxy
 
-- hosts: media_server
+- name: Media server roles
+  hosts: media_server
   become: true
   roles:
     - geerlingguy.docker
     - mediasrv
 
-- hosts: collab_server
+- name: Collaboration server roles
+  hosts: collab_server
   become: true
   roles:
     - geerlingguy.docker
     - collab
 
-- hosts: workstation
+- name: Workstation roles
+  hosts: workstation
   become: true
   roles:
     - desktopenv
@@ -60,34 +69,40 @@
     - graphics
 #    when: desktop_environment is defined  <-- ERROR! 'when' is not a valid attribute for a Play
 
-- hosts: development
+- name: Developer role
+  hosts: development
   become: true
   roles:
     - development
 
-- hosts: gaming
+- name: Gaming role
+  hosts: gaming
   become: true
   roles:
     - gaming
 #   when: desktop_environment is defined  <-- ERROR! 'when' is not a valid attribute for a Play
 
-- hosts: vmhost
+- name: Virtual machine host role
+  hosts: vmhost
   become: true
   roles:
     - vmhost
 
-- hosts: btrfs
+- name: Snapper role
+  hosts: btrfs
   become: true
   roles:
     - snapper
 
-- hosts: router
+- name: Router role
+  hosts: router
   become: true
   roles:
     - router
 #   when: wan.ifname is defined  <-- ERROR! 'when' is not a valid attribute for a Play
 
-- hosts: all
+- name: Post execution clean-up
+  hosts: all
   become: true
   tasks:
     - name: Remove sudo-less pacman permission for `aur_builder`
@@ -99,17 +114,17 @@
         - packages
       when: ansible_facts['distribution'] == "Archlinux"
 
-    - name: Remove 'aur_builder' user 
+    - name: Remove 'aur_builder' user
       ansible.builtin.user:
         name: "{{ aur.builder }}"
         state: absent
-        remove: yes
+        remove: true
       when: ansible_facts['distribution'] == "Archlinux"
 
     - name: Install reflector
       community.general.pacman:
         update_cache: true
-        name: reflector 
+        name: reflector
         state: present
       tags:
         - packages
@@ -144,16 +159,12 @@
       # Only restart if the lan subnet hasn't changed
       when: ansible_facts['default_ipv4']['address'] == lan0.ip
 
-    - name: Reload systemctl daemon
-      ansible.builtin.command: systemctl daemon-reload
-      # Only restart if the lan subnet hasn't changed
-      when: ansible_facts['default_ipv4']['address'] == lan0.ip
-
     - name: Restart systemd-networkd
-      ansible.builtin.service:
+      ansible.builtin.systemd_service:
         name: systemd-networkd.service
         enabled: true
         state: restarted
+        daemon_reload: true
       # Only restart if the lan subnet hasn't changed
       when: ansible_facts['default_ipv4']['address'] == lan0.ip
 

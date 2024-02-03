@@ -1,18 +1,10 @@
 ---
-- name: update_sysctl
-  ansible.builtin.command: sysctl -p
+# # Not needed. Using UFW sysctl instead.
+# - name: update_sysctl
+#   become: true
+#   ansible.builtin.command: sysctl -p
 
-- name: reload_ufw
-  ansible.builtin.command: ufw reload
+- name: generate_netplan 
+  become: true
+  ansible.builtin.command: netplan generate
 
-# systemctl_daemon-reload must come before restart_systemd-networkd.
-# Handlers are executed in the order they are listed below,
-# not in the order listed in the notify statement.
-- name: systemctl_daemon-reload
-  ansible.builtin.command: systemctl daemon-reload
-
-- name: restart_systemd-networkd
-  ansible.builtin.service:
-    name: systemd-networkd.service
-    enabled: true
-    state: restarted

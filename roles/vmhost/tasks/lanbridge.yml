@@ -1,81 +1,136 @@
 ---
-- name: Create network bridge
-  become: true
-  ansible.builtin.copy:
-    content: |
-      [NetDev]
-      Name=br0
-      Kind=bridge
-      MACAddress={{ lan0.mac }}
-    dest: /etc/systemd/network/02-create-bridge-br0.netdev
-    backup: true
-  notify: [vmhost:systemctl_daemon-reload, vmhost:restart_systemd-networkd]
-
-- name: Bind {{ lan0.ifname }} to network bridge
-  become: true
-  ansible.builtin.copy:
-    content: |
-      [Match]
-      Name={{ lan0.ifname }}
-
-      [Network]
-      Bridge=br0
-    dest: /etc/systemd/network/20-bind-ethernet-to-bridge-br0.network
-    backup: true
-  notify: [vmhost:systemctl_daemon-reload, vmhost:restart_systemd-networkd]
-
-- name: Configure bridge
-  become: true
-  ansible.builtin.copy:
-    content: |
-      [Match]
-      Name=br0
-
-      [Address]
-      Address={{ lan0.ip }}/24
-
-      [Route]
-      Gateway={{ lan.gateway }}
-      GatewayOnLink=true
-
-      [Network]
-      MulticastDNS=yes
-      IPMasquerade=yes
-      DHCPServer=yes
-
-      [DHCPServer]
-      DNS=1.1.1.1 1.0.0.1 208.67.222.222 208.67.220.220
-    dest: /etc/systemd/network/25-config-bridge-br0.network
-    backup: true
-  notify: [vmhost:systemctl_daemon-reload, vmhost:restart_systemd-networkd]
-
-- name: Configure routing between internet facing {{ wan.ifname }} and br0
-  become: true
-  ansible.builtin.copy:
-    content: |
-      [Match]
-      Name={{ wan.ifname }}
-
-      [Network]
-      DHCP=yes
-      MulticastDNS=yes
-    dest: /etc/systemd/network/04-{{ wan.ifname }}.network
-    backup: true
-  notify: [vmhost:systemctl_daemon-reload, vmhost:restart_systemd-networkd]
-
-- name: Create custom qemu config allowing {{ remote_user.name }} to connect VM guests to br0
-  become: true
-  ansible.builtin.copy:
-    content: 'allow br0'
-    dest: /etc/qemu/{{ remote_user.name }}.conf
+- name: Remove existing network configuration
+  ansible.builtin.file:
+    state: "{{ item }}"
+    path: "/etc/netplan/"
     owner: root
-    group: "{{ remote_user.group }}"
-    mode: '0640'
-    backup: true
+    group: root
+    mode: '0755'
+  with_items:  # <-- delete and recreate the directory
+    - absent
+    - directory
 
-- name: Source {{ remote_user.name }}'s qemu custom config
+- name: Create a netplan that creates a bridge and connects {{ lan0.ifname }} to it
   become: true
-  ansible.builtin.lineinfile:
-    path: /etc/qemu/bridge.conf
-    line: include /etc/qemu/{{ remote_user.name }}.conf
+  ansible.builtin.copy:
+    content: |
+      # Network router configuration
+      network:
+        version: 2
+        renderer: networkd
+
+        ethernets:
+          # This is the internal-facing wired interface.
+          {{ lan0.ifname }}:
+            dhcp4: false
+            dhcp6: false
+
+        bridges:
+          br0:
+            interfaces: [{{ lan0.ifname }}] # <-- This must be a single line to allow playbooks to add interfaces to the bridge
+            addresses:
+            - {{ lan0.ip }}/24
+            mtu: 1500
+            nameservers:
+              search: [{{ lan.domain }}]
+              addresses:
+              - {{ lan.base }}.4
+              - 1.1.1.1
+              - 1.0.0.1
+              - 208.67.222.222
+              - 208.67.220.220
+              - 8.8.8.8
+              - 8.8.4.4
+    dest: /etc/netplan/00-bridge.yaml
     backup: true
+  notify: 
+    - "router : generate_netplan"
+
+- name: Modify bridge netplan to add {{ wan.ifname }}
+  ansible.builtin.blockinfile:
+    path: /etc/netplan/00-bridge.yaml
+    insertafter: "ethernets:"
+    block: |
+          # This is the public-facing interface.
+          {{ wan.ifname}}:
+            dhcp4: true
+            dhcp6: true
+    backup: true
+  when: wan.ifname is defined
+  notify: 
+    - "router : generate_netplan"
+
+- name: Modify bridge netplan to add {{ wap.ifname }}
+  ansible.builtin.blockinfile:
+    path: /etc/netplan/00-bridge.yaml
+    insertafter: "ethernets:"
+    block: |
+      # This is the internal-facing wireless interface.
+          {{ wap.ifname}}:
+            dhcp4: false
+            dhcp6: false
+    backup: true
+  when: wap.ifname is defined
+  notify: 
+    - "router : generate_netplan"
+
+# # The netplan plays above should do all this for us.
+# - name: Create network bridge
+#   become: true
+#   ansible.builtin.copy:
+#     content: |
+#       [NetDev]
+#       Name=br0
+#       Kind=bridge
+#       MACAddress={{ lan0.mac }}
+#     dest: /etc/systemd/network/02-create-bridge-br0.netdev
+#     backup: true
+
+# - name: Bind {{ lan0.ifname }} to network bridge
+#   become: true
+#   ansible.builtin.copy:
+#     content: |
+#       [Match]
+#       Name={{ lan0.ifname }}
+
+#       [Network]
+#       Bridge=br0
+#     dest: /etc/systemd/network/20-bind-ethernet-to-bridge-br0.network
+#     backup: true
+
+# - name: Configure bridge
+#   become: true
+#   ansible.builtin.copy:
+#     content: |
+#       [Match]
+#       Name=br0
+
+#       [Address]
+#       Address={{ lan0.ip }}/24
+
+#       [Route]
+#       Gateway={{ lan.gateway }}
+#       GatewayOnLink=true
+
+#       [Network]
+#       MulticastDNS=yes
+#       IPMasquerade=yes
+#       DHCPServer=yes
+
+#       [DHCPServer]
+#       DNS=1.1.1.1 1.0.0.1 208.67.222.222 208.67.220.220
+#     dest: /etc/systemd/network/25-config-bridge-br0.network
+#     backup: true
+
+# - name: Configure routing between internet facing {{ wan.ifname }} and br0
+#   become: true
+#   ansible.builtin.copy:
+#     content: |
+#       [Match]
+#       Name={{ wan.ifname }}
+
+#       [Network]
+#       DHCP=yes
+#       MulticastDNS=yes
+#     dest: /etc/systemd/network/04-{{ wan.ifname }}.network
+#     backup: true

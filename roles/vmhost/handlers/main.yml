@@ -7,15 +7,3 @@
 
 - name: reboot_system
   ansible.builtin.reboot:
-
-# systemctl_daemon-reload must come before restart_systemd-networkd.
-# Handlers are executed in the order they are listed below,
-# not in the order listed in the notify statement.
-- name: systemctl_daemon-reload
-  ansible.builtin.command: systemctl daemon-reload
-
-- name: restart_systemd-networkd
-  ansible.builtin.service:
-    name: systemd-networkd.service
-    enabled: true
-    state: restarted

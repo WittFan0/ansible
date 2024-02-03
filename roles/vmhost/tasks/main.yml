@@ -211,3 +211,20 @@
   when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
 - ansible.builtin.include_tasks: lanbridge.yml
+
+- name: Create custom qemu config allowing {{ remote_user.name }} to connect VM guests to br0
+  become: true
+  ansible.builtin.copy:
+    content: 'allow br0'
+    dest: /etc/qemu/{{ remote_user.name }}.conf
+    owner: root
+    group: "{{ remote_user.group }}"
+    mode: '0640'
+    backup: true
+
+- name: Source {{ remote_user.name }}'s qemu custom config
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/qemu/bridge.conf
+    line: include /etc/qemu/{{ remote_user.name }}.conf
+    backup: true

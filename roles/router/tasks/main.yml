@@ -1,4 +1,48 @@
 ---
+- name: Remove existing network configuration
+  ansible.builtin.file:
+    state: "{{ item }}"
+    path: "/etc/netplan/"
+    owner: root
+    group: root
+    mode: '0755'
+  with_items:  # <-- delete and recreate the directory
+    - absent
+    - directory
+
+- name: Create a netplan that assignes a static ip to {{ lan0.ifname }}
+  become: true
+  ansible.builtin.copy:
+    content: |
+      # Network router configuration
+      network:
+        version: 2
+        renderer: networkd
+        ethernets:
+          {{ lan0.ifname }}:
+            addresses:
+            - {{ lan0.ip }}/24
+            nameservers:
+              search: [{{ lan.domain }}]
+              addresses:
+              - {{ lan.base }}.4
+              - 1.1.1.1
+              - 1.0.0.1
+              - 208.67.222.222
+              - 208.67.220.220
+              - 8.8.8.8
+              - 8.8.4.4
+          {{ wan.ifname }}:
+            dhcp4: true
+    dest: /etc/netplan/01-router.yaml
+    backup: true
+  notify: 
+    - "router : generate_netplan"
+
+# Use the wireless nic as a wi-fi access point
+- ansible.builtin.include_tasks: wap.yml
+  when: wap.ifname is defined
+
 - name: Install firewall
   ansible.builtin.package:
     name: ufw
@@ -13,48 +57,51 @@
     regexp: '^DEFAULT_FORWARD_POLICY'
     line: DEFAULT_FORWARD_POLICY="ACCEPT"
     backup: true
-  # notify: reload_ufw  # <-- UFW isn't running yet
 
+# /etc/ufw/sysctl.conf takes precedence over /etc/sysctl.conf
 - name: Enable ipv4 forwarding
   become: true
   ansible.builtin.lineinfile:
-    path: /etc/sysctl.conf
-    regexp: '^net.ipv4.ip_forward'
-    line: net.ipv4.ip_forward = 1
+    path: /etc/ufw/sysctl.conf
+    regexp: '^net/ipv4/ip_forward'
+    line: net/ipv4/ip_forward=1
     backup: true
-  notify: update_sysctl
 
-- name: Enable ipv6 forwarding
-  become: true
-  ansible.builtin.lineinfile:
-    path: /etc/sysctl.conf
-    regexp: '^net.ipv6.conf.all.forwarding'
-    line: net.ipv6.conf.all.forwarding = 1
-    backup: true
-  notify: update_sysctl
+# - name: Enable ipv6 forwarding
+#   become: true
+#   ansible.builtin.lineinfile:
+#     path: /etc/ufw/sysctl.conf
+#     regexp: '^net/ipv6/conf/all/forwarding'
+#     line: net/ipv6/conf/all/forwarding=1
+#     backup: true
+
+# - become: true
+#   ansible.builtin.lineinfile:
+#     path: /etc/ufw/sysctl.conf
+#     regexp: '^net/ipv6/conf/default/forwarding'
+#     line: net/ipv6/conf/default/forwarding=1
+#     backup: true
 
 # add rules that computers in Internal network can connect to external
 # network or internet via router pc acting as a gateway
 - name: Configure IP masquerading and forward necessary ports
   ansible.builtin.blockinfile:
     path: /etc/ufw/before.rules
-    insertbefore: "EOF"
+    insertbefore: "BOF"
     block: |
-      #
-      
       # NAT table rules
       *nat
       :PREROUTING ACCEPT [0:0]
       :POSTROUTING ACCEPT [0:0]
 
-      # Xbox port forwardings
-      -A PREROUTING -i {{ wan.ifname }} --dport 53 -j DNAT --to-destination {{ xbox_ip }}
-      -A PREROUTING -i {{ wan.ifname }} --dport 3074 -j DNAT --to-destination {{ xbox_ip }}
-      -A PREROUTING -i {{ wan.ifname }} -p udp --dport 4500 -j DNAT --to-destination {{ xbox_ip }}
-      -A PREROUTING -i {{ wan.ifname }} -p udp --dport 3544 -j DNAT --to-destination {{ xbox_ip }}
-      -A PREROUTING -i {{ wan.ifname }} -p udp --dport 500 -j DNAT --to-destination {{ xbox_ip }}
-      -A PREROUTING -i {{ wan.ifname }} -p udp --dport 88 -j DNAT --to-destination {{ xbox_ip }}
-      -A PREROUTING -i {{ wan.ifname }} -p tcp --dport 80 -j DNAT --to-destination {{ xbox_ip }}
+      # # Xbox port forwardings  # <-- UFW won't start at boot with these enabled?
+      # -A PREROUTING -i {{ wan.ifname }} --dport 53 -j DNAT --to-destination {{ xbox_ip }}:53
+      # -A PREROUTING -i {{ wan.ifname }} --dport 3074 -j DNAT --to-destination {{ xbox_ip }}:3074
+      # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 4500 -j DNAT --to-destination {{ xbox_ip }}:4500
+      # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 3544 -j DNAT --to-destination {{ xbox_ip }}:3544
+      # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 500 -j DNAT --to-destination {{ xbox_ip }}:500
+      # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 88 -j DNAT --to-destination {{ xbox_ip }}:88
+      # -A PREROUTING -i {{ wan.ifname }} -p tcp --dport 80 -j DNAT --to-destination {{ xbox_ip }}:80
 
       # Masquerade traffic exiting through {{ wan.ifname }} interface
       -A POSTROUTING -s {{ lan.base }}.0/24 -o {{ wan.ifname }} -j MASQUERADE
@@ -63,11 +110,6 @@
       # be processed
       COMMIT
     backup: yes
-  # notify: reload_ufw  # <-- UFW isn't running yet
-
-# Use the wireless nic as a wi-fi access point
-- ansible.builtin.include_tasks: wap.yml
-  when: wap.ifname is defined
 
 
 # TODO: Define a gateway on each system that isn't the router pc

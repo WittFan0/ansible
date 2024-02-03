@@ -5,7 +5,7 @@
 - name: Add hosts
   ansible.builtin.lineinfile:
     path: /etc/hosts
-    line: 192.168.40.8  dan.q.qw  dan
+    line: "{{ lan.base }}.8  dan.{{ lan.domain }}  dan"
     insertafter: 'EOF'
     mode: '0644'
     backup: true
@@ -66,20 +66,19 @@
   ansible.builtin.copy:
     content: |
       Acquire {
-        HTTP::proxy "http://dan:3128";
-        HTTPS::proxy "http://dan:3128";
+        HTTP::proxy "{{ proxy_env }}";
       }
     dest: /etc/apt/apt.conf.d/10proxy.conf
     backup: yes
   tags:
     - packages
-  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"] and proxy_env is defined
 
 - name: Switch to cacheable http apt sources
   ansible.builtin.replace:
     path: /etc/apt/sources.list
     regexp: 'http?://([A-Za-z0-9]+(\.[A-Za-z0-9]+)+)/ubuntu/'
-    replace: 'http://mirrors.edge.kernel.org/ubuntu/'
+    replace: 'http://us.archive.ubuntu.com/ubuntu/'
     backup: true
   tags:
     - packages

@@ -1,0 +1,77 @@
+---
+
+
+##### https://askubuntu.com/questions/1137761/set-the-nameserver-in-ubuntu-with-netplan
+
+
+# - name: Set OS distribution dependent variables
+#   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+# - name: Install packages
+#   become: true
+#   ansible.builtin.package:
+#     name: 
+#       - package 
+#     state: present
+#   tags:
+#     - packages
+#   environment: "{{proxy_env}}"
+
+# - name: Install package (apt)
+#   become: true
+#   ansible.builtin.apt:
+#     name: 
+#       - 
+#     state: present
+#   tags:
+#     - packages
+#   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+#   environment: "{{proxy_env}}"
+
+# - name: Install package (pacman)
+#   become: true
+#   community.general.pacman:
+#     name: 
+#       -  
+#     state: present
+#   tags:
+#     - packages
+#   when: ansible_facts['distribution'] == "Archlinux"
+#   environment: "{{proxy_env}}"
+
+# - name: Install AUR pacakges
+#   kewlfft.aur.aur:
+#     name: 
+#       - 
+#     state: present
+#   tags:
+#     - aur
+#     - packages
+#   become: true
+#   become_user: "{{ aur.builder }}"
+#   when: ansible_facts['distribution'] == "Archlinux"
+
+# - name: Configure 
+#   ansible.builtin.template:
+#     src: 
+#     dest: /
+#     backup: true
+#   notify: 
+
+# - name: Create file
+#   ansible.builtin.copy:
+#     src: 
+#     dest: /
+#     owner: "{{ remote_user.name }}"
+#     group: "{{ remote_user.group }}"
+#     backup: true
+#   notify: 
+
+# - name: Enable and start service
+#   ansible.builtin.service:
+#     name: .service
+#     enabled: yes
+#     state: started
+
+# - ansible.builtin.include_tasks: .yml
+#   when: ansible_facts['distribution'] == "DistroName"

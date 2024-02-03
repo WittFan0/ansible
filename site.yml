@@ -20,9 +20,9 @@
     - monitor
     - harden  # TODO: Limit to WAN interface
   environment:
-    http_proxy: http://dan:3128
-    https_proxy: http://dan:3128
-    ftp_proxy: http://dan:3128
+    http_proxy: "{{ proxy_env }}"
+    https_proxy: "{{ proxy_env }}"
+    ftp_proxy: "{{ proxy_env }}"
 
 - hosts: printing
   become: true
@@ -120,9 +120,42 @@
       become: true
       when: ansible_facts['distribution'] == "Archlinux"
 
-    # - name: Enable firewall
+    - name: Open SSH port
+      community.general.ufw:
+        rule: limit
+        to_port: "{{ ssh_port }}"
+        proto: tcp
+        comment: Rate limit OpenSSH server
+      become: true
+      # Only restart if the lan subnet hasn't changed
+      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+
+    - name: Enable firewall
     #   ansible.builtin.command: ufw enable
-    #   become: true
+      become: true
+      community.general.ufw:
+        state: enabled
+      # Only restart if the lan subnet hasn't changed
+      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+
+    - name: Generate and apply netplan configs
+      become: true
+      ansible.builtin.command: netplan generate && netplan apply
+      # Only restart if the lan subnet hasn't changed
+      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+
+    - name: Reload systemctl daemon
+      ansible.builtin.command: systemctl daemon-reload
+      # Only restart if the lan subnet hasn't changed
+      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+
+    - name: Restart systemd-networkd
+      ansible.builtin.service:
+        name: systemd-networkd.service
+        enabled: true
+        state: restarted
+      # Only restart if the lan subnet hasn't changed
+      when: ansible_facts['default_ipv4']['address'] == lan0.ip
 
   # roles:
   #   - sshd-keyonly  # <-- Must come last because it disables root ssh

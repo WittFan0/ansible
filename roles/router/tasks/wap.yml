@@ -2,6 +2,127 @@
 - name: Set OS distribution dependent variables
   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
+# # wpa supplicant is not installed by default
+# - name: Stop wpa-supplicant
+#   become: true
+#   ansible.builtin.service:
+#     name: wpa-supplicant.service
+#     enabled: true
+#     state: stopped
+
+
+
+- name: Create a bridge to serve multiple internal-facing interfaces
+- ansible.builtin.include_tasks: ../../vmhost/tasks/lanbridge.yml
+
+
+
+
+# # Config from https://raspberrypi.stackexchange.com/questions/98511/configuring-raspberry-pi-as-router-wifi-and-ethernet-bridge/98551#98551
+# - name: Create a directory for the access point config file
+#   ansible.builtin.file:
+#     path: /etc/wpa_supplicant/
+#     state: directory
+#     mode: '0755'
+
+# - name: Configure wpa_supplicant for access point
+#   become: true
+#   ansible.builtin.copy:
+#     content: |
+#       country=US
+#       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+#       update_config=1
+
+#       network={
+#           ssid="keepout-test"
+#           mode=2
+#           #frequency=2412  # <-- Channel 1
+#           frequency=2437  # <-- Channel 6
+#           #frequency=2442  # <-- Channel 7
+#           #frequency=2462  # <-- Channel 11
+#           #key_mgmt=NONE   # uncomment this for an open hotspot
+#           # delete next 3 lines if key_mgmt=NONE
+#           key_mgmt=WPA-PSK
+#           proto=RSN WPA
+#           psk="{{ vault_wpa_password }}"
+#       }
+#     dest: /etc/wpa_supplicant/wpa_supplicant-{{ wap.ifname }}.conf
+#     mode: '0600'
+#     backup: true
+
+# - name: Create a directory for {{ wap.ifname }} config file
+#   ansible.builtin.file:
+#     path: /etc/systemd/system/wpa_supplicant@{{ wap.ifname }}.service.d/
+#     state: directory
+#     mode: '0755'
+
+# - name: Switch {{ wap.ifname }} to access point mode and connect to the bridge
+#   become: true
+#   ansible.builtin.copy:
+#     content: |
+#       [Service]
+#       ExecStartPre=/sbin/iw dev %i set type __ap
+#       ExecStartPre=/bin/ip link set %i master br0
+
+#       ExecStart=
+#       ExecStart=/sbin/wpa_supplicant -c/etc/wpa_supplicant/wpa_supplicant-%I.conf -Dnl80211,wext -i%I -bbr0
+
+#       ExecStopPost=-/bin/ip link set %i nomaster
+#       ExecStopPost=-/sbin/iw dev %i set type managed
+#     dest: /etc/systemd/system/wpa_supplicant@{{ wap.ifname }}.service.d/override.conf
+#     backup: true
+
+
+
+
+- name: Create hostapd config directory if it does not exist
+  ansible.builtin.file:
+    path: /etc/hostapd
+    state: directory
+    mode: '0755'
+
+- name: Configure hostapd for access point
+  become: true
+  ansible.builtin.copy:
+    content: |
+      # the interface used by the AP
+      interface={{ wap.ifname }}
+      # bridge
+      bridge=br0
+      # "g" simply means 2.4GHz band
+      hw_mode=g
+      # the channel to use
+      channel=6
+      # limit the frequencies used to those allowed in the country
+      ieee80211d=1
+      # the country code
+      country_code=US
+      # Enable 802.11n support
+      ieee80211n=1
+      ## Enable 802.11ac support
+      #ieee80211ac=1
+      ## Enable 802.11ax support
+      #ieee80211ax=1
+      # QoS support, also required for full speed on 802.11n/ac/ax
+      wmm_enabled=1
+
+      # the name of the AP
+      ssid=keepout2
+      # 1=wpa, 2=wep, 3=both
+      auth_algs=1
+      # WPA2 only
+      wpa=2
+      wpa_key_mgmt=WPA-PSK
+      rsn_pairwise=CCMP
+      wpa_passphrase={{ vault_wpa_password }}
+
+      ## Use "iw list" to show device capabilities and modify ht_capab and vht_capab accordingly
+      #ht_capab=[HT40+][SHORT-GI-40][TX-STBC][RX-STBC1][DSSS_CCK-40]
+      #vht_capab=[RXLDPC][SHORT-GI-80][TX-STBC-2BY1][RX-STBC-1]
+    dest: /etc/hostapd/hostapd.conf
+    mode: '0600'
+    backup: true
+
 - name: Install wireless packages
   become: true
   ansible.builtin.package:
@@ -9,77 +130,22 @@
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
-# Config from https://raspberrypi.stackexchange.com/questions/98511/configuring-raspberry-pi-as-router-wifi-and-ethernet-bridge/98551#98551
-- name: Configure wpa_supplicant for access point
+- name: Set {{ wap.ifname }} to Access Point mode
+  ansible.builtin.command: iw dev {{ wap.ifname }} set type __ap
+
+- name: Allow hostapd to be run as a service [ DEPRECATED IN UBUNTU!!! ]
   become: true
-  ansible.builtin.copy:
-    content: |
-      country=US
-      ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-      update_config=1
-
-      network={
-          ssid="keepout-test"
-          mode=2
-          #frequency=2412  # <-- Channel 1
-          frequency=2437  # <-- Channel 6
-          #frequency=2442  # <-- Channel 7
-          #frequency=2462  # <-- Channel 11
-          #key_mgmt=NONE   # uncomment this for an open hotspot
-          # delete next 3 lines if key_mgmt=NONE
-          key_mgmt=WPA-PSK
-          proto=RSN WPA
-          psk="{{ vault_wpa_password }}
-      }
-    dest: /etc/wpa_supplicant/wpa_supplicant-{{ wap.ifname }}.conf
-    mode: '0600'
+  ansible.builtin.lineinfile:
+    path: /etc/default/hostapd
+    regexp: '^DAEMON_CONF='
+    line: DAEMON_CONF="/etc/hostapd/hostapd.conf"
     backup: true
-  notify: restart_wpa_supplicant
 
-- ansible.builtin.include_tasks: ../../vmhost/tasks/lanbridge.yml
-
-- name: Create a directory for {{ wap.ifname }} config file
-  ansible.builtin.file:
-    path: /etc/systemd/system/wpa_supplicant@{{ wap.ifname }}.service.d/
-    state: directory
-    mode: '0755'
-
-- name: Tell wpa_supplicant to connect {{ wap.ifname }} to the bridge
+- name: Enable and start hostapd
   become: true
-  ansible.builtin.copy:
-    content: |
-      [Service]
-      ExecStartPre=/sbin/iw dev %i set type __ap
-      ExecStartPre=/bin/ip link set %i master br0
-
-      ExecStart=
-      ExecStart=/sbin/wpa_supplicant -c/etc/wpa_supplicant/wpa_supplicant-%I.conf -Dnl80211,wext -i%I -bbr0
-
-      ExecStopPost=-/bin/ip link set %i nomaster
-      ExecStopPost=-/sbin/iw dev %i set type managed
-    dest: /etc/systemd/system/wpa_supplicant@{{ wap.ifname }}.service.d/override.conf
-    backup: true
-  notify: restart_wpa_supplicant
-
-
-
-# - name: rfkill unblock wlan
-#   ansible.builtin.command: rfkill unblock wlan
-
-
-
-- name: Configure wan interface
-  become: true
-  ansible.builtin.copy:
-    content: |
-      [Match]
-      Name={{ wan.ifname }}
-
-      [Network]
-      DHCP=yes
-      MulticastDNS=yes
-    dest: /etc/systemd/network/15-wan.network
-    backup: true
-  notify: [router:systemctl_daemon-reload, router:restart_systemd-networkd]
+  ansible.builtin.service:
+    name: hostapd.service
+    enabled: true
+    state: started

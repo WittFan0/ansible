@@ -1,27 +1,4 @@
-- name: Create resolved.conf directory if it does not exist
-  ansible.builtin.file:
-    path: /etc/systemd/resolved.conf.d
-    state: directory
-    mode: '0755'
-
-- name: Stop systemd-resolved DNS services
-  ansible.builtin.copy:
-    content: |
-      [Resolve]
-      DNSStubListener=no
-    dest: /etc/systemd/resolved.conf.d/99-dnsmasq.conf
-    mode: '0644'
-    backup: no
-  notify: restart_resolved
-
-- name: Install DNS, DHCP and TFTP servers
-  ansible.builtin.package:
-    name: dnsmasq
-    state: present
-    update_cache: true
-  tags:
-    - packages
-
+---
 - name: Provide systemd-resolved domain name resolution for software that reads /etc/resolv.conf directly 
   ansible.builtin.file:
     src: /run/systemd/resolve/stub-resolv.conf
@@ -35,7 +12,6 @@
     dest: /etc/hosts.dnsmasq
     mode: '0644'
     backup: yes
-  notify: restart_dnsmasq
 
 - name: Download DNS blacklist
   ansible.builtin.get_url:
@@ -56,7 +32,6 @@
     dest: /etc/dnsmasq.d/10-dnsblacklist.conf
     mode: '0644'
     backup: no
-  notify: restart_dnsmasq
 
 # # Blackilst is no longer being maintained
 # # TODO: Find a DNS blacklist replacement
@@ -79,7 +54,6 @@
     dest: /srv/tftp/pxe/undionly.kpxe
     mode: '0644'
     backup: no
-  notify: restart_dnsmasq
 
 - name: Download boot file for UEFI netbooting
   ansible.builtin.get_url:
@@ -87,7 +61,6 @@
     dest: /srv/tftp/pxe/ipxe.efi
     mode: '0644'
     backup: no
-  notify: restart_dnsmasq
 
 - name: Create netboot menu
   ansible.builtin.copy:
@@ -95,7 +68,6 @@
     dest: /srv/tftp/pxe/bootmenu.ipxe
     mode: '0644'
     backup: yes
-  notify: restart_dnsmasq
 
 - name: Configure netboot
   ansible.builtin.copy:
@@ -103,7 +75,6 @@
     dest: /etc/dnsmasq.d/10-netboot.conf
     mode: '0644'
     backup: yes
-  notify: restart_dnsmasq
 
 - name: Configure DNS and DHCP servers
   ansible.builtin.template:
@@ -111,7 +82,6 @@
     dest: /etc/dnsmasq.d/10-router.conf
     mode: '0644'
     backup: yes
-  notify: restart_dnsmasq
 
 - name: Add DNS setting for Plex
   ansible.builtin.copy:
@@ -119,11 +89,28 @@
     dest: /etc/dnsmasq.d/10-plex.conf
     mode: '0644'
     backup: no
-  notify: restart_dnsmasq
+
+- name: Install firewall and DNS, DHCP and TFTP servers
+  ansible.builtin.package:
+    name: ["dnsmasq", "ufw"]
+    state: present
+    update_cache: true
+  tags:
+    - packages
+
+- name: Accept DNS requests from {{ lan.subnet }}
+  community.general.ufw:
+    rule: allow
+    from_ip: "{{ lan.subnet }}"
+    to_port: domain
+    to_ip: "{{ lan0.ip}}"
+    comment: DNS
+  become: true
 
 - name: Accept DHCP requests
   community.general.ufw:
     rule: allow
+    # from_ip: "{{ lan.subnet }}"  # <-- requesting device isn't yet part of the subnet
     to_port: 67:68
     proto: udp
     comment: DHCP
@@ -136,11 +123,51 @@
     to_port: tftp
     to_ip: "{{ lan0.ip}}"
     proto: udp
-    comment: Netboot
+    comment: TFTP
   become: true
+
+- name: Accept NTP requests from {{ lan.subnet }}
+  community.general.ufw:
+    rule: allow
+    from_ip: "{{ lan.subnet }}"
+    to_ip: "{{ lan0.ip }}"
+    to_port: ntp
+    proto: udp
+    comment: NTP
+  become: true
+
+- name: Create resolved.conf directory if it does not exist
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+    mode: '0755'
+
+- name: Stop systemd-resolved from binding to DNS port 53
+  ansible.builtin.copy:
+    content: |
+      # Stop systemd-resolved from binding to DNS port 53
+      [Resolve]
+      DNSStubListener=no
+    dest: /etc/systemd/resolved.conf.d/99-dnsmasq.conf
+    mode: '0644'
+    backup: no
+
+# - name: Check value of default_ipv4.address
+#   ansible.builtin.debug:
+#     var: ansible_facts['default_ipv4']['address']
+
+- name: Restart systemd-resolved if necessary to free up DNS port 53
+  ansible.builtin.service:
+    name: systemd-resolved.service
+    enabled: yes
+    state: restarted
+  # Only restart if the lan subnet hasn't changed
+  when: ansible_facts['default_ipv4']['address'] == lan0.ip
 
 - name: Enable and start DNS, DHCP and TFTP servers
   ansible.builtin.service:
     name: dnsmasq.service
     enabled: yes
     state: started
+  # Only start if the lan subnet hasn't changed
+  when: ansible_facts['default_ipv4']['address'] == lan0.ip

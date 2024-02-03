@@ -1,17 +1,4 @@
 ---
-# - name: Set OS distribution dependent variables
-#   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
-
-- name: Install proxy
-  become: true
-  ansible.builtin.package:
-    name: 
-      - squid 
-    state: present
-  tags:
-    - packages
-  environment: "{{proxy_env}}"
-
 - name: Create proxy cache directory if it does not exist
   become: true
   ansible.builtin.file:
@@ -29,43 +16,36 @@
       maximum_object_size 256 MB
       cache_dir aufs /var/cache/squid 10000 16 256
 
-      # refresh pattern for pacman
-      # refresh_pattern \.pkg\.tar\.   0       20%     4320      reload-into-ims
+      refresh pattern for pacman
+      refresh_pattern \.pkg\.tar\.   0       20%     4320      reload-into-ims
 
-      # refresh pattern for debs and udebs
-      # refresh_pattern deb$   129600 100% 129600
-      # refresh_pattern udeb$   129600 100% 129600
-      # refresh_pattern tar.gz$  129600 100% 129600
+      refresh pattern for debs and udebs
+      refresh_pattern deb$   129600 100% 129600
+      refresh_pattern udeb$   129600 100% 129600
+      refresh_pattern tar.gz$  129600 100% 129600
 
-      # handle meta-release and changelogs.ubuntu.com special
-      # refresh_pattern changelogs.ubuntu.com/*  0  1% 1
+      handle meta-release and changelogs.ubuntu.com special
+      refresh_pattern changelogs.ubuntu.com/*  0  1% 1
 
-      # refresh_pattern .              0       0%      0
+      refresh_pattern .              0       0%      0
     dest: /etc/squid/conf.d/50-packagecache.conf
     # validate: /usr/sbin/squid -k parse
     backup: false
   notify: reload_proxy
 
-# - name: Set max file size
-#   ansible.builtin.lineinfile:
-#     dest: /etc/squid/squid.conf
-#     regexp: "^maximum_object_size"
-#     line: maximum_object_size 256 MB
-#     backup: true
+# - name: Set OS distribution dependent variables
+#   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
-# - name: Cache files to disk
-#   ansible.builtin.lineinfile:
-#     dest: /etc/squid/squid.conf
-#     regexp: "^cache_dir"
-#     line: cache_dir aufs /var/cache/squid 10000 16 256
-#     backup: false
-
-- name: Enable and start proxy service
+- name: Install proxy and firewall
   become: true
-  ansible.builtin.service:
-    name: squid.service
-    enabled: yes
-    state: started
+  ansible.builtin.package:
+    name: 
+      - squid
+      - ufw
+    state: present
+  tags:
+    - packages
+  environment: "{{proxy_env}}"
 
 - name: Open proxy port
   become: true
@@ -74,6 +54,11 @@
     from_ip: "{{ lan.subnet }}"
     to_ip: "{{ lan0.ip }}"
     to_port: '3128'
-    comment: proxy
-    state: enabled
+    comment: Squid proxy
 
+- name: Enable and start proxy service
+  become: true
+  ansible.builtin.service:
+    name: squid.service
+    enabled: yes
+    state: started

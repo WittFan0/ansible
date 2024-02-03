@@ -6,7 +6,7 @@ remote_user:
   group: lance
   shell: bash
   shell_path: /bin/bash  # <-- This must have a matching entry in /etc/shells
-  email:  "{{ vault_user_email }}"
+  email: "{{ vault_user_email }}"
   password: "{{ vault_user_password }}"
 
 lan:
@@ -24,7 +24,4 @@ google_client_secret: "{{ vault_google_client_secret }}"
 docker_users:
   - lance
 
-proxy_env:
-  http_proxy: http://dan:3128
-  https_proxy: http://dan:3128
-  ftp_proxy: http://dan:3128
+proxy_env: http://dan:3128

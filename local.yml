@@ -27,7 +27,7 @@
         key: os_{{ ansible_facts['distribution'] }}
 
   roles:
-    - btrfs
+    # - btrfs
     - update
     - common
     - monitor
@@ -45,7 +45,7 @@
     # - development
     # - gaming
     # - vmhost
-    - snapper
+    # - snapper
     - router
 
   post_tasks:

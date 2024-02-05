@@ -89,8 +89,8 @@
     mode: '0600'
     owner: root
     group: root
-    regexp: 'interfaces: [{{ lan0.ifname }}]'
-    line: 'interfaces: [{{ lan0.ifname }},{{ wap.ifname }}] # <-- This must be a single line to allow playbooks to add interfaces to the bridge'
+    regexp: '^      interfaces: '
+    line: '      interfaces: [{{ lan0.ifname }},{{ wap.ifname }}] # <-- This must be a single line to allow playbooks to add interfaces to the bridge'
   when: wap.ifname is defined
   notify: 
     - "router : generate_netplan"

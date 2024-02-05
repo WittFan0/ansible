@@ -119,7 +119,6 @@
   tags:
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
-  notify: reboot_system
 
 - name: Update package cache and upgrade (Debian)
   ansible.builtin.apt: 
@@ -140,7 +139,6 @@
     update_cache: true
   tags:
     - packages
-  notify: reboot_system
 
 - name: Install base packages
   ansible.builtin.package:
@@ -149,15 +147,9 @@
     update_cache: true
   tags:
     - packages
-  notify: reboot_system
 
 - name: Enable power profiles
   ansible.builtin.service:
     name: power-profiles-daemon.service
     enabled: yes
     state: started
-
-- name: Reboot if necessary
-  meta: flush_handlers
-  tags:
-    - packages

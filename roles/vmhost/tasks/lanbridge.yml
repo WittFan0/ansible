@@ -13,6 +13,9 @@
 - name: Create a netplan that creates a bridge and connects {{ lan0.ifname }} to it
   become: true
   ansible.builtin.copy:
+    mode: '0600'
+    owner: root
+    group: root
     content: |
       # Network router configuration
       network:
@@ -50,6 +53,9 @@
   ansible.builtin.blockinfile:
     path: /etc/netplan/00-bridge.yaml
     insertafter: "ethernets:"
+    mode: '0600'
+    owner: root
+    group: root
     block: |
           # This is the public-facing interface.
           {{ wan.ifname}}:
@@ -64,6 +70,9 @@
   ansible.builtin.blockinfile:
     path: /etc/netplan/00-bridge.yaml
     insertafter: "ethernets:"
+    mode: '0600'
+    owner: root
+    group: root
     block: |
       # This is the internal-facing wireless interface.
           {{ wap.ifname}}:

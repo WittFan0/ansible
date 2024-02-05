@@ -13,7 +13,7 @@
 
 
 - name: Create a bridge to serve multiple internal-facing interfaces
-- ansible.builtin.include_tasks: ../../vmhost/tasks/lanbridge.yml
+  ansible.builtin.include_tasks: ../../vmhost/tasks/lanbridge.yml
 
 
 

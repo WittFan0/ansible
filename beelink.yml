@@ -10,9 +10,7 @@
   connection: local
   become: true
   environment:
-    http_proxy: http://dan:3128
-    https_proxy: http://dan:3128
-    ftp_proxy: http://dan:3128
+    proxy_env: http://dan:3128
 
   pre_tasks:
     - name: Classify hosts depending on their OS distribution

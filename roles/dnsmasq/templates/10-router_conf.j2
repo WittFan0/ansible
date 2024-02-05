@@ -1,6 +1,4 @@
-# interface={{ lan0.ifname }},{{ wap.ifname }}
 except-interface={{ wan.ifname }}
-# listen-address=127.0.0.1,{{ lan0.ip }},{{ wap.ip }}
 domain-needed      # Never forward plain names (without a dot or domain part)
 bogus-priv         # Never forward addresses in the non-routed address spaces
 strict-order       # Query each server strictly in /etc/resolv.conf order

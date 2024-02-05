@@ -1,4 +1,9 @@
 ---
+- name: Install docker python library
+  ansible.builtin.apt:
+    name: python3-docker
+    state: present
+
 - name: Start 'nextcloud-all-in-one' container
   community.docker.docker_container:
     name: nextcloud-aio-mastercontainer

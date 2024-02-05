@@ -2,7 +2,7 @@
 - name: Create proxy config directory if it does not exist
   become: true
   ansible.builtin.file:
-    path: /etc/squid
+    path: /etc/squid/conf.d
     owner: root
     group: root
     mode: '0755'
@@ -25,15 +25,15 @@
       maximum_object_size 256 MB
       cache_dir aufs /var/cache/squid 10000 16 256
 
-      refresh pattern for pacman
+      # refresh pattern for pacman
       refresh_pattern \.pkg\.tar\.   0       20%     4320      reload-into-ims
 
-      refresh pattern for debs and udebs
+      # refresh pattern for debs and udebs
       refresh_pattern deb$   129600 100% 129600
       refresh_pattern udeb$   129600 100% 129600
       refresh_pattern tar.gz$  129600 100% 129600
 
-      handle meta-release and changelogs.ubuntu.com special
+      # handle meta-release and changelogs.ubuntu.com special
       refresh_pattern changelogs.ubuntu.com/*  0  1% 1
 
       refresh_pattern .              0       0%      0

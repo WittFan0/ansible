@@ -13,6 +13,9 @@
 - name: Create a netplan that assignes a static ip to {{ lan0.ifname }}
   become: true
   ansible.builtin.copy:
+    mode: '0600'
+    owner: root
+    group: root
     content: |
       # Network router configuration
       network:

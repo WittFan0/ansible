@@ -1,11 +1,9 @@
 ---
 # Run the following commands on localhost
 #   pacman -S git ansible
-#   nano ~/.vault_pass.txt
-#   chmod 600 ~/.vault_pass.txt
 #   ansible-galaxy install geerlingguy.ntp geerlingguy.docker
 #   ansible-galaxy collection install kewlfft.aur
-#   ansible-pull --vault-password-file ~/.vault_pass.txt -U http://github.com/WittFan0/ansible.git
+#   ansible-pull -J -K -U http://github.com/WittFan0/ansible.git
 
 - name: Play for using ansible-pull on localhost
   hosts: localhost

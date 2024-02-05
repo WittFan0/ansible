@@ -83,6 +83,18 @@
   notify: 
     - "router : generate_netplan"
 
+- name: Modify bridge netplan to connect {{ wap.ifname }} to bridge
+  ansible.builtin.lineinfile:
+    path: /etc/netplan/00-bridge.yaml
+    mode: '0600'
+    owner: root
+    group: root
+    regexp: 'interfaces: [{{ lan0.ifname }}]'
+    line: 'interfaces: [{{ lan0.ifname }},{{ wap.ifname }}] # <-- This must be a single line to allow playbooks to add interfaces to the bridge'
+  when: wap.ifname is defined
+  notify: 
+    - "router : generate_netplan"
+
 # # The netplan plays above should do all this for us.
 # - name: Create network bridge
 #   become: true

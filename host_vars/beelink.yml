@@ -8,7 +8,7 @@ lan0:
     mac: 84:39:be:68:69:ab
 
 wan: 
-    ifname: enxee129fdc4453
+    ifname: enx00b56d0d9126
 
 wap:
     ifname: wlp2s0

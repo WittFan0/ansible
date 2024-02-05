@@ -1,4 +1,13 @@
 ---
+- name: Create proxy config directory if it does not exist
+  become: true
+  ansible.builtin.file:
+    path: /etc/squid
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+
 - name: Create proxy cache directory if it does not exist
   become: true
   ansible.builtin.file:

@@ -34,6 +34,9 @@
             addresses:
             - {{ lan0.ip }}/24
             mtu: 1500
+            routes:
+                - to: default
+                  via: [{{ lan.gateway }}]
             nameservers:
               search: [{{ lan.domain }}]
               addresses:

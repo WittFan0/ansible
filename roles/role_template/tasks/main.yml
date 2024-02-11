@@ -18,6 +18,8 @@
 #     name: 
 #       - 
 #     state: present
+#     cache_valid_time: 3600  # Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+#     # skip_pgp_check: yes # <-- Avoid extra step of having to load maintainer's key
 #   tags:
 #     - packages
 #   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]

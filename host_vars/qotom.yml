@@ -1,0 +1,20 @@
+hostname: qotom
+ansible_user: lance
+
+# kernel_parameters: "quiet consoleblank=60"
+
+# grub_gfxmode: 
+
+lan0:
+    ip: "{{ lan.base }}.7"
+    ifname: enp2s0
+
+wan: 
+    ifname: enp1s0
+
+# wap:
+#     ifname: wlp1s0
+
+ssh_port: 22   # changing this from 22 gets messy. For workaround see https://dmsimard.com/2016/03/15/changing-the-ssh-port-with-ansible/
+
+# desktop_environment: none

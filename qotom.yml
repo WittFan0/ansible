@@ -1,0 +1,107 @@
+---
+# Run the following commands on localhost
+#   pacman -S git ansible
+#   ansible-galaxy install geerlingguy.ntp geerlingguy.docker
+#   ansible-galaxy collection install kewlfft.aur
+#   ansible-pull --ask-vault-password -K -U http://github.com/WittFan0/ansible.git -i beelink,
+
+- name: Play for using ansible-pull on qotom
+  hosts: qotom
+  connection: local
+  become: true
+  environment:
+    proxy_env: http://dan:3128
+
+  pre_tasks:
+    - name: Classify hosts depending on their OS distribution
+      ansible.builtin.group_by:
+        key: os_{{ ansible_facts['distribution'] }}
+
+  roles:
+    # - btrfs
+    - update
+    # - common
+    - monitor
+    # - harden  # TODO: Limit to WAN interface
+    # - printing
+    - geerlingguy.ntp
+    - dnsmasq
+    - proxy
+    # - geerlingguy.docker
+    # - mediasrv
+    # - collab
+    # - desktopenv
+    # - ripping
+    # - graphics
+    # - development
+    # - gaming
+    # - vmhost
+    # - snapper
+    - router
+
+  post_tasks:
+    - name: Remove sudo-less pacman permission for `aur_builder`
+      ansible.builtin.file:
+        path: /etc/sudoers.d/11-install-aur_builder
+        state: absent
+      tags:
+        - aur
+        - packages
+      when: ansible_facts['distribution'] == "Archlinux"
+
+    - name: Remove 'aur_builder' user
+      ansible.builtin.user:
+        name: "{{ aur.builder }}"
+        state: absent
+        remove: true
+      when: ansible_facts['distribution'] == "Archlinux"
+
+    - name: Install reflector
+      community.general.pacman:
+        update_cache: true
+        name: reflector
+        state: present
+      tags:
+        - packages
+      when: ansible_facts['distribution'] == "Archlinux"
+
+    - name: Update mirror list (Arch)
+      ansible.builtin.command: reflector --country US,Canada --completion-percent 90 --sort rate --latest 20 --protocol https --save /etc/pacman.d/mirrorlist
+      become: true
+      when: ansible_facts['distribution'] == "Archlinux"
+
+    - name: Open SSH port
+      community.general.ufw:
+        rule: limit
+        to_port: "{{ ssh_port }}"
+        proto: tcp
+        comment: Rate limit OpenSSH server
+      become: true
+      # Only restart if the lan subnet hasn't changed
+      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+
+    - name: Enable firewall
+    #   ansible.builtin.command: ufw enable
+      become: true
+      community.general.ufw:
+        state: enabled
+      # Only restart if the lan subnet hasn't changed
+      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+
+    - name: Generate and apply netplan configs
+      become: true
+      ansible.builtin.command: netplan generate && netplan apply
+      # Only restart if the lan subnet hasn't changed
+      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+
+#    - name: Restart systemd-networkd
+#      ansible.builtin.systemd_service:
+#        name: systemd-networkd.service
+#        enabled: true
+#        state: restarted
+#        daemon_reload: true
+#      # Only restart if the lan subnet hasn't changed
+#      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+
+  # roles:
+  #   - sshd-keyonly  # <-- Must come last because it disables root ssh

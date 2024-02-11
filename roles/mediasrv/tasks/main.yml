@@ -3,7 +3,6 @@
   ansible.builtin.package:
     name: ["ufw"]
     state: present
-    update_cache: true
   tags:
     - packages
 

@@ -5,7 +5,6 @@
   ansible.builtin.package:
     name: nullmailer
     state: present
-    update_cache: true
   tags:
     - packages
 
@@ -55,7 +54,6 @@
   ansible.builtin.package:
     name: mailutils
     state: present
-    update_cache: true
   tags:
     - packages
 
@@ -63,7 +61,6 @@
   ansible.builtin.package:
     name: smartmontools
     state: present
-    update_cache: true
   tags:
     - packages
 
@@ -79,7 +76,6 @@
   ansible.builtin.package:
     name: "{{ sensors_package }}"
     state: present
-    update_cache: true
   tags:
     - packages
     
@@ -117,7 +113,6 @@
   ansible.builtin.package:
     name: logwatch
     state: present
-    update_cache: true
   tags:
     - packages
 

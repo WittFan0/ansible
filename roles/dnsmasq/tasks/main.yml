@@ -94,7 +94,6 @@
   ansible.builtin.package:
     name: ["dnsmasq", "ufw"]
     state: present
-    update_cache: true
   tags:
     - packages
 

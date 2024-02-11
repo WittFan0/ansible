@@ -10,10 +10,10 @@ remote_user:
   password: "{{ vault_user_password }}"
 
 lan:
-  domain: q.qw
-  subnet: 192.168.40.0/24
+  domain: r.qw
+  subnet: 192.168.2.0/24
   gateway: 192.168.40.1
-  base: 192.168.40
+  base: 192.168.2
 
 lan_base: "{{ lan.subnet | regex_replace('.0/[0-9]{2}', '') }}"
 

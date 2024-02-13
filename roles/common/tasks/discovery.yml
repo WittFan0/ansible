@@ -1,4 +1,8 @@
 ---
+# TODO: Fully deconflict systemd-resolved and avahi-daemon mDNS services
+
+# TODO: Configure mDNS for {{ lan.domain }}
+
 - name: Create resolved.conf directory if it does not exist
   ansible.builtin.file:
     path: /etc/systemd/resolved.conf.d
@@ -38,7 +42,16 @@
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-  
+
+- name: Accept mDNS requests from {{ lan.subnet }}
+  community.general.ufw:
+    rule: allow
+    from_ip: "{{ lan.subnet }}"
+    to_port: mdns
+    to_ip: "{{ lan0.ip}}"
+    comment: mDNS
+  become: true
+
 - name: Enable service discovery
   ansible.builtin.service:
     name: avahi-daemon.service

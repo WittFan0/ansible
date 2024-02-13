@@ -95,7 +95,7 @@
     mode: '0755'
 
 - ansible.builtin.include_tasks: lanmounts.yml
-- ansible.builtin.include_tasks: discovery.yml
+# - ansible.builtin.include_tasks: discovery.yml  # <-- incomplete
 - ansible.builtin.include_tasks: shell2xdg.yml
   when: remote_user.shell is defined
 - ansible.builtin.include_tasks: user_skel.yml

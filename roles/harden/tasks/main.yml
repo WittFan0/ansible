@@ -108,16 +108,6 @@
     to_port: '52080'
     comment: Piwigo
 
-- name: Open port for service discovery
-  community.general.ufw:
-    rule: allow
-    from_ip: "{{ lan.subnet }}"
-    to_ip: "{{ lan0.ip }}"
-    to_port: mdns
-    proto: udp
-    comment: Avahi service discovery
-  become: true
-
 # PROBABLY NEED TO TEST THIS (e.g. SUBVOLUMES, DOCKER, ETC.) BEFORE ENABLING EVERYTHING.
 # - name: Activate firejail
 #   ansible.builtin.command: |

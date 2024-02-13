@@ -94,7 +94,6 @@
     dest: /usr/local/sbin/
     mode: '0755'
 
-- ansible.builtin.include_tasks: local_dns.yml
 - ansible.builtin.include_tasks: lanmounts.yml
 - ansible.builtin.include_tasks: discovery.yml
 - ansible.builtin.include_tasks: shell2xdg.yml

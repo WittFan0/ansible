@@ -90,12 +90,33 @@
     mode: '0644'
     backup: no
 
-- name: Install firewall and DNS, DHCP and TFTP servers
+- name: Install firewall and DNS, DHCP, TFTP and dnscrypt-proxy servers
   ansible.builtin.package:
-    name: ["dnsmasq", "ufw"]
+    name: ["dnsmasq", "ufw", "dnscrypt-proxy"]
     state: present
   tags:
     - packages
+
+- name: Run dnscrypt-proxy as a forwarder for dnsmasq
+  ansible.builtin.lineinfile:
+    path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
+    insertbefore: "BOF"
+    line: cache = false
+
+- name: Have dnscrypt-proxy choose the fastest server from the sources already configured under [sources]
+  ansible.builtin.lineinfile:
+    path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
+    regexp: '^server_names'
+    line: # server_names = ['cloudflare']
+
+# # The Ubuntu package uses unsupported systemd sockets to accept connections. 
+# # In order to configure the local port, the /lib/systemd/system/dnscrypt-proxy.socket file
+# # needs to be edited instead of the standard dnscrypt-proxy.toml file
+# - name: To forward queries from dnsmasq, dnscrypt-proxy must listen on a port different from the default 53 
+#   ansible.builtin.lineinfile:
+#     path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
+#     regexp: '^listen_addresses'
+#     line: listen_addresses = ['127.0.0.1:53000', '[::1]:53000']
 
 - name: Accept DNS requests from {{ lan.subnet }}
   community.general.ufw:
@@ -151,9 +172,9 @@
     mode: '0644'
     backup: no
 
-# - name: Check value of default_ipv4.address
-#   ansible.builtin.debug:
-#     var: ansible_facts['default_ipv4']['address']
+- name: Check value of default_ipv4.address
+  ansible.builtin.debug:
+    var: ansible_facts['default_ipv4']['address']
 
 - name: Restart systemd-resolved if necessary to free up DNS port 53
   ansible.builtin.service:
@@ -161,6 +182,14 @@
     enabled: yes
     state: restarted
   # Only restart if the lan subnet hasn't changed
+  when: ansible_facts['default_ipv4']['address'] == lan0.ip
+
+- name: Enable and start dnscrypt-proxy server
+  ansible.builtin.service:
+    name: dnscrypt-proxy.service
+    enabled: yes
+    state: started
+  # Only start if the lan subnet hasn't changed
   when: ansible_facts['default_ipv4']['address'] == lan0.ip
 
 - name: Enable and start DNS, DHCP and TFTP servers

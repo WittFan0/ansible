@@ -146,8 +146,3 @@
   tags:
     - packages
 
-- name: Enable power profiles
-  ansible.builtin.service:
-    name: power-profiles-daemon.service
-    enabled: yes
-    state: started

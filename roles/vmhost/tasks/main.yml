@@ -62,6 +62,12 @@
     state: directory
     mode: '0755'
 
+- name: Enable power profiles
+  ansible.builtin.service:
+    name: power-profiles-daemon.service
+    enabled: yes
+    state: started
+
 - name: Download libvirt hook for running a command on startup or shutdown of a VM
   become: true
   ansible.builtin.get_url:

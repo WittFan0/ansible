@@ -9,7 +9,6 @@ base_packages:
     # - moreutils
     # - dateutils
     - linux-firmware
-    - power-profiles-daemon
     - nano
     - sudo
     - htop

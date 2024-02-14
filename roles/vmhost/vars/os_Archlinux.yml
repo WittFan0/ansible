@@ -10,6 +10,7 @@ virtualization_packages:
   - vagrant
   - qemu-desktop    # QEMU/KVM support
   - edk2-ovmf
+  - power-profiles-daemon
 
 grub_boot_conf_dest: '/boot/grub/grub.cfg'
 grub_mkconfig_command: 'grub-mkconfig'

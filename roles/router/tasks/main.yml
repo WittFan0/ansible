@@ -27,7 +27,7 @@
             - {{ lan0.ip }}/24
             routes:
                 - to: default
-                  via: [{{ lan.gateway }}]
+                  via: {{ lan.gateway }}
             nameservers:
               search: [{{ lan.domain }}]
               addresses:

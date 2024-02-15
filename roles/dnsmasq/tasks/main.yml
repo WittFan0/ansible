@@ -107,7 +107,8 @@
   ansible.builtin.lineinfile:
     path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
     regexp: '^server_names'
-    line: # server_names = ['cloudflare']
+    line: |
+      # server_names = ['cloudflare']
 
 # # The Ubuntu package uses unsupported systemd sockets to accept connections. 
 # # In order to configure the local port, the /lib/systemd/system/dnscrypt-proxy.socket file

@@ -183,3 +183,17 @@
     enabled: yes
     state: started
 
+# Firejail installs A LOT of dependencies. Is it worth it?
+# - name: Install firejail
+#   ansible.builtin.package:
+#     name: 
+#       - firejail
+#     state: present
+#   tags:
+#     - packages
+
+# PROBABLY NEED TO TEST THIS (e.g. SUBVOLUMES, DOCKER, ETC.) BEFORE ENABLING EVERYTHING.
+# - name: Activate firejail
+#   ansible.builtin.command: |
+#     firecfg
+#   become: true

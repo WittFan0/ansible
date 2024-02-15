@@ -3,7 +3,6 @@
     name: 
       - ufw
       - sshguard
-      - firejail
     state: present
   tags:
     - packages
@@ -87,9 +86,3 @@
     rule: allow
     to_port: '52080'
     comment: Piwigo
-
-# PROBABLY NEED TO TEST THIS (e.g. SUBVOLUMES, DOCKER, ETC.) BEFORE ENABLING EVERYTHING.
-# - name: Activate firejail
-#   ansible.builtin.command: |
-#     firecfg
-#   become: true

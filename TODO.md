@@ -7,6 +7,7 @@ firejail
 
 
 [functionality]
+install Plex
 use local DNS
 mount data directories
 add directories to $PATH for user
@@ -24,6 +25,7 @@ gitconfig?
 
 
 [optimization]
+pass proxy IP and names as a host variable
 switch hostapd from deprecated systemd service to ifupdown (is ifupdown compatible with netplan?)
 roll hardening plays into services being hardened
 switch to using ansible.posix.authorized_key module

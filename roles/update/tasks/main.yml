@@ -2,15 +2,17 @@
 - name: Set OS distribution dependent variables
   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
+# TODO: Pass proxy IP and names as a host variable
 - name: Add hosts
   ansible.builtin.lineinfile:
     path: /etc/hosts
-    line: "{{ lan.base }}.8  dan.{{ lan.domain }}  dan"
+    line: "192.168.40.8  dan.q.qw  dan"
     insertafter: 'EOF'
     mode: '0644'
     backup: true
   tags:
     - packages
+  when: proxy_env is defined
 
 - name: Enable pacman color
   ansible.builtin.lineinfile:

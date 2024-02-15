@@ -144,3 +144,42 @@
 #     state: started
 #   when: desktop_environment == "gnome"
 
+- name: Install smartcard packages
+  ansible.builtin.package:
+    name: 
+      - pcsc-tools
+    state: present
+  tags:
+    - packages
+
+- name: Install smartcard service (Debian)
+  ansible.builtin.apt:
+    name: pcscd
+    state: present
+  tags:
+    - packages
+
+- name: Install smartcard (AUR)
+  kewlfft.aur.aur:
+    name: 
+      - coolkey
+    state: present
+    update_cache: "yes"
+  tags:
+    - aur
+    - packages
+  become: true
+  become_user: "{{ aur.builder }}"
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Unpack DoD root certificates into /opt
+  ansible.builtin.unarchive:
+    src: unclass-certificates_pkcs7_DoD.zip
+    dest: /opt/
+
+- name: Enable and start smartcard service
+  ansible.builtin.service: 
+    name: pcscd.service
+    enabled: yes
+    state: started
+

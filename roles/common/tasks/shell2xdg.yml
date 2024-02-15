@@ -61,7 +61,7 @@
       HISTFILE=$_datadir/history
       HISTSIZE=50000
       HISTCONTROL="ignoredups"
-      HISTIGNORE="ls *:sudo ls *:history *:exit:htop:reboot:sudo reboot:poweroff:sudo poweroff:lsmod *:journalctl *:ps *"
+      HISTIGNORE="exit:htop:reboot:sudo reboot:poweroff:sudo poweroff"
 
       unset _confdir
       unset _datadir

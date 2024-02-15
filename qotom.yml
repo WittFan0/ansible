@@ -3,7 +3,8 @@
 #   pacman -S git ansible
 #   ansible-galaxy install geerlingguy.ntp geerlingguy.docker
 #   ansible-galaxy collection install kewlfft.aur
-#   ansible-pull --ask-vault-password -K -U http://github.com/WittFan0/ansible.git -i beelink,
+#   scp lance@taichi:/home/lance/.vault_pass.txt ~/
+#   ansible-pull -K -U http://github.com/WittFan0/ansible.git -i qotom,
 
 - name: Play for using ansible-pull on qotom
   hosts: qotom
@@ -20,16 +21,16 @@
   roles:
     # - btrfs
     - update
-    # - common
+    - common
     - monitor
-    # - harden  # TODO: Limit to WAN interface
-    # - printing
+    - harden  # TODO: Limit to WAN interface
+    - printing
     - geerlingguy.ntp
     - dnsmasq
     - proxy
-    # - geerlingguy.docker
-    # - mediasrv
-    # - collab
+    - geerlingguy.docker
+    - mediasrv
+    - collab
     # - desktopenv
     # - ripping
     # - graphics

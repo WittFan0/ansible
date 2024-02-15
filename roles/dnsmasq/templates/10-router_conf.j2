@@ -5,7 +5,7 @@ strict-order       # Query each server strictly in /etc/resolv.conf order
 no-resolv          # Do not read /etc/resolv.conf or any other file besides this one
 cache-size=10000   # cache 10000 names (maximum allowed)
 server=127.0.2.1   # local dnscrypt-proxy server
-listen-address=::1,127.0.0.1,192.168.2.1
+listen-address=::1,127.0.0.1,{{ lan0.ip }}
 bind-interfaces    # This appears to be needed to coexist with systemd-resolved
 no-hosts           # Do not read /etc/hosts
 addn-hosts=/etc/hosts.dnsmasq
@@ -15,6 +15,9 @@ dhcp-range={{ lan.base }}.100,{{ lan.base }}.199,12h
 dhcp-option=option:netmask,255.255.255.0
 dhcp-option=option:dns-server,{{ lan0.ip }}
 dhcp-option=option:router,{{ lan0.ip }}
+dhcp-option=option:ntp-server,{{ lan0.ip }}
+dhcp-option=option:tftp-server,{{ lan0.ip }}
+dhcp-option=option:domain-search,{{ lan.domain }}
 #dhcp-no-override    # Disable re-use of the DHCP servername and filename fields as extra option space
 dhcp-host=e0:3f:49:b3:1e:6a,{{ lan.base }}.2,office
 dhcp-host=80:fa:5b:43:f6:3e,{{ lan.base }}.3,sabre15

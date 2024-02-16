@@ -1,3 +1,57 @@
-greeter_packages:
+xfce_packages:
+  # - xubuntu-desktop  # <-- full install
+  - xfce4  # <-- minimal install
+  - desktop-base
+  - tango-icon-theme
+  - thunar-volman
+  - xfce4-notifyd
+  - xfce4-goodies
+  - lightdm
+  - lightdm-gtk-greeter
+  - baobab
+  - blueman
+  - catfish
+  - desktop-file-utils
+  - engrampa
+  - fonts-liberation
+  - gigolo
+  - xfce4-indicator-plugin
+  - gnome-disk-utility
 
-xfce_packages: 
+kde_packages:
+  # - kde-full
+  # - kde-standard
+  # - kubuntu-desktop
+  - kde-plasma-desktop  # <-- minimal install
+  - sddm
+  - ark
+  - filelight
+  - kdf
+  - ksystemlog
+  - krfb
+  - print-manager
+  - sweeper
+
+gnome_packages:
+  # - ubuntu-desktop  # <-- full install
+  - gnome-session   # <-- minimal install part 1
+  - gnome-terminal  # <-- minimal install part 2
+
+sway_packages:
+  - sway
+  - foot
+  - suckless-tools
+  - sway-backgrounds
+  - swayidle
+  - swaylock
+  - xdg-desktop-portal-wlr
+
+nvidia_video_packages:
+  - 
+
+intel_video_packages:
+  - 
+
+virtio_video_packages:
+  - 
+

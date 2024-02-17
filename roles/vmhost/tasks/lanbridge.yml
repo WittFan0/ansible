@@ -37,7 +37,7 @@
             mtu: 1500
             routes:
                 - to: default
-                  via: [{{ lan.gateway }}]
+                  via: {{ lan.gateway }}
             nameservers:
               search: [{{ lan.domain }}]
               addresses:
@@ -50,7 +50,7 @@
               # - 8.8.4.4
     dest: /etc/netplan/00-bridge.yaml
     backup: true
-  notify: 
+  notify:
     - "router : generate_netplan"
 
 - name: Modify bridge netplan to add {{ wan.ifname }}
@@ -61,13 +61,13 @@
     owner: root
     group: root
     block: |
-          # This is the public-facing interface.
-          {{ wan.ifname}}:
-            dhcp4: true
-            dhcp6: true
+      # This is the public-facing interface.
+      {{ wan.ifname }}:
+        dhcp4: true
+        dhcp6: true
     backup: true
   when: wan.ifname is defined
-  notify: 
+  notify:
     - "router : generate_netplan"
 
 - name: Modify bridge netplan to add {{ wap.ifname }}
@@ -79,7 +79,7 @@
     group: root
     block: |
       # This is the internal-facing wireless interface.
-          {{ wap.ifname}}:
+          {{ wap.ifname }}:
             optional: true
             dhcp4: false
             dhcp6: false
@@ -97,5 +97,5 @@
     regexp: '^      interfaces: '
     line: '      interfaces: [{{ lan0.ifname }},{{ wap.ifname }}] # <-- This must be a single line to allow playbooks to add interfaces to the bridge'
   when: wap.ifname is defined
-  notify: 
+  notify:
     - "router : generate_netplan"

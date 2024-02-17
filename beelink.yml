@@ -78,22 +78,23 @@
         proto: tcp
         comment: Rate limit OpenSSH server
       become: true
-      # Only restart if the lan subnet hasn't changed
-      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+      # # Only restart if the lan subnet hasn't changed
+      # when: ansible_facts['default_ipv4']['address'] == lan0.ip
 
     - name: Enable firewall
     #   ansible.builtin.command: ufw enable
       become: true
       community.general.ufw:
         state: enabled
-      # Only restart if the lan subnet hasn't changed
-      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+      # # Only restart if the lan subnet hasn't changed
+      # when: ansible_facts['default_ipv4']['address'] == lan0.ip
 
     - name: Generate and apply netplan configs
       become: true
-      ansible.builtin.command: netplan generate && netplan apply
-      # Only restart if the lan subnet hasn't changed
-      when: ansible_facts['default_ipv4']['address'] == lan0.ip
+      ansible.builtin.shell: |
+        netplan generate && netplan apply
+      # # Only restart if the lan subnet hasn't changed
+      # when: ansible_facts['default_ipv4']['address'] == lan0.ip
 
 #    - name: Restart systemd-networkd
 #      ansible.builtin.systemd_service:

@@ -1,8 +1,65 @@
 ---
-- name: Install docker python library
+- name: Install docker python library (apt)
   ansible.builtin.apt:
     name: python3-docker
     state: present
+    cache_valid_time: 3600  # Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+    # skip_pgp_check: yes # <-- Avoid extra step of having to load maintainer's key
+  tags:
+    - packages
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Install docker python library (pacman)
+  become: true
+  community.general.pacman:
+    name: 
+      - python-docker
+    state: present
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux"
+  environment: "{{proxy_env}}"
+
+- name: Install backup/restore software and firewall
+  become: true
+  ansible.builtin.package:
+    name:
+      - rclone
+      - ufw
+    state: present
+  tags:
+    - packages
+  environment: "{{proxy_env}}"
+
+- name: Create rclone configuration for Nextcloud
+  become: true
+  ansible.builtin.template:
+    src: nextcloud_rclone_conf.j2
+    dest: "{{ collab_rclone_conf }}"
+    mode: '0700'
+    owner: root
+    group: root
+
+- name: Create nextcloud data directory
+  ansible.builtin.file:
+    path: "{{ collab_datadir }}"
+    state: directory
+    mode: '0700'
+    owner: "{{ collab_owner }}"
+    group: root
+
+- name: Create nextcloud backup directory
+  ansible.builtin.file:
+    path: "{{ collab_backupdir }}"
+    state: directory
+    mode: '0700'
+    owner: root
+    group: root
+
+- name: Restore nextcloud backup folder from cloud
+  become: true
+  ansible.builtin.shell: |
+    rclone sync blomp-encrypted:nc {{ collab_backupdir }}/ --config {{ collab_rclone_conf }}
 
 - name: Start 'nextcloud-all-in-one' container
   community.docker.docker_container:
@@ -17,18 +74,11 @@
       - "80:80"
       - "8080:8080"
       - "8443:8443"
-      # - "443:443"
     env:
-        NEXTCLOUD_ENABLE_DRI_DEVICE: "true"
-        # Values which might be parsed as numbers, booleans or other types by the YAML parser need to be quoted
-        NEXTCLOUD_UPLOAD_LIMIT: "10G"
-
-- name: Install firewall
-  ansible.builtin.package:
-    name: ["ufw"]
-    state: present
-  tags:
-    - packages
+      NEXTCLOUD_DATADIR: "{{ collab_datadir }}"
+      NEXTCLOUD_ENABLE_DRI_DEVICE: "true"
+      # Values which might be parsed as numbers, booleans or other types by the YAML parser need to be quoted
+      NEXTCLOUD_UPLOAD_LIMIT: "10G"
 
 - name: Configure Nextcloud firewall exception
   ansible.builtin.copy:

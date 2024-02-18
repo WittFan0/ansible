@@ -1,0 +1,17 @@
+[blomp-swift]
+type = swift
+user = "{{ vault_collab_email }}"
+key = "{{ vault_collab_key }}"
+auth = https://authenticate.blomp.com/v2.0/
+auth_version = 2
+tenant = storage
+
+[blomp]
+type = alias
+remote = blomp-swift:{{ vault_collab_email }}
+
+[blomp-encrypted]
+type = crypt
+remote = blomp-swift:{{ vault_collab_email }}
+password = {{ vault_collab_pass }}
+password2 = {{ vault_collab_pass2 }}

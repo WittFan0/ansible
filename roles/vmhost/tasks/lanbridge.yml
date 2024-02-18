@@ -62,11 +62,11 @@
     group: root
     block: |
       # This is the public-facing interface.
-      {{ wan.ifname }}:
-        dhcp4: true
-        dhcp6: true
+          {{ wan.ifname }}:
+            dhcp4: true
+            dhcp6: true
     backup: true
-  when: wan.ifname is defined
+  when: wap.ifname is not defined and wan.ifname is defined
   notify:
     - "router : generate_netplan"
 
@@ -84,7 +84,29 @@
             dhcp4: false
             dhcp6: false
     backup: true
-  when: wap.ifname is defined
+  when: wap.ifname is defined and wan.ifname is not defined
+  notify: 
+    - "router : generate_netplan"
+
+- name: Modify bridge netplan to add {{ wap.ifname }} and {{ wan.ifname }}
+  ansible.builtin.blockinfile:
+    path: /etc/netplan/00-bridge.yaml
+    insertafter: "ethernets:"
+    mode: '0600'
+    owner: root
+    group: root
+    block: |
+      # This is the internal-facing wireless interface.
+          {{ wap.ifname }}:
+            optional: true
+            dhcp4: false
+            dhcp6: false
+      # This is the public-facing interface.
+          {{ wan.ifname }}:
+            dhcp4: true
+            dhcp6: true
+    backup: true
+  when: wap.ifname is defined and wan.ifname is defined
   notify: 
     - "router : generate_netplan"
 

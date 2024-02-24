@@ -5,7 +5,7 @@ hostname: beelink
 lan0:
     ip: "{{ lan.base }}.9"
     ifname: enp1s0
-    mac: 84:39:be:68:69:ab
+    mac: {{ vault_mac_beelink }}
 
 wan: 
     ifname: enx00b56d0d9126

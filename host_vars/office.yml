@@ -5,7 +5,7 @@ hostname: archsrv
 lan0:
     ip: "{{ lan.base }}.2"
     ifname: eno1
-    mac: e0:3f:49:b3:1e:6a
+    mac: {{ vault_mac_office }}
 
 wan:
     ifname: 

@@ -6,8 +6,6 @@ remote_user:
   group: lance
   shell: bash
   shell_path: /bin/bash  # <-- This must have a matching entry in /etc/shells
-  email: "{{ vault_user_email }}"
-  password: "{{ vault_user_password }}"
 
 lan:
   domain: r.qw
@@ -16,10 +14,6 @@ lan:
   base: 192.168.2
 
 lan_base: "{{ lan.subnet | regex_replace('.0/[0-9]{2}', '') }}"
-
-mailer_passwd: "{{ vault_mailer_passwd }}"
-
-google_client_secret: "{{ vault_google_client_secret }}"
 
 docker_users:
   - lance

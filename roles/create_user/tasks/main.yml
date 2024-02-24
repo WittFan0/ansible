@@ -19,7 +19,7 @@
   ansible.builtin.user:
     name: "{{ remote_user.name }}"
     group: "{{ remote_user.group }}"
-    password: "{{ remote_user.password|password_hash('sha512') }}"
+    password: "{{ vault_user_password|password_hash('sha512') }}"
     password_lock: false
     update_password: on_create # --> only set the password for newly created users
     shell: "{{ remote_user.shell_path }}"

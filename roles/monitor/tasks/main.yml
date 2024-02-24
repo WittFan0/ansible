@@ -10,7 +10,7 @@
 
 - name: Configure nullmailer admin address
   ansible.builtin.copy:
-    content: "{{ remote_user.email }}"
+    content: "{{ vault_user_email }}"
     dest: /etc/nullmailer/adminaddr
     backup: yes
   notify: restart_nullmailer

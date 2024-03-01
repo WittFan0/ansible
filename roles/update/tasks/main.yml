@@ -39,7 +39,7 @@
 - name: Enable pacman multilib
   ansible.builtin.blockinfile:
     path: /etc/pacman.conf
-    block: | 
+    block: |
       [multilib]
       Include = /etc/pacman.d/mirrorlist
     insertafter: 'EOF'
@@ -49,8 +49,11 @@
   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Create pacman hook directory
-  file: path=/etc/pacman.d/hooks
-        state=directory
+  ansible.builtin.file:
+    path: /etc/pacman.d/hooks
+    owner: root
+    mode: '0755'
+    state: directory
   tags:
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
@@ -59,7 +62,9 @@
   ansible.builtin.copy:
     content: Server = http://arch.mirror.constant.com/$repo/os/$arch
     dest: /etc/pacman.d/mirrorlist
-    backup: yes
+    owner: root
+    mode: '0644'
+    backup: true
   tags:
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
@@ -71,16 +76,53 @@
         HTTP::proxy "{{ proxy_env }}";
       }
     dest: /etc/apt/apt.conf.d/10proxy.conf
-    backup: yes
+    owner: root
+    mode: '0644'
+    backup: true
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"] and proxy_env is defined
+
+- name: Set unattended upgrades (Debian)
+  ansible.builtin.copy:
+    content: |
+      Unattended-Upgrade::Allowed-Origins {
+              "${distro_id}:${distro_codename}";
+              "${distro_id}:${distro_codename}-security";
+              "${distro_id}ESMApps:${distro_codename}-apps-security";
+              "${distro_id}ESM:${distro_codename}-infra-security";
+      };
+      Unattended-Upgrade::DevRelease "auto";
+      Unattended-Upgrade::Mail "{{ vault_user_email }}";
+      Unattended-Upgrade::MailReport "on-change";
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    mode: '0640'
+    backup: true
+  tags:
+    - packages
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Set update notifier (Debian)
+  ansible.builtin.copy:
+    content: |
+      DPkg::Post-Invoke {"if [ -d /var/lib/update-notifier ]; then touch /var/lib/update-notifier/dpkg-run-stamp; fi; /usr/lib/update-notifier/update-motd-updates-available 2>/dev/null || true";};
+      APT::Update::Post-Invoke-Success {"/usr/lib/update-notifier/update-motd-updates-available 2>/dev/null || true";};
+    dest: /etc/apt/apt.conf.d/99update-notifier
+    owner: root
+    mode: '0644'
+    backup: true
+  tags:
+    - packages
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Switch to cacheable http apt sources
   ansible.builtin.replace:
     path: /etc/apt/sources.list
     regexp: 'http?://([A-Za-z0-9]+(\.[A-Za-z0-9]+)+)/ubuntu/'
     replace: 'http://us.archive.ubuntu.com/ubuntu/'
+    owner: root
+    mode: '0644'
     backup: true
   tags:
     - packages
@@ -89,7 +131,7 @@
 # - name: Install reflector
 #   community.general.pacman:
 #     update_cache: true
-#     name: reflector 
+#     name: reflector
 #     state: present
 #   tags:
 #     - packages
@@ -123,20 +165,20 @@
   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Update package cache and upgrade (Debian)
-  ansible.builtin.apt: 
+  ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600  # Only run "update_cache=yes" if the last one is more than 3600 seconds ago
     name: "*"
     state: latest
-    autoclean: yes
-    autoremove: yes
+    autoclean: true
+    autoremove: true
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-  
+
 - name: Install distro base packages
   ansible.builtin.package:
-    name: "{{ distro_packages }}" 
+    name: "{{ distro_packages }}"
     state: present
   tags:
     - packages

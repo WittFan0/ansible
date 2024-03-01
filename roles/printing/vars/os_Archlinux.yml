@@ -2,3 +2,4 @@ printing_packages:
   - cups
   - lpr
   - libusb
+  - ufw

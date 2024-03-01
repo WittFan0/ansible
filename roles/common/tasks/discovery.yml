@@ -17,13 +17,14 @@
       LLMNR=no
     dest: /etc/systemd/resolved.conf.d/98-avahi.conf
     mode: '0644'
-    backup: no
+    backup: false
   notify: restart_resolved
 
 - name: Install NSS module for Multicast DNS name resolution (pacman)
   community.general.pacman:
     update_cache: true
-    name: 
+    name:
+      - ufw
       - nss-mdns
       - dbus-python
       - python-gobject
@@ -37,7 +38,9 @@
 - name: Install NSS module for Multicast DNS name resolution (apt)
   become: true
   ansible.builtin.apt:
-    name: libnss-mdns
+    name:
+      - libnss-mdns
+      - ufw
     state: present
   tags:
     - packages
@@ -48,13 +51,12 @@
     rule: allow
     from_ip: "{{ lan.subnet }}"
     to_port: mdns
-    to_ip: "{{ lan0.ip}}"
+    to_ip: "{{ lan0.ip }}"
     comment: mDNS
   become: true
 
 - name: Enable service discovery
   ansible.builtin.service:
     name: avahi-daemon.service
-    enabled: yes
+    enabled: true
     state: started
-

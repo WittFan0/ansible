@@ -10,6 +10,16 @@
     - absent
     - directory
 
+- name: Install netplan
+  become: true
+  ansible.builtin.package:
+    name: 
+      - netplan 
+    state: present
+  tags:
+    - packages
+  environment: "{{proxy_env}}"
+
 - name: Create a netplan that creates a bridge and connects {{ lan0.ifname }} to it
   become: true
   ansible.builtin.copy:

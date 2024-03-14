@@ -10,6 +10,16 @@
     - absent
     - directory
 
+- name: Install netplan
+  become: true
+  ansible.builtin.package:
+    name: 
+      - netplan 
+    state: present
+  tags:
+    - packages
+  environment: "{{proxy_env}}"
+
 - name: Create a netplan that assignes a static ip to {{ lan0.ifname }}
   become: true
   ansible.builtin.copy:
@@ -42,11 +52,11 @@
             dhcp4: true
     dest: /etc/netplan/01-router.yaml
     backup: true
-  notify: 
+  notify:
     - "router : generate_netplan"
 
-# Use the wireless nic as a wi-fi access point
-- ansible.builtin.include_tasks: wap.yml
+- name: Use the wireless nic as a wi-fi access point
+  ansible.builtin.include_tasks: wap.yml
   when: wap.ifname is defined
 
 - name: Install firewall
@@ -93,12 +103,16 @@
 - name: Configure IP masquerading and forward necessary ports
   ansible.builtin.blockinfile:
     path: /etc/ufw/before.rules
+    append_newline: true
     insertbefore: "BOF"
     block: |
       # NAT table rules
       *nat
       :PREROUTING ACCEPT [0:0]
       :POSTROUTING ACCEPT [0:0]
+
+      # # Redirect all DNS requests to this machine  # <-- EXPERIMENTAL
+      # -A PREROUTING -d {{ lan0.ip }} --dport 53 -j DNAT --to-destination {{ lan0.ip }}:53
 
       # # Xbox port forwardings  # <-- UFW won't start at boot with these enabled?
       # -A PREROUTING -i {{ wan.ifname }} --dport 53 -j DNAT --to-destination {{ xbox_ip }}:53
@@ -115,7 +129,4 @@
       # don't delete the 'COMMIT' line or these nat table rules won't
       # be processed
       COMMIT
-    backup: yes
-
-
-# TODO: Define a gateway on each system that isn't the router pc
+    backup: true

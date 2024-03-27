@@ -10,7 +10,17 @@
   ansible.builtin.copy:
     src: ufw-plexmediacenter
     dest: /etc/ufw/applications.d/plexmediaserver
-    backup: yes
+    owner: root
+    mode: "0640"
+    backup: true
+
+- name: Increase the number of files non-root users are allowed to subscribe to via inotify
+  ansible.builtin.copy:
+    src: 40-max-user-watches.conf
+    dest: /etc/sysctl.d/40-max-user-watches.conf
+    owner: root
+    mode: "0640"
+    backup: true
 
 - name: Open Plex ports
   community.general.ufw:
@@ -18,4 +28,3 @@
     name: plexmediaserver
     comment: Plex
   become: true
-

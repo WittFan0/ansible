@@ -1,4 +1,5 @@
 hostname: taichi
+ansible_user: lance
 
 kernel_parameters: "quiet splash nvidia_drm.modeset=1 intel_iommu=on iommu=pt"
 
@@ -7,10 +8,13 @@ grub_gfxmode: 2560x1440x32,1920x1080x32,1440x900x32,1280x1024x32,1024x768x32,aut
 lan0:
     ip: "{{ lan.base }}.5"
     ifname: eno1
-    mac: {{ vault_mac_taichi }}
+    mac: "{{ vault_mac_taichi }}"
 
 wan:
-    ifname: 
+    ifname: enp7s0
+
+wap:
+    ifname: wlp6s0
 
 ssh_port: 22   # changing this from 22 gets messy. For workaround see https://dmsimard.com/2016/03/15/changing-the-ssh-port-with-ansible/
 

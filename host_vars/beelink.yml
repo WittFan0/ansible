@@ -5,7 +5,7 @@ hostname: beelink
 lan0:
     ip: "{{ lan.base }}.9"
     ifname: enp1s0
-    mac: {{ vault_mac_beelink }}
+    mac: "{{ vault_mac_beelink }}"
 
 wan: 
     ifname: enx00b56d0d9126
@@ -15,4 +15,4 @@ wap:
 
 ssh_port: 22   # changing this from 22 gets messy. For workaround see https://dmsimard.com/2016/03/15/changing-the-ssh-port-with-ansible/
 
-# desktop_environment: none
+desktop_environment: xfce

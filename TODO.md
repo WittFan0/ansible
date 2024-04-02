@@ -1,9 +1,9 @@
 [security]
 Python encryption warning
-replace discontinued notracking blocklists
 disable root login
 endlessh for ubuntu
 firejail
+sshguard before.rule file modification
 
 
 [functionality]
@@ -14,7 +14,7 @@ add directories to $PATH for user
 install printer driver (move lib32-zlib from distro packages)
 nvidia drivers
 share data directories
-media server | /etc/dnsmasq.d/10-plex.conf | max_user_watches | NFS | SMB
+media server | /etc/dnsmasq.d/10-plex.conf | max_user_watches | NFS | SMB | WSDD(2)
 grub-btrfs for ubuntu
 add (btrfs) to binaries section of mkinitcpio.conf (ubuntu)
 create filesystem | fstrim | BTRFS to mkinitcpio | fstab
@@ -26,6 +26,7 @@ gitconfig?
 
 [optimization]
 pass proxy IP and names as a host variable
+switch from ntpd to chrony
 switch hostapd from deprecated systemd service to ifupdown (is ifupdown compatible with netplan?)
 roll hardening plays into services being hardened
 switch to using ansible.posix.authorized_key module

@@ -9,7 +9,8 @@ set -e
 sleep_then_download() {
 # Sleep for up to an hour to spread the load of checking for updates
 /usr/bin/sleep $(/usr/bin/shuf -i 1-3600 -n 1)
-/usr/bin/curl -o /etc/dnsmasq.blacklist.txt https://github.com/notracking/hosts-blocklists/raw/master/dnsmasq/dnsmasq.blacklist.txt
+echo "Downloading DNS blacklist" | systemd-cat -t dnsmasq-blacklist-update -p info
+/usr/bin/curl -o /etc/dnsmasq.blacklist.txt https://big.oisd.nl/dnsmasq2
 }
 
 sleep_then_download &

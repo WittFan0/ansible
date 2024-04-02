@@ -11,14 +11,14 @@
     src: hosts_dnsmasq.j2
     dest: /etc/hosts.dnsmasq
     mode: '0644'
-    backup: yes
+    backup: True
 
 - name: Download DNS blacklist
   ansible.builtin.get_url:
-    url: https://github.com/notracking/hosts-blocklists/raw/master/dnsmasq/dnsmasq.blacklist.txt
+    url: https://big.oisd.nl/dnsmasq2
     dest: /etc/dnsmasq.blacklist.txt
     mode: '0644'
-    backup: no
+    backup: false
 
 - name: Create dnsmasq config directory if it does not exist
   ansible.builtin.file:
@@ -31,16 +31,14 @@
     content: conf-file=/etc/dnsmasq.blacklist.txt
     dest: /etc/dnsmasq.d/10-dnsblacklist.conf
     mode: '0644'
-    backup: no
+    backup: false
 
-# # Blackilst is no longer being maintained
-# # TODO: Find a DNS blacklist replacement
-# - name: Add cron job for refreshing DNS blacklist
-#   ansible.builtin.copy:
-#     src: dns-blacklist-update
-#     dest: /etc/cron.daily/dns-blacklist-update
-#     mode: '0755'
-#     backup: no
+- name: Add cron job for refreshing DNS blacklist
+  ansible.builtin.copy:
+    src: dns-blacklist-update
+    dest: /etc/cron.daily/dns-blacklist-update
+    mode: '0755'
+    backup: false
 
 - name: Create PXE directory if it does not exist
   ansible.builtin.file:
@@ -53,42 +51,42 @@
     url: http://boot.ipxe.org/undionly.kpxe
     dest: /srv/tftp/pxe/undionly.kpxe
     mode: '0644'
-    backup: no
+    backup: false
 
 - name: Download boot file for UEFI netbooting
   ansible.builtin.get_url:
     url: http://boot.ipxe.org/ipxe.efi
     dest: /srv/tftp/pxe/ipxe.efi
     mode: '0644'
-    backup: no
+    backup: false
 
 - name: Create netboot menu
   ansible.builtin.copy:
     src: bootmenu.ipxe
     dest: /srv/tftp/pxe/bootmenu.ipxe
     mode: '0644'
-    backup: yes
+    backup: true
 
 - name: Configure netboot
   ansible.builtin.copy:
     src: 10-netboot.conf
     dest: /etc/dnsmasq.d/10-netboot.conf
     mode: '0644'
-    backup: yes
+    backup: true
 
 - name: Configure DNS and DHCP servers
   ansible.builtin.template:
     src: 10-router_conf.j2
     dest: /etc/dnsmasq.d/10-router.conf
     mode: '0644'
-    backup: yes
+    backup: true
 
 - name: Add DNS setting for Plex
   ansible.builtin.copy:
     content: rebind-domain-ok=/plex.direct/
     dest: /etc/dnsmasq.d/10-plex.conf
     mode: '0644'
-    backup: no
+    backup: false
 
 - name: Install firewall and DNS, DHCP, TFTP and dnscrypt-proxy servers
   ansible.builtin.package:
@@ -110,10 +108,10 @@
     line: |
       # server_names = ['cloudflare']
 
-# # The Ubuntu package uses unsupported systemd sockets to accept connections. 
+# # The Ubuntu package uses unsupported systemd sockets to accept connections.
 # # In order to configure the local port, the /lib/systemd/system/dnscrypt-proxy.socket file
 # # needs to be edited instead of the standard dnscrypt-proxy.toml file
-# - name: To forward queries from dnsmasq, dnscrypt-proxy must listen on a port different from the default 53 
+# - name: To forward queries from dnsmasq, dnscrypt-proxy must listen on a port different from the default 53
 #   ansible.builtin.lineinfile:
 #     path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
 #     regexp: '^listen_addresses'
@@ -124,7 +122,7 @@
     rule: allow
     from_ip: "{{ lan.subnet }}"
     to_port: domain
-    to_ip: "{{ lan0.ip}}"
+    to_ip: "{{ lan0.ip }}"
     comment: DNS
   become: true
 
@@ -137,12 +135,12 @@
     comment: DHCP
   become: true
 
-- name: Accept tftp queries from {{ lan.subnet }} for network booting
+- name: Accept tftp queries from {{ lan.subnet }}
   community.general.ufw:
     rule: allow
     from_ip: "{{ lan.subnet }}"
     to_port: tftp
-    to_ip: "{{ lan0.ip}}"
+    to_ip: "{{ lan0.ip }}"
     proto: udp
     comment: TFTP
   become: true
@@ -171,7 +169,7 @@
       DNSStubListener=no
     dest: /etc/systemd/resolved.conf.d/99-dnsmasq.conf
     mode: '0644'
-    backup: no
+    backup: false
 
 - name: Check value of default_ipv4.address
   ansible.builtin.debug:
@@ -180,7 +178,7 @@
 - name: Restart systemd-resolved if necessary to free up DNS port 53
   ansible.builtin.service:
     name: systemd-resolved.service
-    enabled: yes
+    enabled: true
     state: restarted
   # Only restart if the lan subnet hasn't changed
   when: ansible_facts['default_ipv4']['address'] == lan0.ip
@@ -188,7 +186,7 @@
 - name: Enable and start dnscrypt-proxy server
   ansible.builtin.service:
     name: dnscrypt-proxy.service
-    enabled: yes
+    enabled: true
     state: started
   # Only start if the lan subnet hasn't changed
   when: ansible_facts['default_ipv4']['address'] == lan0.ip
@@ -196,7 +194,7 @@
 - name: Enable and start DNS, DHCP and TFTP servers
   ansible.builtin.service:
     name: dnsmasq.service
-    enabled: yes
+    enabled: true
     state: started
   # Only start if the lan subnet hasn't changed
   when: ansible_facts['default_ipv4']['address'] == lan0.ip

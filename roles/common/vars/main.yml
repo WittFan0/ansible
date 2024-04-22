@@ -1,4 +1,4 @@
-ntp_timezone: America/New_York
+ntp_timezone: "{{ timezone }}"
 
 ntp_restrict:
   - "127.0.0.1"
@@ -6,4 +6,3 @@ ntp_restrict:
   - "{{ lan.subnet }}"
 
 ntp_cron_handler_enabled: true  # <-- restart the cron daemon after the timezone has changed.
-

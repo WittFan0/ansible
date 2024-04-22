@@ -10,10 +10,19 @@
     name:
       - wireplumber
       - pipewire-pulse
-      - pipewire-jack
+      # - pipewire-jack  # <-- not available until 23.04
       # - lib32-pipewire-jack
     state: present
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
+
+- name: Install pipewire-jack
+  ansible.builtin.package:
+    name:
+      - pipewire-jack  # <-- not available until 23.04
+      - lib32-pipewire-jack
+    state: present
+  environment: "{{ proxy_env }}"
+  when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Create wallpaper directory if it doesn't exist
   ansible.builtin.file:
@@ -25,6 +34,8 @@
   ansible.builtin.copy:
     src: wallpaper/
     dest: "{{ wallpaper-dir }}"
+    owner: root
+    mode: '0755'
     backup: false
 
 # - name: Clone Dracula wallpapers from github
@@ -64,7 +75,7 @@
   tags:
     - packages
   when: ansible_facts['virtualization_role'] == "guest"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Install nvidia video packages
   ansible.builtin.package:
@@ -73,7 +84,7 @@
   tags:
     - packages
   when: ansible_facts['virtualization_role'] != "guest"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Enable Nvidia hardware video acceleration (Arch)
   kewlfft.aur.aur:
@@ -85,9 +96,9 @@
   become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
-- name: Remove kms (nvidia requirement) and add plymouth to initial ramdisk (Arch) 
+- name: Remove kms (nvidia requirement) and add plymouth to initial ramdisk (Arch)
   ansible.builtin.copy:
     dest: /etc/mkinitcpio.conf.d/nvidia.conf
     content: HOOKS=(base udev autodetect modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs plymouth)
@@ -111,6 +122,8 @@
   ansible.builtin.copy:
     src: plymouth.conf
     dest: /etc/systemd/system/display-manager.service.d/plymouth.conf
+    owner: root
+    mode: '0644'
     backup: true
   when: desktop_environment != "gnome"
 
@@ -120,7 +133,7 @@
 - name: Enable {{ display-mgr }} display manager
   ansible.builtin.service:
     name: "{{ display-mgr }}.service"
-    enabled: yes
+    enabled: true
     state: started
 
 # - name: Enable LightDM display manager
@@ -146,7 +159,7 @@
 
 - name: Install smartcard packages
   ansible.builtin.package:
-    name: 
+    name:
       - pcsc-tools
     state: present
   tags:
@@ -161,7 +174,7 @@
 
 - name: Install smartcard (AUR)
   kewlfft.aur.aur:
-    name: 
+    name:
       - coolkey
     state: present
     update_cache: "yes"
@@ -178,15 +191,15 @@
     dest: /opt/
 
 - name: Enable and start smartcard service
-  ansible.builtin.service: 
+  ansible.builtin.service:
     name: pcscd.service
-    enabled: yes
+    enabled: true
     state: started
 
 # Firejail installs A LOT of dependencies. Is it worth it?
 # - name: Install firejail
 #   ansible.builtin.package:
-#     name: 
+#     name:
 #       - firejail
 #     state: present
 #   tags:

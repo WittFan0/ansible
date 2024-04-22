@@ -2,18 +2,31 @@
 - name: Install remote mounting programs
   become: true
   ansible.builtin.package:
-    name: "{{ mount_client_packages }}" 
+    name: "{{ mount_client_packages }}"
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
+
+- name: Create samba config directory if it does not exist
+  ansible.builtin.file:
+    path: /etc/samba
+    state: directory
+    mode: '0755'
+
+- name: Create tplink credentials file
+  ansible.builtin.template:
+    src: tplinkcredentials.j2
+    dest: /etc/samba/.tplinkcredentials
+    mode: '0600'
+    backup: true
 
 - name: Install davfs2 AUR package to access Nextcloud files
   kewlfft.aur.aur:
-    name: 
+    name:
       - davfs2
     state: present
-    skip_pgp_check: yes # <-- Avoid extra step of having to load maintainer's key
+    skip_pgp_check: true # <-- Avoid extra step of having to load maintainer's key
   tags:
     - aur
     - packages
@@ -31,7 +44,7 @@
     path: "{{ item }}"
     state: directory
     mode: '0755'
-  loop: 
+  loop:
     - /mnt/movies
     - /mnt/television
     - /mnt/home_movies-orig

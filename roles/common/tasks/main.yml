@@ -26,14 +26,14 @@
   when: ansible_facts['distribution'] == "Archlinux"
 
 # geerlingguy.ntp will overwrite timezone
-- name: Set timezone to {{ ntp_timezone }}
+- name: Set timezone to {{ timezone }}
   community.general.timezone:
-    name: "{{ ntp_timezone }}"
+    name: "{{ timezone }}"
 
 # - name: Set timezone 
 #   become: true
 #   ansible.builtin.file:
-#     src: /usr/share/zoneinfo/{{ ntp_timezone }}
+#     src: /usr/share/zoneinfo/{{ timezone }}
 #     dest: /etc/localtime
 #     state: link
 #     force: true

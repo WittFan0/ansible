@@ -95,6 +95,11 @@
   tags:
     - packages
 
+- name: Allow dnsmasq to process .conf files in /etc/dnsmasq.d/
+  ansible.builtin.lineinfile:
+    path: /etc/dnsmasq.conf
+    line: conf-dir=/etc/dnsmasq.d/,*.conf
+
 - name: Run dnscrypt-proxy as a forwarder for dnsmasq
   ansible.builtin.lineinfile:
     path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml

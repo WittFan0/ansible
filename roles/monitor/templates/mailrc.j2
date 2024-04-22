@@ -1,0 +1,5 @@
+account gmail {
+   set v15-compat
+   set from="{{ hostname }} administrator <{{ vault_user_email }}>"
+   set mta=smtp://{{ vault_mailer_username }}:{{ vault_mailer_password }}@smtp.gmail.com smtp-use-starttls
+}

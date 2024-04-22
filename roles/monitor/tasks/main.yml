@@ -1,61 +1,21 @@
 - name: Set OS distribution dependent variables
   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
-- name: Install nullmailer
-  ansible.builtin.package:
-    name: nullmailer
-    state: present
-  tags:
-    - packages
-
-- name: Configure nullmailer admin address
-  ansible.builtin.copy:
-    content: "{{ vault_user_email }}"
-    dest: /etc/nullmailer/adminaddr
-    backup: yes
-  notify: restart_nullmailer
-
-- name: Configure nullmailer network domain name
-  ansible.builtin.copy:
-    content: "{{ lan.domain }}"
-    dest: /etc/nullmailer/defaultdomain
-    backup: yes
-  notify: restart_nullmailer
-
-- name: Configure mailname
-  ansible.builtin.copy:
-    content: "{{ hostname }}.{{ lan.domain }}"
-    dest: /etc/mailname
-    backup: yes
-  notify: restart_nullmailer
-
-- name: Configure nullmailer remote server
+- name: Configure sending through gmail
   ansible.builtin.template:
-    src: nullmailer-remotes.j2
-    dest: /etc/nullmailer/remotes
-    owner: "{{ nullmailer_owner }}"
+    src: mailrc.j2
+    dest: /root/.mailrc
+    backup: true
+    become: true
     mode: '0600'
-    backup: yes
-  notify: restart_nullmailer
 
-- name: Copy nullmailer test script
-  ansible.builtin.template:
-    src: testnullmailer_sh.j2
-    dest: /usr/local/sbin/testnullmailer.sh
-    mode: '0755'
-
-- name: Enable and start nullmailer
-  ansible.builtin.service:
-    name: nullmailer.service
-    enabled: yes
-    state: started
-
-- name: Install mailutils
+- name: Install s-nail
   ansible.builtin.package:
-    name: mailutils
+    name: s-nail
     state: present
   tags:
     - packages
+  environment: "{{proxy_env}}"
 
 - name: Install hardrive monitor
   ansible.builtin.package:
@@ -63,12 +23,14 @@
     state: present
   tags:
     - packages
+  environment: "{{proxy_env}}"
 
 - name: Configure hardrive monitor
   ansible.builtin.template:
     src: smartd.j2
     dest: /etc/smartd.conf
-    backup: yes
+    backup: true
+    mode: '0644'
   notify:
     - restart_smartd
 
@@ -85,7 +47,7 @@
     url: "{{ sensors_conf_url }}"
     dest: '/etc/sensors.d/'
     mode: '0644'
-    force: yes
+    force: true
   tags:
     - packages
   when: sensors_conf_url is defined
@@ -105,7 +67,7 @@
 - name: Enable and start sensors daemon
   ansible.builtin.service:
     name: "{{ sensors_service }}"
-    enabled: yes
+    enabled: true
     state: started
   when: ansible_facts['virtualization_role'] != "guest"
 
@@ -120,20 +82,22 @@
   ansible.builtin.template:
     src: logwatch_conf.j2
     dest: /etc/logwatch/conf/logwatch.conf
-    backup: yes
+    backup: true
+    mode: '0644'
   notify: restart_logwatch
 
 - name: Configure smartd log monitoring
   ansible.builtin.copy:
     content: "LogFile = syslog"
     dest: /etc/logwatch/conf/services/smartd.conf
+    mode: '0644'
   notify: restart_logwatch
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Enable and start logwatch timer
   ansible.builtin.service:
     name: logwatch.timer
-    enabled: yes
+    enabled: true
     state: started
   when: ansible_facts['distribution'] == "Archlinux"
 

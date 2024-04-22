@@ -1,8 +1,3 @@
-- name: restart_nullmailer
-  ansible.builtin.service:
-    name: nullmailer.service
-    state: restarted
-
 - name: restart_smartd
   ansible.builtin.service:
     name: smartd.service

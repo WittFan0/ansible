@@ -152,13 +152,14 @@ kde_packages:
   - tokodon
   - ark
   - filelight
+  - hunspell-en_us  # <-- language dictionary for kate
   - kate
   - kbackup
   - kcalc
   - kclock
   - kdialog
   - kfind
-  # - kgpg  <-- keeps prompting for initial config?
+  # - kgpg  # <-- keeps prompting for initial config?
   - kleopatra
   - kwalletmanager
   - kweather

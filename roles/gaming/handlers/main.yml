@@ -1,8 +1,0 @@
----
-- name: restart_
-  ansible.builtin.service:
-    name: .service
-    state: restarted
-
-- name: reload_systemd_config
-  ansible.builtin.command: systemctl daemon-reload

@@ -1,11 +1,4 @@
-TmpDir = /var/cache/logwatch
 Output = mail
 Format = html
-Encode = none
 MailTo = "{{ vault_user_email }}"
 MailFrom = "logwatch@{{ hostname }}.{{ lan.domain }}"
-Range = yesterday
-Detail = Low
-Service = All
-mailer = "/usr/sbin/sendmail -t"
-LogDir = /var/log

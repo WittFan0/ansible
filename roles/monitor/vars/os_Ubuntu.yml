@@ -3,3 +3,5 @@ sensors_package:
   - lm-sensors
 
 sensors_service: lm-sensors.service
+
+nullmailer_owner: "mail"

@@ -6,7 +6,8 @@
     src: mailrc.j2
     dest: /root/.mailrc
     backup: true
-    become: true
+    owner: root
+    group: root
     mode: '0600'
 
 - name: Install s-nail
@@ -16,6 +17,60 @@
   tags:
     - packages
   environment: "{{proxy_env}}"
+
+- name: Install nullmailer  # <-- logwatch depends on included sendmail
+  ansible.builtin.package:
+    name: nullmailer
+    state: present
+  tags:
+    - packages
+  environment: "{{proxy_env}}"
+
+- name: Configure nullmailer admin address
+  ansible.builtin.copy:
+    content: "{{ vault_user_email }}"
+    dest: /etc/nullmailer/adminaddr
+    owner: "{{ nullmailer_owner }}"
+    mode: '0644'
+    backup: true
+  notify: restart_nullmailer
+
+- name: Configure nullmailer network domain name
+  ansible.builtin.copy:
+    content: "{{ lan.domain }}"
+    dest: /etc/nullmailer/defaultdomain
+    owner: "{{ nullmailer_owner }}"
+    mode: '0644'
+    backup: true
+  notify: restart_nullmailer
+
+- name: Configure mailname
+  ansible.builtin.copy:
+    content: "{{ hostname }}.{{ lan.domain }}"
+    dest: /etc/mailname
+    backup: true
+  notify: restart_nullmailer
+
+- name: Configure nullmailer remote server
+  ansible.builtin.template:
+    src: nullmailer-remotes.j2
+    dest: /etc/nullmailer/remotes
+    owner: "{{ nullmailer_owner }}"
+    mode: '0600'
+    backup: true
+  notify: restart_nullmailer
+
+- name: Copy nullmailer test script
+  ansible.builtin.template:
+    src: testnullmailer_sh.j2
+    dest: /usr/local/sbin/testnullmailer.sh
+    mode: '0755'
+
+- name: Enable and start nullmailer
+  ansible.builtin.service:
+    name: nullmailer.service
+    enabled: true
+    state: started
 
 - name: Install hardrive monitor
   ansible.builtin.package:
@@ -106,3 +161,4 @@
     src: reboot-check.j2
     dest: /etc/cron.daily/reboot-check
     mode: '0755'
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]

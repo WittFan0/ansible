@@ -183,6 +183,12 @@
   tags:
     - packages
 
+- name: Make sure cronie service unit is enabled
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: cronie
+  when: ansible_facts['distribution'] == "Archlinux"
+
 - name: Install base packages
   ansible.builtin.package:
     name: "{{ base_packages }}"

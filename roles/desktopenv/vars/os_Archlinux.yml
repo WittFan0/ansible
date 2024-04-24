@@ -152,7 +152,9 @@ kde_packages:
   - tokodon
   - ark
   - filelight
-  - hunspell-en_us  # <-- language dictionary for kate
+  - hunspell-en_us  # <-- needed by hunspell
+  - hunspell  # <-- needed by sonnet
+  - sonnet  # <-- needed by kate
   - kate
   - kbackup
   - kcalc

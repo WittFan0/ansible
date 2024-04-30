@@ -58,3 +58,4 @@ alias df='df -h'
 alias du='du -ch'
 alias dehash='grep -Ev "^#|^;|^$"'
 alias editvault='cd ~/Projects/ansible && ansible-vault edit group_vars/all/vault  --vault-password-file ~/.vault_pass.txt'
+alias getdockerips="sudo docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' \$(sudo docker ps -aq)"

@@ -28,3 +28,11 @@ gpu_aud_nodedev: pci_0000_01_00_1
 grub_root_uuid: 84dadd8d-a899-4bd4-8a35-fd1ef0e48d16
 
 # passthrough_gpu_pci_id: 10de:2182,10de:1aeb,10de:1aec,10de:1aed
+
+timezone: "America/Detroit"
+dockersecretsdir: "/mnt/nvme_data/dockerdata/secrets"
+dockerappdatadir: "/mnt/nvme_data/dockerdata/appdata"
+mediadir: "/mnt/sata_data/media"
+dldir: "/mnt/sata_data/media/downloads"
+collabdatadir: /mnt/nvme_data/ncdata
+collabbackupdir: /mnt/sata_data/backup/nextcloud

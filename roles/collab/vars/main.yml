@@ -1,4 +1,2 @@
 ---
-collab_datadir: /mnt/nvme_data/ncdata
-collab_backupdir: /mnt/sata_data/backup/nextcloud
 collab_rclone_conf: /opt/nextcloud_rclone.conf

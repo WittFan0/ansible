@@ -1,0 +1,10 @@
+[Unit]
+Description=Allow gamemode group to change iGPU governor
+
+[Service]
+Type=oneshot
+RemainAfterExit=True
+ExecStart=/usr/local/bin/igpugovernor.sh
+
+[Install]
+WantedBy=multi-user.target

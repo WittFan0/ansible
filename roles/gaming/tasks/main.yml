@@ -61,6 +61,29 @@
     groups: gamemode
     append: yes
 
+- name: Copy script allowing gamemode group to access to power data (INSECURE!)
+  ansible.builtin.copy:
+    src: igpugovernor.sh
+    dest: /usr/local/bin/igpugovernor.sh
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create systemd service to allow gamemode group to access power data (INSECURE!)
+  ansible.builtin.copy:
+    src: igpugovernor.service
+    dest: /etc/systemd/system/igpugovernor.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable service giving gamemode group access to power data (INSECURE!)
+  ansible.builtin.systemd_service:
+    name: igpugovernor.service
+    state: started
+    enabled: true
+    daemon_reload: true
+
 - name: Install Lutris (pacman)
   ansible.builtin.package:
     name:  # <-- Wine dependencies listed on Lutris github page

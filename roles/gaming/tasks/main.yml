@@ -9,7 +9,7 @@
   tags:
     - packages
   when: desktop_environment == "kde"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Install Gnome dependency packages
   ansible.builtin.package:
@@ -18,7 +18,7 @@
   tags:
     - packages
   when: desktop_environment == "gnome"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Install gtk dependency packages
   ansible.builtin.package:
@@ -27,11 +27,11 @@
   tags:
     - packages
   when: desktop_environment == "xfce"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Install packages
   ansible.builtin.package:
-    name: 
+    name:
       - ttf-liberation
       - vulkan-icd-loader
       - lib32-vulkan-icd-loader
@@ -53,7 +53,13 @@
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
+
+- name: Add user to gamemode group
+  ansible.builtin.user:
+    name: {{ remote_user.name }}
+    groups: gamemode
+    append: yes
 
 - name: Install Lutris (pacman)
   ansible.builtin.package:
@@ -114,7 +120,7 @@
   tags:
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Install Lutris (apt)
   become: true
@@ -167,4 +173,4 @@
   become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"

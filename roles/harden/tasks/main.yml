@@ -7,7 +7,41 @@
   tags:
     - packages
 
-- name: Install endlessh (AUR)
+- name: Create a directory for custom systemd services
+  ansible.builtin.file:
+    path: /etc/systemd/system
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create custom service file for Endlessh
+  ansible.builtin.copy:
+    src: endlessh.service
+    dest: /etc/systemd/system/endlessh.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Allow Endlessh service to bind on ports lower than 1024
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/endlessh.service
+    regexp: 'AmbientCapabilities='
+    line: AmbientCapabilities=CAP_NET_BIND_SERVICE
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Allow Endlessh service to bind on ports lower than 1024
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/endlessh.service
+    regexp: 'PrivateUsers='
+    line: '#PrivateUsers=true'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install Endlessh (AUR)
   kewlfft.aur.aur:
     name:
       - endlessh-git
@@ -19,6 +53,20 @@
   become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Allow Endlessh to run on ports lower than 1024
+  ansible.builtin.command: setcap 'cap_net_bind_service=+ep' /usr/bin/endlessh
+  become: yes
+
+- name: Have Endlessh listen on port 22
+  ansible.builtin.lineinfile:
+    path: /etc/endlessh.conf
+    regexp: '^Port '
+    line: Port 22
+    owner: root
+    group: root
+    mode: '0644'
+    create: true
 
 # # Using blockinfile here doesn't work because Ansible can only manage
 # # a single block in each file. before.rules already has a managed block
@@ -63,31 +111,31 @@
   become: true
   community.general.ufw:
     rule: allow
-    to_port: '2222'
+    to_port: '22'
     proto: tcp
     comment: OpenSSH tarpit
 
-- name: Open NFS port
-  become: true
-  community.general.ufw:
-    rule: allow
-    from_ip: "{{ lan.subnet }}"
-    to_ip: "{{ lan0.ip }}"
-    to_port: nfs
-    comment: NFS
+# - name: Open NFS port
+#   become: true
+#   community.general.ufw:
+#     rule: allow
+#     from_ip: "{{ lan.subnet }}"
+#     to_ip: "{{ lan0.ip }}"
+#     to_port: nfs
+#     comment: NFS
 
-- name: Open phpMyAdmin port
-  become: true
-  community.general.ufw:
-    rule: allow
-    from_ip: "{{ lan.subnet }}"
-    to_ip: "{{ lan0.ip }}"
-    to_port: '51111'
-    comment: phpMyAdmin
+# - name: Open phpMyAdmin port
+#   become: true
+#   community.general.ufw:
+#     rule: allow
+#     from_ip: "{{ lan.subnet }}"
+#     to_ip: "{{ lan0.ip }}"
+#     to_port: "{{ vault_phpmyadmin_port }}"
+#     comment: phpMyAdmin
 
-- name: Open Piwigo ports
-  become: true
-  community.general.ufw:
-    rule: allow
-    to_port: '52080'
-    comment: Piwigo
+# - name: Open Piwigo port
+#   become: true
+#   community.general.ufw:
+#     rule: allow
+#     to_port: "{{ vault_piwigo_port }}"
+#     comment: Piwigo

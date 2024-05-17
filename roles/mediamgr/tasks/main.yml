@@ -1,0 +1,16 @@
+---
+- name: Set OS distribution dependent variables
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install desktop environment
+  ansible.builtin.include_tasks: ../../desktopenv/tasks/main.yml
+  when: desktop_exists is not defined
+
+- name: Install photo management packages
+  ansible.builtin.package:
+    name: "{{ graphics_gtk_packages }}"
+    state: present
+  tags:
+    - packages
+  when: desktop_environment != "kde"
+  environment: "{{ proxy_env }}"

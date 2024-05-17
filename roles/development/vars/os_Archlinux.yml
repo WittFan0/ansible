@@ -1,4 +1,4 @@
-base_dev_packages: 
+development_base_packages:
   - base-devel
   - pigz
   - pbzip2

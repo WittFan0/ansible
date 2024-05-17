@@ -1,5 +1,5 @@
 ---
-- name: Play for pushing ansible plays from server 
+- name: Play for pushing ansible plays from server
   hosts: all
   become: true
 
@@ -19,13 +19,10 @@
   become: true
   roles:
     - update
+    - create_user
     - common
     - monitor
     - harden  # TODO: Limit to WAN interface
-  environment:
-    http_proxy: "{{ proxy_env }}"
-    https_proxy: "{{ proxy_env }}"
-    ftp_proxy: "{{ proxy_env }}"
 
 - name: Printing role
   hosts: printing
@@ -60,14 +57,17 @@
     - geerlingguy.docker
     - collab
 
-- name: Workstation roles
-  hosts: workstation
+- name: Media manager role
+  hosts: mediamgr
   become: true
   roles:
-    - desktopenv
-    # - ripping
-    - graphics
-#    when: desktop_environment is defined  <-- ERROR! 'when' is not a valid attribute for a Play
+    - mediamgr
+
+- name: Ripping role
+  hosts: ripping
+  become: true
+  roles:
+    - ripping
 
 - name: Developer role
   hosts: development
@@ -80,7 +80,6 @@
   become: true
   roles:
     - gaming
-#   when: desktop_environment is defined  <-- ERROR! 'when' is not a valid attribute for a Play
 
 - name: Virtual machine host role
   hosts: vmhost
@@ -88,24 +87,25 @@
   roles:
     - vmhost
 
-- name: Snapper role
-  hosts: btrfs
-  become: true
-  roles:
-    - snapper
+# # TODO: Move snapper to its own dedicated playbook.
+# # Since it deletes the /.snapshot directory it should only ever be run one time.
+# - name: Snapper role
+#   hosts: btrfs
+#   become: true
+#   roles:
+#     - snapper
 
 - name: Router role
   hosts: router
   become: true
   roles:
     - router
-#   when: wan.ifname is defined  <-- ERROR! 'when' is not a valid attribute for a Play
 
 - name: Post execution clean-up
   hosts: all
   become: true
   tasks:
-    - name: Remove sudo-less pacman permission for `aur_builder`
+    - name: Remove sudo-less pacman permission for aur_builder
       ansible.builtin.file:
         path: /etc/sudoers.d/11-install-aur_builder
         state: absent
@@ -114,7 +114,7 @@
         - packages
       when: ansible_facts['distribution'] == "Archlinux"
 
-    - name: Remove 'aur_builder' user
+    - name: Remove aur_builder user
       ansible.builtin.user:
         name: "{{ aur.builder }}"
         state: absent

@@ -1,9 +1,16 @@
 ---
-- name: recreate_initial_ramdisk
-  ansible.builtin.command: mkinitcpio -P 
+- name: Generate netplan
+  ansible.builtin.command: netplan generate
+  become: true
 
-- name: reinstall_grub
-  ansible.builtin.command: "{{grub-mkconfig}} -o {{grub_boot_conf_dest}}"
+- name: Recreate initial ramdisk
+  ansible.builtin.command: mkinitcpio -P
+  become: true
 
-- name: reboot_system
+- name: Reinstall grub
+  ansible.builtin.command: "{{ vmhost_grub_mkconfig_command }} -o {{ vmhost_grub_boot_conf_dest }}"
+  become: true
+
+- name: Reboot system
   ansible.builtin.reboot:
+  become: true

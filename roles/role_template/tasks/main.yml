@@ -10,7 +10,7 @@
 #     state: present
 #   tags:
 #     - packages
-#   environment: "{{proxy_env}}"
+#   environment: "{{ proxy_env }}"
 
 # - name: Install package (apt)
 #   become: true
@@ -23,7 +23,7 @@
 #   tags:
 #     - packages
 #   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-#   environment: "{{proxy_env}}"
+#   environment: "{{ proxy_env }}"
 
 # - name: Install package (pacman)
 #   become: true
@@ -34,7 +34,11 @@
 #   tags:
 #     - packages
 #   when: ansible_facts['distribution'] == "Archlinux"
-#   environment: "{{proxy_env}}"
+#   environment: "{{ proxy_env }}"
+
+# - name: Setup a user to build AUR packages
+#   ansible.builtin.include_tasks: ../../common/tasks/aur.yml
+#   when: ansible_facts['distribution'] == "Archlinux" and aur_ran is not defined
 
 # - name: Install AUR pacakges
 #   kewlfft.aur.aur:

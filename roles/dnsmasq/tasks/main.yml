@@ -1,5 +1,5 @@
 ---
-- name: Provide systemd-resolved domain name resolution for software that reads /etc/resolv.conf directly 
+- name: Provide systemd-resolved domain name resolution for software that reads /etc/resolv.conf directly
   ansible.builtin.file:
     src: /run/systemd/resolve/stub-resolv.conf
     dest: /etc/resolv.conf
@@ -11,7 +11,8 @@
     src: hosts_dnsmasq.j2
     dest: /etc/hosts.dnsmasq
     mode: '0644'
-    backup: True
+    backup: true
+  notify: Restart dnsmasq
 
 - name: Download DNS blacklist
   ansible.builtin.get_url:
@@ -19,6 +20,7 @@
     dest: /etc/dnsmasq.blacklist.txt
     mode: '0644'
     backup: false
+  notify: Restart dnsmasq
 
 - name: Create dnsmasq config directory if it does not exist
   ansible.builtin.file:
@@ -28,10 +30,11 @@
 
 - name: Add DNS blacklist to DNS server
   ansible.builtin.copy:
-    content: conf-file=/etc/dnsmasq.blacklist.txt
+    content: "conf-file=/etc/dnsmasq.blacklist.txt\n"
     dest: /etc/dnsmasq.d/10-dnsblacklist.conf
     mode: '0644'
     backup: false
+  notify: Restart dnsmasq
 
 - name: Add cron job for refreshing DNS blacklist
   ansible.builtin.copy:
@@ -39,6 +42,7 @@
     dest: /etc/cron.daily/dns-blacklist-update
     mode: '0755'
     backup: false
+  notify: Restart dnsmasq
 
 - name: Create PXE directory if it does not exist
   ansible.builtin.file:
@@ -73,6 +77,7 @@
     dest: /etc/dnsmasq.d/10-netboot.conf
     mode: '0644'
     backup: true
+  notify: Restart dnsmasq
 
 - name: Configure DNS and DHCP servers
   ansible.builtin.template:
@@ -80,13 +85,15 @@
     dest: /etc/dnsmasq.d/10-router.conf
     mode: '0644'
     backup: true
+  notify: Restart dnsmasq
 
 - name: Add DNS setting for Plex
   ansible.builtin.copy:
-    content: rebind-domain-ok=/plex.direct/
+    content: "rebind-domain-ok=/plex.direct/\n"
     dest: /etc/dnsmasq.d/10-plex.conf
     mode: '0644'
     backup: false
+  notify: Restart dnsmasq
 
 - name: Install firewall and DNS, DHCP, TFTP and dnscrypt-proxy servers
   ansible.builtin.package:
@@ -99,6 +106,7 @@
   ansible.builtin.lineinfile:
     path: /etc/dnsmasq.conf
     line: conf-dir=/etc/dnsmasq.d/,*.conf
+  notify: Restart dnsmasq
 
 - name: Run dnscrypt-proxy as a forwarder for dnsmasq
   ansible.builtin.lineinfile:
@@ -106,12 +114,17 @@
     insertbefore: "BOF"
     line: cache = false
 
+- name: Have dnscrypt-proxy listen on port 53000
+  ansible.builtin.lineinfile:
+    path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
+    regexp: '^listen_addresses'
+    line: listen_addresses = ['127.0.0.1:53000']
+
 - name: Have dnscrypt-proxy choose the fastest server from the sources already configured under [sources]
   ansible.builtin.lineinfile:
     path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
     regexp: '^server_names'
-    line: |
-      # server_names = ['cloudflare']
+    state: absent
 
 # # The Ubuntu package uses unsupported systemd sockets to accept connections.
 # # In order to configure the local port, the /lib/systemd/system/dnscrypt-proxy.socket file

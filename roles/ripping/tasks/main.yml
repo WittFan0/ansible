@@ -2,10 +2,14 @@
 - name: Set OS distribution dependent variables
   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
-- name: Install multimedia tools and players 
+- name: Install desktop environment
+  ansible.builtin.include_tasks: ../../desktopenv/tasks/main.yml
+  when: desktop_exists is not defined
+
+- name: Install multimedia tools and players
   become: true
   ansible.builtin.package:
-    name: "{{ mm_packages }}"
+    name: "{{ ripping_mm_packages }}"
     state: present
   tags:
     - packages
@@ -13,17 +17,21 @@
 - name: Install abcde (apt)
   become: true
   ansible.builtin.apt:
-    name: 
+    name:
       - abcde
     state: present
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
+
+# - name: Setup a user to build AUR packages
+#   ansible.builtin.include_tasks: ../../common/tasks/aur.yml
+#   when: ansible_facts['distribution'] == "Archlinux" and aur_ran is not defined
 
 # - name: Install abcde (AUR)  # <-- cant install key for cd-discid dependency
 #   kewlfft.aur.aur:
-#     name: 
+#     name:
 #       - abcde
 #     state: present
 #   tags:
@@ -39,5 +47,5 @@
     dest: /home/{{ remote_user.name }}/.abcde.conf
     owner: "{{ remote_user.name }}"
     group: "{{ remote_user.group }}"
+    mode: '0644'
     backup: true
-

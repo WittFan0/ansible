@@ -1,4 +1,3 @@
-wap_packages:
+router_wap_packages:
     - iw
     - hostapd
-    

@@ -1,35 +1,55 @@
+---
+  # This play executes in the directory it is called from. Since this play is included by other plays,
+  # all file references in this play must redirect to the desktopenv path.
+
 - name: Set OS distribution dependent variables
-  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  ansible.builtin.include_vars: "../../desktopenv/vars/os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install packages
   ansible.builtin.package:
-    name: "{{ xfce_packages }}"
+    name: "{{ desktopenv_xfce_packages }}"
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
+  when: desktop_environment == "xfce"
+
+- name: Setup a user to build AUR packages
+  ansible.builtin.include_tasks: ../../common/tasks/aur.yml
+  when: ansible_facts['distribution'] == "Archlinux" and aur_ran is not defined and desktop_environment == "xfce"
 
 - name: Install XFCE AUR pacakges
   kewlfft.aur.aur:
-    name: "{{ xfce_packages_aur }}"
+    name: "{{ desktopenv_xfce_packages_aur }}"
     state: present
   tags:
     - aur
     - packages
   become: true
   become_user: "{{ aur.builder }}"
-  when: ansible_facts['distribution'] == "Archlinux"
-  environment: "{{proxy_env}}"
+  when: ansible_facts['distribution'] == "Archlinux" and desktop_environment == "xfce"
+  environment: "{{ proxy_env }}"
+
+- name: Add XFCE wallpapers
+  ansible.builtin.copy:
+    src: ../../desktopenv/files/wallpaper/
+    dest: "{{ desktopenv_wallpaper_dir }}"
+    owner: root
+    mode: '0755'
+    backup: false
+  when: desktop_environment == "xfce"
 
 - name: Install XFCE4 Gradient-black theme
   ansible.builtin.unarchive:
-    src: Gradient-black-46.1.tar.gz
+    src: ../../desktopenv/files/Gradient-black-46.1.tar.gz
     dest: /usr/share/themes/
+  when: desktop_environment == "xfce"
 
 - name: Install EFDark-IconsCream icon theme
   ansible.builtin.unarchive:
-    src: EFDark-IconsCream.tar.gz
+    src: ../../desktopenv/files/EFDark-IconsCream.tar.gz
     dest: /usr/share/icons/
+  when: desktop_environment == "xfce"
 
 - name: Set greeter GTK theme
   ansible.builtin.lineinfile:
@@ -37,6 +57,7 @@
     insertafter: "[greeter]"
     regexp: "^theme-name"
     line: "theme-name = Gradient-black-46"
+  when: desktop_environment == "xfce"
 
 - name: Set greeter GTK icon theme
   ansible.builtin.lineinfile:
@@ -44,6 +65,7 @@
     insertafter: "[greeter]"
     regexp: "^icon-theme-name"
     line: "icon-theme-name = EFDark-IconsCream"
+  when: desktop_environment == "xfce"
 
 - name: Set greeter GTK background
   ansible.builtin.lineinfile:
@@ -51,4 +73,4 @@
     insertafter: "[greeter]"
     regexp: "^background"
     line: "background = /usr/share/backgrounds/xfce/XFCE_83_No_Logo.png"
-
+  when: desktop_environment == "xfce"

@@ -2,7 +2,7 @@
 - name: Install remote mounting programs
   become: true
   ansible.builtin.package:
-    name: "{{ mount_client_packages }}"
+    name: "{{ common_mount_client_packages }}"
     state: present
   tags:
     - packages
@@ -18,15 +18,19 @@
   ansible.builtin.template:
     src: tplinkcredentials.j2
     dest: /etc/samba/.tplinkcredentials
-    mode: '0600'
+    mode: '0640'
     backup: true
+
+- name: Setup a user to build AUR packages
+  ansible.builtin.include_tasks: ../../common/tasks/aur.yml
+  when: ansible_facts['distribution'] == "Archlinux" and aur_ran is not defined
 
 - name: Install davfs2 AUR package to access Nextcloud files
   kewlfft.aur.aur:
     name:
       - davfs2
     state: present
-    skip_pgp_check: true # <-- Avoid extra step of having to load maintainer's key
+    # skip_pgp_check: true # <-- Avoid extra step of having to load maintainer's key
   tags:
     - aur
     - packages
@@ -45,24 +49,14 @@
     state: directory
     mode: '0755'
   loop:
-    - /mnt/movies
-    - /mnt/television
-    - /mnt/home_movies-orig
-    - /mnt/music
-    - /mnt/photos
     - /mnt/router/sda1
 
 - name: Add fstab entries for remote shares
   ansible.builtin.blockinfile:
     path: /etc/fstab
     block: |
-      {{ vault_nextcloud_fqdn }}remote.php/dav/files/{{ remote_user.name }}/    /home/{{ remote_user.name }}/nextcloud davfs user,rw,noauto 0 0
-
-      //router/sda1                  /mnt/router/sda1                     cifs  _netdev,credentials=/etc/samba/.tplinkcredentials,uid=1000,gid=499,iocharset=utf8,file_mode=0664,dir_mode=0775,vers=2.0,noauto  0  0
-
-      mythbox:/movies	               /mnt/movies                          nfs   rsize=8192,wsize=8192,timeo=14,noauto
-      mythbox:/television	           /mnt/television                      nfs   rsize=8192,wsize=8192,timeo=14,noauto
-      mythbox:/home_movies-orig      /mnt/home_movies-orig                nfs   rsize=8192,wsize=8192,timeo=14,noauto
-      mythbox:/music                 /mnt/music                           nfs   rsize=8192,wsize=8192,timeo=14,noauto
-      mythbox:/photos                /mnt/photos                          nfs   rsize=8192,wsize=8192,timeo=14,noauto
-  notify: reload_systemd_config
+      {{ vault_nextcloud_fqdn }}remote.php/dav/files/{{ remote_user.name }}/  /home/{{ remote_user.name }}/nextcloud  davfs  user,rw,noauto                                                                                                                  0  0
+      //router/sda1                                         /mnt/router/sda1       cifs   _netdev,credentials=/etc/samba/.tplinkcredentials,uid=1000,gid=499,iocharset=utf8,file_mode=0664,dir_mode=0775,vers=2.0,noauto  0  0
+    prepend_newline: true
+    append_newline: true
+  notify: Reload systemd config

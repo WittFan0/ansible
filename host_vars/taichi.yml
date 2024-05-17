@@ -1,5 +1,6 @@
 hostname: taichi
 ansible_user: lance
+ansible_port: 65432
 
 kernel_parameters: "quiet splash nvidia_drm.modeset=1 intel_iommu=on iommu=pt"
 
@@ -20,7 +21,8 @@ ssh_port: 22   # changing this from 22 gets messy. For workaround see https://dm
 
 desktop_environment: kde
 
-sensors_conf_url: https://github.com/lm-sensors/lm-sensors/raw/f63be94d93adc80840d80fa0c52844a986d958e9/configs/ASRock/Z390_Taichi.conf
+# sensors_conf_url: https://github.com/lm-sensors/lm-sensors/raw/f63be94d93adc80840d80fa0c52844a986d958e9/configs/ASRock/Z390_Taichi.conf
+sensors_conf_url: https://raw.githubusercontent.com/lm-sensors/lm-sensors/f63be94d93adc80840d80fa0c52844a986d958e9/configs/ASRock/Z390_Taichi.conf
 
 gpu_vid_nodedev: pci_0000_01_00_0
 gpu_aud_nodedev: pci_0000_01_00_1
@@ -29,10 +31,11 @@ grub_root_uuid: 84dadd8d-a899-4bd4-8a35-fd1ef0e48d16
 
 # passthrough_gpu_pci_id: 10de:2182,10de:1aeb,10de:1aec,10de:1aed
 
-timezone: "America/Detroit"
 dockersecretsdir: "/mnt/nvme_data/dockerdata/secrets"
 dockerappdatadir: "/mnt/nvme_data/dockerdata/appdata"
 mediadir: "/mnt/sata_data/media"
 dldir: "/mnt/sata_data/media/downloads"
 collabdatadir: /mnt/nvme_data/ncdata
 collabbackupdir: /mnt/sata_data/backup/nextcloud
+
+docker_compose_package: docker-compose  # <-- Specific to Arch

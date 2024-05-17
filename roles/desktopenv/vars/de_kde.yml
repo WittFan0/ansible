@@ -1,3 +1,3 @@
-display-mgr: sddm
+desktopenv_display_mgr: sddm
 
-wallpaper-dir: /usr/share/wallpapers/
+desktopenv_wallpaper_dir: /usr/share/wallpapers/

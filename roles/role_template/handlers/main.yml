@@ -4,5 +4,5 @@
     name: .service
     state: restarted
 
-- name: reload_systemd_config
+- name: Reload systemd config
   ansible.builtin.command: systemctl daemon-reload

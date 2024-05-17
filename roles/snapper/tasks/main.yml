@@ -5,16 +5,20 @@
 - name: Install btrfs filesystem utilities
   become: true
   ansible.builtin.package:
-    name: 
-      - btrfs-progs 
+    name:
+      - btrfs-progs
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
+
+- name: Setup a user to build AUR packages
+  ansible.builtin.include_tasks: ../../common/tasks/aur.yml
+  when: ansible_facts['distribution'] == "Archlinux" and aur_ran is not defined
 
 - name: Install snapper pacakges (AUR)
   kewlfft.aur.aur:
-    name: 
+    name:
       - snapper-support
     state: present
   tags:
@@ -23,26 +27,27 @@
   become: true
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
-- name: Unmount existing {{ root_snapshot_path }} volume 
+- name: Unmount existing {{ root_snapshot_path }} volume
   become: true
   ansible.builtin.command: /usr/bin/umount "{{ root_snapshot_path }}"
   args:
     removes: "{{ root_snapshot_path }}"
 
-- name: Remove existing {{ root_snapshot_path }} directory 
+- name: Remove existing {{ root_snapshot_path }} directory
   become: true
   ansible.builtin.file:
     path: "{{ root_snapshot_path }}"
     state: absent
 
-- name: Create root configuration for Snapper 
+- name: Create root configuration for Snapper
   become: true
   ansible.builtin.command: /usr/bin/snapper -c root create-config /
   args:
     creates: /etc/snapper/configs/root
 
+# TODO: Test to see if this needs to be done
 - name: Remove {{ root_snapshot_path }} volume created by snapper install
   become: true
   ansible.builtin.command: /usr/bin/btrfs subvolume delete "{{ root_snapshot_path }}"
@@ -67,9 +72,9 @@
   become: true
   ansible.builtin.command: /usr/bin/mount "{{ root_snapshot_path }}"
 
-- name: Change default btrfs subvolume to @ 
+- name: Change default btrfs subvolume to @
   become: true
-  ansible.builtin.command: /usr/bin/btrfs subvolume set-def 256 /
+  ansible.builtin.command: /usr/bin/btrfs subvolume set-default 256 /
 
 - name: Allow {{ snapper_group }} group to work with snapper config
   become: true
@@ -124,17 +129,17 @@
   become: true
   ansible.builtin.service:
     name: snapperd.service
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Enable and start grub-btrfs-snapper service
   become: true
   ansible.builtin.service:
     name: grub-btrfs-snapper.service
-    enabled: yes
+    enabled: true
     state: started
 
-- name: Create initial root snapshot 
+- name: Create initial root snapshot
   become: false
   ansible.builtin.command: /usr/bin/snapper -c root create -d "*** Snapper Installed ***"
 

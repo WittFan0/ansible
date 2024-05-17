@@ -1,4 +1,4 @@
-base_dev_packages: 
+development_base_packages:
   - build-essential
   - git
   - giggle
@@ -7,5 +7,4 @@ base_dev_packages:
 # Mirror server for fetching the public keys and the Visual Studio Code
 # installation package. The URL may include directories. The URL must not end
 # with a trailing slash.
-visual_studio_code_mirror: 'https://packages.microsoft.com'
-
+development_vscode_mirror: 'https://packages.microsoft.com'

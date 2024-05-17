@@ -13,17 +13,17 @@
 - name: Install netplan
   become: true
   ansible.builtin.package:
-    name: 
-      - netplan 
+    name:
+      - netplan
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
-- name: Create a netplan that creates a bridge and connects {{ lan0.ifname }} to it
+- name: Create a netplan that creates a bridge and connects {{ lan0.ifname }}
   become: true
   ansible.builtin.copy:
-    mode: '0600'
+    mode: '0640'
     owner: root
     group: root
     content: |
@@ -61,13 +61,13 @@
     dest: /etc/netplan/00-bridge.yaml
     backup: true
   notify:
-    - "router : generate_netplan"
+    - Generate netplan
 
-- name: Modify bridge netplan to add {{ wan.ifname }}
+- name: Modify netplan to add {{ wan.ifname }}
   ansible.builtin.blockinfile:
     path: /etc/netplan/00-bridge.yaml
     insertafter: "ethernets:"
-    mode: '0600'
+    mode: '0640'
     owner: root
     group: root
     block: |
@@ -75,16 +75,18 @@
           {{ wan.ifname }}:
             dhcp4: true
             dhcp6: true
+    append_newline: true
+    prepend_newline: true
     backup: true
   when: wap.ifname is not defined and wan.ifname is defined
   notify:
-    - "router : generate_netplan"
+    - Generate netplan
 
-- name: Modify bridge netplan to add {{ wap.ifname }}
+- name: Modify netplan to add {{ wap.ifname }}
   ansible.builtin.blockinfile:
     path: /etc/netplan/00-bridge.yaml
     insertafter: "ethernets:"
-    mode: '0600'
+    mode: '0640'
     owner: root
     group: root
     block: |
@@ -93,16 +95,18 @@
             optional: true
             dhcp4: false
             dhcp6: false
+    append_newline: true
+    prepend_newline: true
     backup: true
   when: wap.ifname is defined and wan.ifname is not defined
-  notify: 
-    - "router : generate_netplan"
+  notify:
+    - Generate netplan
 
-- name: Modify bridge netplan to add {{ wap.ifname }} and {{ wan.ifname }}
+- name: Modify netplan to add {{ wap.ifname }} and {{ wan.ifname }}
   ansible.builtin.blockinfile:
     path: /etc/netplan/00-bridge.yaml
     insertafter: "ethernets:"
-    mode: '0600'
+    mode: '0640'
     owner: root
     group: root
     block: |
@@ -115,19 +119,21 @@
           {{ wan.ifname }}:
             dhcp4: true
             dhcp6: true
+    append_newline: true
+    prepend_newline: true
     backup: true
   when: wap.ifname is defined and wan.ifname is defined
-  notify: 
-    - "router : generate_netplan"
+  notify:
+    - Generate netplan
 
-- name: Modify bridge netplan to connect {{ wap.ifname }} to bridge
+- name: Modify bridge netplan to connect {{ wap.ifname }}
   ansible.builtin.lineinfile:
     path: /etc/netplan/00-bridge.yaml
-    mode: '0600'
+    mode: '0640'
     owner: root
     group: root
     regexp: '^      interfaces: '
     line: '      interfaces: [{{ lan0.ifname }},{{ wap.ifname }}] # <-- This must be a single line to allow playbooks to add interfaces to the bridge'
   when: wap.ifname is defined
   notify:
-    - "router : generate_netplan"
+    - Generate netplan

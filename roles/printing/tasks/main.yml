@@ -23,12 +23,17 @@
   ansible.builtin.template:
     src: cupsd_conf.j2
     dest: /etc/cups/cupsd.conf
-    backup: yes
-  notify: restart_cups
+    mode: '0644'
+    backup: true
+  notify: Restart cups
+
+- name: Setup a user to build AUR packages
+  ansible.builtin.include_tasks: ../../common/tasks/aur.yml
+  when: ansible_facts['distribution'] == "Archlinux" and aur_ran is not defined
 
 - name: Install Brother printer driver (Arch) # <-- Doesn't work for printing to Brother printer over network. Use IPP instead.
   kewlfft.aur.aur:
-    name: 
+    name:
       - brother-hll2320d
     state: present
   tags:
@@ -59,7 +64,7 @@
     mode: '0755'
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
-# # Because the installation script is interactive, 
+# # Because the installation script is interactive,
 # # it cannot be run using ansible.
 # - name: Install Brother printer driver (Debian)
 #   ansible.builtin.command: |
@@ -69,5 +74,5 @@
 - name: Enable print system
   ansible.builtin.service:
     name: cups.service
-    enabled: yes
+    enabled: true
     state: started

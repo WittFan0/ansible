@@ -2,14 +2,18 @@
 - name: Set OS distribution dependent variables
   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
+- name: Install desktop environment
+  ansible.builtin.include_tasks: ../../desktopenv/tasks/main.yml
+  when: desktop_exists is not defined
+
 - name: Install development packages
   become: true
   ansible.builtin.package:
-    name: "{{ base_dev_packages }}"
+    name: "{{ development_base_packages }}"
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Use all cores when compiling software
   ansible.builtin.lineinfile:
@@ -49,14 +53,14 @@
 - name: Install code editor (Arch)
   become: true
   ansible.builtin.package:
-    name: 
+    name:
       - code
       - x11-ssh-askpass
     state: present
   tags:
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Install VS Code dependencies (apt)
   become: true
@@ -76,7 +80,7 @@
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Create APT keyrings dir
   become: true
@@ -91,19 +95,19 @@
 - name: Install VS Code key (apt)
   become: true
   ansible.builtin.get_url:
-    url: '{{ visual_studio_code_mirror }}/keys/microsoft.asc'
+    url: '{{ development_vscode_mirror }}/keys/microsoft.asc'
     dest: '/etc/apt/trusted.gpg.d/'
     mode: '0644'
-    force: yes
+    force: true
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Install VS Code repo (apt)
   become: true
   ansible.builtin.apt_repository:
-    repo: deb {{ visual_studio_code_mirror }}/repos/vscode stable main
+    repo: deb {{ development_vscode_mirror }}/repos/vscode stable main
     filename: vscode
     state: present
   tags:
@@ -118,5 +122,4 @@
   tags:
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-  environment: "{{proxy_env}}"
-
+  environment: "{{ proxy_env }}"

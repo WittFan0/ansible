@@ -18,7 +18,7 @@
     dest: /etc/systemd/resolved.conf.d/98-avahi.conf
     mode: '0644'
     backup: false
-  notify: restart_resolved
+  notify: Restart resolved
 
 - name: Install NSS module for Multicast DNS name resolution (pacman)
   community.general.pacman:

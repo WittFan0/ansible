@@ -14,4 +14,5 @@ ssh_port: 22   # changing this from 22 gets messy. For workaround see https://dm
 
 desktop_environment: none
 
+ntp_enabled: false  # <-- Allow VM host to manage clock
 ntp_tinker_panic: true  # <-- Enable tinker panic, which is useful when running NTP in a VM.

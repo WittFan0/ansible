@@ -8,7 +8,7 @@
   tags:
     - shell
 
-- name: Create XDG-compliant skeleton files for {{ remote_user.shell }}_profile 
+- name: Create XDG-compliant skeleton files for {{ remote_user.shell }}_profile
   ansible.builtin.command: /usr/bin/mv /etc/skel/.{{ remote_user.shell }}_profile /etc/skel/.config/{{ remote_user.shell }}/profile
   args:
     creates: /etc/skel/.config/{{ remote_user.shell }}/profile
@@ -45,12 +45,12 @@
 #     mode: '0644'
 #   tags:
 #     - shell
-#   notify: 
+#   notify:
 
 - name: Create global XDG-compliant BASH interactive shell
   ansible.builtin.blockinfile:
     path: /etc/bash.bashrc
-    block: | 
+    block: |
       _confdir=${XDG_CONFIG_HOME:-$HOME/.config}/bash
       _datadir=${XDG_DATA_HOME:-$HOME/.local/share}/bash
 
@@ -74,6 +74,8 @@
       export GPG_TTY
     insertafter: 'EOF'
     mode: '0644'
+    append_newline: true
+    prepend_newline: true
     backup: true
   when: remote_user.shell  == "bash"
   tags:
@@ -87,12 +89,12 @@
 #     mode: '0644'
 #   tags:
 #     - shell
-#   notify: 
+#   notify:
 
 - name: Set global environment variables
   ansible.builtin.blockinfile:
     path: /etc/security/pam_env.conf
-    block: | 
+    block: |
       XDG_CONFIG_DIRS DEFAULT=/etc/xdg
       XDG_DATA_DIRS   DEFAULT=/usr/local/share:/usr/share
       XDG_CONFIG_HOME DEFAULT=@{HOME}/.config
@@ -106,10 +108,12 @@
       HISTCONTROL     DEFAULT=ignoreboth
     insertafter: 'EOF'
     mode: '0644'
+    append_newline: true
+    prepend_newline: true
     backup: true
   tags:
     - shell
-#   notify: 
+#   notify:
 
 - name: Install Bash
   ansible.builtin.package:
@@ -123,7 +127,7 @@
 
 - name: Install ZSH
   ansible.builtin.package:
-    name: "{{ zsh_packages }}"
+    name: "{{ common_zsh_packages }}"
     state: present
   tags:
     - shell

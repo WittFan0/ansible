@@ -1,5 +1,5 @@
 hostname: archvm
-ansible_user: root
+ansible_user: arch
 
 # kernel_parameters: "quiet consoleblank=60"
 
@@ -9,11 +9,12 @@ lan0:
     mac: 02:00:00:00:01:09
     # ip2: "{{ ansible_facts["eth0"]["ipv4"]["address"] }}"
 
-wan:
-    ifname: 
+# wan:
+#     ifname: 
 
 ssh_port: 22  # changing this from 22 gets messy. For workaround see https://dmsimard.com/2016/03/15/changing-the-ssh-port-with-ansible/
 
-desktop_environment: kde
+desktop_environment: sway
 
+ntp_enabled: false  # <-- Allow VM host to manage clock
 ntp_tinker_panic: true  # <-- Enable tinker panic, which is useful when running NTP in a VM.

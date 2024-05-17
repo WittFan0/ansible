@@ -1,15 +1,15 @@
 except-interface={{ wan.ifname }}
-domain-needed      # Never forward plain names (without a dot or domain part)
-bogus-priv         # Never forward addresses in the non-routed address spaces
-strict-order       # Query each server strictly in /etc/resolv.conf order
-no-resolv          # Do not read /etc/resolv.conf or any other file besides this one
-cache-size=10000   # cache 10000 names (maximum allowed)
-server=127.0.2.1   # local dnscrypt-proxy server
+domain-needed            # Never forward plain names (without a dot or domain part)
+bogus-priv               # Never forward addresses in the non-routed address spaces
+strict-order             # Query each server strictly in /etc/resolv.conf order
+no-resolv                # Do not read /etc/resolv.conf or any other file besides this one
+cache-size=10000         # cache 10000 names (maximum allowed)
+server=127.0.0.1#53000   # local dnscrypt-proxy server
 listen-address=::1,127.0.0.1,{{ lan0.ip }}
-bind-interfaces    # This appears to be needed to coexist with systemd-resolved
-no-hosts           # Do not read /etc/hosts
+bind-interfaces          # This appears to be needed to coexist with systemd-resolved
+no-hosts                 # Do not read /etc/hosts
 addn-hosts=/etc/hosts.dnsmasq
-expand-hosts       # Automatically append domain to simple names in a hosts-file
+expand-hosts             # Automatically append domain to simple names in a hosts-file
 domain={{ lan.domain }}
 dhcp-range={{ lan.base }}.100,{{ lan.base }}.199,12h
 dhcp-option=option:netmask,255.255.255.0
@@ -18,15 +18,18 @@ dhcp-option=option:router,{{ lan0.ip }}
 dhcp-option=option:ntp-server,{{ lan0.ip }}
 dhcp-option=option:tftp-server,{{ lan0.ip }}
 dhcp-option=option:domain-search,{{ lan.domain }}
-#dhcp-no-override    # Disable re-use of the DHCP servername and filename fields as extra option space
-dhcp-host={{ vault_mac_office }},{{ lan.base }}.2,office
-dhcp-host={{ vault_mac_sabre15 }},{{ lan.base }}.3,sabre15
+# dhcp-no-override     # Disable re-use of the DHCP servername and filename fields as extra option space
+dhcp-host={{ vault_mac_sabre15 }},{{ lan.base }}.2,sabre15-wired
+dhcp-host={{ vault_mac_sabre15_wireless }},{{ lan.base }}.3,sabre15-wireless
 dhcp-host={{ vault_mac_mythbox }},{{ lan.base }}.4,mythbox
 dhcp-host={{ vault_mac_taichi }},{{ lan.base }}.5,taichi
 dhcp-host={{ vault_mac_calistasair }},{{ lan.base }}.6,calistas-air
 dhcp-host={{ vault_mac_dan }},{{ lan.base }}.8,dan
 dhcp-host={{ vault_mac_beelink }},{{ lan.base }}.9,beelink
 dhcp-host={{ vault_mac_rpi301 }},{{ lan.base }}.14,rpi3-01
+dhcp-host={{ vault_mac_lanceipad }},{{ lan.base }}.15,Lances-iPad
+dhcp-host={{ vault_mac_pixel6a }},{{ lan.base }}.20,pixel6a
+dhcp-host={{ vault_mac_galaxy_a13 }},{{ lan.base }}.29,galaxy-a13
 dhcp-host=02:00:00:00:01:09,{{ lan.base }}.31,archvm
 dhcp-host=02:00:00:00:01:08,{{ lan.base }}.32,netbootisovm
 dhcp-host=02:00:00:00:01:07,{{ lan.base }}.33,pxevm
@@ -36,11 +39,15 @@ dhcp-host=02:00:00:00:01:04,{{ lan.base }}.36,dualbootvm
 dhcp-host=02:00:00:00:01:03,{{ lan.base }}.37,workvm
 dhcp-host=02:00:00:00:01:01,{{ lan.base }}.38,popos2204vm
 dhcp-host=02:00:00:00:01:02,{{ lan.base }}.39,mint4vm
-dhcp-host=b4:7c:9c:5f:04:a8,{{ lan.base }}.67,amazon-dbba26bae
-dhcp-host=fc:a6:67:ac:54:16,{{ lan.base }}.68,amazon-852d2f3f0
-dhcp-host=08:7c:39:d9:48:08,{{ lan.base }}.69,amazon-a073010e6
-dhcp-host=b8:31:b5:68:d3:b1,{{ lan.base }}.86,xbox1s
-dhcp-host=b8:3e:59:64:f0:c5,{{ lan.base }}.87,roku3
-dhcp-host=1c:1e:e3:9a:68:fc,{{ lan.base }}.88,tclrokutv-214
-dhcp-host=00:18:dd:07:14:24,{{ lan.base }}.89,hdhr-1071424d
+dhcp-host={{ vault_mac_pwork }},{{ lan.base }}.40,PAYX-fIqKOPttrY
+dhcp-host={{ vault_mac_lwork }},{{ lan.base }}.41,ZHTVL-K22303ST
+dhcp-host={{ vault_mac_lgdryer }},{{ lan.base }}.66,LG_Smart_Dryer2_open
+dhcp-host={{ vault_mac_amazon_dbba26bae }},{{ lan.base }}.67,amazon-dbba26bae
+dhcp-host={{ vault_mac_amazon_852d2f3f0 }},{{ lan.base }}.68,amazon-852d2f3f0
+dhcp-host={{ vault_mac_amazon_a073010e6 }},{{ lan.base }}.69,amazon-a073010e6
+dhcp-host={{ vault_mac_65hisenserokutv }},{{ lan.base }}.85,65HisenseRokuTV
+dhcp-host={{ vault_mac_xbox1s }},{{ lan.base }}.86,xbox1s
+dhcp-host={{ vault_mac_roku3 }},{{ lan.base }}.87,roku3
+dhcp-host={{ vault_mac_tclrokutv_214 }},{{ lan.base }}.88,tclrokutv-214
+dhcp-host={{ vault_mac_hdhr_1071424d }},{{ lan.base }}.89,hdhr-1071424d
 dhcp-host=02:00:00:00:00:00,{{ lan.base }}.94,mythboxtest

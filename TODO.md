@@ -2,18 +2,19 @@
 Python encryption warning
 disable root login
 endlessh for ubuntu
-firejail
+replace firejail with bubblewrap
 sshguard before.rule file modification
+tighten docker ufw rules
+what is the purpose of /etc/ssh/sshd_config.d/50-ansible.conf?
 
 
 [functionality]
 install Plex
 use local DNS
-mount data directories
+configure avahi/systemd-resolved for printing
 add directories to $PATH for user
 install printer driver (move lib32-zlib from distro packages)
-nvidia drivers
-share data directories
+limit nvidia driver install to hosts with nvidia gpus
 media server | /etc/dnsmasq.d/10-plex.conf | max_user_watches | NFS | SMB | WSDD(2)
 grub-btrfs for ubuntu
 add (btrfs) to binaries section of mkinitcpio.conf (ubuntu)
@@ -22,9 +23,11 @@ get dracula wallpapers from git
 install netdata monitor?
 /etc/grub.d/42_isoboot?
 gitconfig?
+downgrade nftables to iptables for better docker compatibility?
 
 
 [optimization]
+move snapper to its own playbook
 pass proxy IP and names as a host variable
 switch from ntpd to chrony
 switch hostapd from deprecated systemd service to ifupdown (is ifupdown compatible with netplan?)

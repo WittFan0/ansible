@@ -1,1 +1,1 @@
-os_groups: sudo,dip,plugdev
+create_user_os_groups: sudo,dip,plugdev

@@ -4,7 +4,6 @@
 #   become: true
 #   ansible.builtin.command: sysctl -p
 
-- name: generate_netplan 
+- name: Generate netplan
   become: true
   ansible.builtin.command: netplan generate
-

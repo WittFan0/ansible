@@ -15,31 +15,9 @@
     group: root
     mode: '0755'
 
-- name: Create custom service file for Endlessh
-  ansible.builtin.copy:
-    src: endlessh.service
-    dest: /etc/systemd/system/endlessh.service
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Allow Endlessh service to bind on ports lower than 1024
-  ansible.builtin.lineinfile:
-    path: /etc/systemd/system/endlessh.service
-    regexp: 'AmbientCapabilities='
-    line: AmbientCapabilities=CAP_NET_BIND_SERVICE
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Allow Endlessh service to bind on ports lower than 1024
-  ansible.builtin.lineinfile:
-    path: /etc/systemd/system/endlessh.service
-    regexp: 'PrivateUsers='
-    line: '#PrivateUsers=true'
-    owner: root
-    group: root
-    mode: '0644'
+- name: Setup a user to build AUR packages
+  ansible.builtin.include_tasks: ../../common/tasks/aur.yml
+  when: ansible_facts['distribution'] == "Archlinux" and aur_ran is not defined
 
 - name: Install Endlessh (AUR)
   kewlfft.aur.aur:
@@ -54,11 +32,40 @@
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
 
+- name: Create custom service file for Endlessh
+  ansible.builtin.get_url:
+    # url: https://github.com/skeeto/endlessh/raw/master/util/endlessh.service
+    url: https://raw.githubusercontent.com/skeeto/endlessh/master/util/endlessh.service
+    dest: /etc/systemd/system/endlessh.service
+    owner: root
+    group: root
+    mode: '0644'
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Allow Endlessh service to bind on ports lower than 1024
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/endlessh.service
+    regexp: 'AmbientCapabilities='
+    line: AmbientCapabilities=CAP_NET_BIND_SERVICE
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Allow Endlessh service to bind to ports lower than 1024
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/endlessh.service
+    regexp: 'PrivateUsers='
+    line: '#PrivateUsers=true'
+    owner: root
+    group: root
+    mode: '0644'
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
 - name: Allow Endlessh to run on ports lower than 1024
   ansible.builtin.command: setcap 'cap_net_bind_service=+ep' /usr/bin/endlessh
-  become: yes
+  become: true
 
-- name: Have Endlessh listen on port 22
+- name: Have Endlessh listen on port 22 (Arch)
   ansible.builtin.lineinfile:
     path: /etc/endlessh.conf
     regexp: '^Port '
@@ -67,6 +74,25 @@
     group: root
     mode: '0644'
     create: true
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Create endlessh config directory (Ubuntu)
+  ansible.builtin.file:
+    path: /etc/endlessh
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Have Endlessh listen on port 22 (Ubuntu)
+  ansible.builtin.copy:
+    content: "Port 22\n"
+    dest: /etc/endlessh/config
+    owner: root
+    group: root
+    mode: '0644'
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 # # Using blockinfile here doesn't work because Ansible can only manage
 # # a single block in each file. before.rules already has a managed block
@@ -81,6 +107,8 @@
 #       # hand off control for sshd to sshguard
 #       :sshguard - [0:0]
 #       -A ufw-before-input -p tcp --dport "{{ ssh_port }}" -j sshguard
+#     append_newline: true
+#     prepend_newline: true
 #     backup: true
 
 # - name: Configure UFW for sshguard (ipv6)
@@ -91,6 +119,8 @@
 #       # hand off control for sshd to sshguard
 #       :sshguard - [0:0]
 #       -A ufw6-before-input -p tcp --dport "{{ ssh_port }}" -j sshguard
+#     append_newline: true
+#     prepend_newline: true
 #     backup: true
 
 # - name: Enable and start sshguard

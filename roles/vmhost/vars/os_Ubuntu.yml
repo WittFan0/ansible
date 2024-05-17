@@ -1,4 +1,4 @@
-virtualization_packages:
+vmhost_packages:
   - dmidecode
   - gettext
   - ssh-askpass  # lets us manage KVM Virtual Machines on a remote server

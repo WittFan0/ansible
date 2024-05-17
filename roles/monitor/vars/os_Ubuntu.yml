@@ -1,7 +1,7 @@
-sensors_package: 
+monitor_sensors_package:
   - i2c-tools
   - lm-sensors
 
-sensors_service: lm-sensors.service
+monitor_sensors_service: lm-sensors.service
 
-nullmailer_owner: "mail"
+monitor_nullmailer_owner: "mail"

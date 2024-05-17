@@ -1,9 +1,9 @@
-mount_client_packages:
+common_mount_client_packages:
   - nfs-common
   - rclone
   - davfs2
 
-zsh_packages:
+common_zsh_packages:
   - zsh
   - zsh-autosuggestions
   - zsh-syntax-highlighting

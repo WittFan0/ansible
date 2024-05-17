@@ -1,4 +1,7 @@
 ---
+- name: Set OS distribution dependent variables
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
 - name: Install docker python library (apt)
   ansible.builtin.apt:
     name: python3-docker
@@ -12,13 +15,13 @@
 - name: Install docker python library (pacman)
   become: true
   community.general.pacman:
-    name: 
+    name:
       - python-docker
     state: present
   tags:
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Install backup/restore software and firewall
   become: true
@@ -29,14 +32,14 @@
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Create rclone configuration for Nextcloud
   become: true
   ansible.builtin.template:
     src: nextcloud_rclone_conf.j2
     dest: "{{ collab_rclone_conf }}"
-    mode: '0700'
+    mode: '0640'
     owner: root
     group: root
 
@@ -64,7 +67,7 @@
 
 # The original nextcloud data dir seems to be hardcoded in the blomp backup.
 # This is a workaround until I find a way to change the dir in the backup.
-- name: Create link necessary to restore nextcloud from backup 
+- name: Create link necessary to restore nextcloud from backup
   ansible.builtin.file:
     src: "{{ collabdatadir }}"
     dest: /home/lance/docker/appdata/nextcloud
@@ -99,7 +102,8 @@
   ansible.builtin.copy:
     src: ufw-nextcloud-aio
     dest: /etc/ufw/applications.d/nextcloud-aio
-    backup: yes
+    mode: '0644'
+    backup: true
 
 - name: Open Nexcloud ports
   community.general.ufw:

@@ -2,7 +2,46 @@
 - name: Set OS distribution dependent variables
   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
-- name: Provide systemd-resolved domain name resolution for libvirt 
+- name: Install desktop environment
+  ansible.builtin.include_tasks: ../../desktopenv/tasks/main.yml
+  when: desktop_exists is not defined
+
+- name: Create a directory for custom udev rules
+  ansible.builtin.file:
+    path: /etc/udev/rules.d/
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Read net.bridge sysctl rules whenever a bridge is created
+  ansible.builtin.copy:
+    content: |
+      # From: https://wiki.libvirt.org/Net.bridge.bridge-nf-call_and_sysctl.conf.html
+      ACTION=="add", SUBSYSTEM=="module", KERNEL=="br_netfilter", RUN+="/usr/lib/systemd/systemd-sysctl --prefix=net/bridge
+    dest: /etc/udev/rules.d/99-bridge.rules
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+
+# This approach may not work with nftables?
+#   see: https://wiki.archlinux.org/title/Talk:Nftables#c-8472-20231119133800-In0ni-2021-10-14T23:56:00.000Z
+#        https://unix.stackexchange.com/a/657786
+- name: Prevent packets traversing the libvirt bridge from being sent to iptables for processing
+  ansible.builtin.copy:
+    content: |
+      # Taken from: https://wiki.libvirt.org/Net.bridge.bridge-nf-call_and_sysctl.conf.html
+      net.bridge.bridge-nf-call-arptables = 0
+      net.bridge.bridge-nf-call-ip6tables = 0
+      net.bridge.bridge-nf-call-iptables = 0
+    dest: /etc/sysctl.d/bridge.conf
+    owner: root
+    group: root
+    mode: '0640'
+    backup: true
+
+- name: Provide systemd-resolved domain name resolution for libvirt
   become: true
   ansible.builtin.file:
     src: /run/systemd/resolve/stub-resolv.conf
@@ -13,12 +52,12 @@
 - name: Install virtualization packages
   become: true
   ansible.builtin.package:
-    name: "{{ virtualization_packages }}"
+    name: "{{ vmhost_packages }}"
     state: present
   tags:
     - packages
     - vmhost
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Create kvm group
   become: true
@@ -65,7 +104,7 @@
 - name: Enable power profiles
   ansible.builtin.service:
     name: power-profiles-daemon.service
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Download libvirt hook for running a command on startup or shutdown of a VM
@@ -74,6 +113,7 @@
     url: https://raw.githubusercontent.com/PassthroughPOST/VFIO-Tools/master/libvirt_hooks/qemu
     dest: /etc/libvirt/hooks/qemu
     mode: '0755'
+    backup: true
 
 - name: Create directory for libvirt VM startup hooks
   become: true
@@ -88,7 +128,6 @@
     src: start_sh.j2
     dest: /etc/libvirt/hooks/qemu.d/passthrough_gaming/prepare/begin/start.sh
     mode: '0755'
-  notify: restart_dnsmasq
   when: gpu_vid_nodedev is defined and gpu_aud_nodedev is defined
 
 - name: Create directory for libvirt VM shutdown hooks
@@ -103,15 +142,14 @@
   ansible.builtin.template:
     src: revert_sh.j2
     dest: /etc/libvirt/hooks/qemu.d/passthrough_gaming/release/end/revert.sh
-    mode: '0644'
-  notify: restart_dnsmasq
+    mode: '0755'
   when: gpu_vid_nodedev is defined and gpu_aud_nodedev is defined
 
 - name: Enable and start libvirt
   become: true
   ansible.builtin.service:
     name: libvirtd.service
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Add libvirt plugin provider to Vagrant  # libvirtd.service must be running for this to work
@@ -169,7 +207,7 @@
   become: true
   ansible.builtin.copy:
     dest: /etc/mkinitcpio-vfio.conf
-    content: 
+    content:
       BINARIES=(btrfs)
       MODULES=(vfio_pci vfio vfio_iommu_type1)
       FILES="/etc/modprobe-vfio.conf"
@@ -179,15 +217,15 @@
     mode: '0644'
     backup: true
   notify:  # <-- Handlers are executed in the order they are defined in the handlers section, not in the order listed in the notify statement.
-    - reboot_system
-    - recreate_initial_ramdisk
+    - Reboot system
+    - Recreate initial ramdisk
   when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
 - name: Create initramfs preset for GPU passthrough (Arch)
   become: true
   ansible.builtin.copy:
     dest: /etc/mkinitcpio.d/linux-zen-vfio.preset
-    content: 
+    content:
       # mkinitcpio preset file for the 'linux-zen' package
 
       PRESETS=('vfio')
@@ -201,8 +239,8 @@
     mode: '0644'
     backup: true
   notify:  # <-- Handlers are executed in the order they are defined in the handlers section, not in the order listed in the notify statement.
-    - reboot_system
-    - recreate_initial_ramdisk
+    - Reboot system
+    - Recreate initial ramdisk
   when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
 - name: Create VFIO boot menu entry
@@ -212,20 +250,21 @@
     dest: /etc/grub.d/21_linux_zen_vfio
     mode: '0755'
   notify:  # <-- Handlers are executed in the order they are defined in the handlers section, not in the order listed in the notify statement.
-    - reboot_system
-    - reinstall_grub
+    - Reboot system
+    - Reinstall grub
   when: passthrough_gpu_pci_id is defined and ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
-- ansible.builtin.include_tasks: lanbridge.yml
+- name: Invoke lanbridge.yml
+  ansible.builtin.include_tasks: lanbridge.yml
 
 - name: Create custom qemu config allowing {{ remote_user.name }} to connect VM guests to br0
   become: true
   ansible.builtin.copy:
-    content: 'allow br0'
+    content: "allow br0\n"
     dest: /etc/qemu/{{ remote_user.name }}.conf
     owner: root
     group: "{{ remote_user.group }}"
-    mode: '0640'
+    mode: '0660'
     backup: true
 
 - name: Source {{ remote_user.name }}'s qemu custom config

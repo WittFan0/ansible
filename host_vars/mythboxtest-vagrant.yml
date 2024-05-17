@@ -1,0 +1,18 @@
+hostname: mythboxtest
+
+# kernel_parameters: "quiet consoleblank=60"
+
+lan0:
+    ip: "{{ lan.base }}.94"
+    ifname: eth1
+    mac: 02:00:00:00:00:00
+
+wan: 
+    ifname: eth0
+
+ssh_port: 22   # changing this from 22 gets messy. For workaround see https://dmsimard.com/2016/03/15/changing-the-ssh-port-with-ansible/
+
+# desktop_environment: none
+
+ntp_enabled: false  # <-- Allow VM host to manage clock
+ntp_tinker_panic: true  # <-- Enable tinker panic, which is useful when running NTP in a VM.

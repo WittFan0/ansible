@@ -2,9 +2,13 @@
 - name: Set OS distribution dependent variables
   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
+- name: Install desktop environment
+  ansible.builtin.include_tasks: ../../desktopenv/tasks/main.yml
+  when: desktop_exists is not defined
+
 - name: Install KDE dependency packages
   ansible.builtin.package:
-    name: "{{ kde_dependency_packages }}"
+    name: "{{ gaming_kde_dependency_packages }}"
     state: present
   tags:
     - packages
@@ -13,7 +17,7 @@
 
 - name: Install Gnome dependency packages
   ansible.builtin.package:
-    name: "{{ gnome_dependency_packages }}"
+    name: "{{ gaming_gnome_dependency_packages }}"
     state: present
   tags:
     - packages
@@ -22,7 +26,7 @@
 
 - name: Install gtk dependency packages
   ansible.builtin.package:
-    name: "{{ gtk_dependency_packages }}"
+    name: "{{ gaming_gtk_dependency_packages }}"
     state: present
   tags:
     - packages
@@ -57,9 +61,9 @@
 
 - name: Add user to gamemode group
   ansible.builtin.user:
-    name: {{ remote_user.name }}
+    name: "{{ remote_user.name }}"
     groups: gamemode
-    append: yes
+    append: true
 
 - name: Copy script allowing gamemode group to access to power data (INSECURE!)
   ansible.builtin.copy:
@@ -183,9 +187,13 @@
     - packages
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
+- name: Setup a user to build AUR packages
+  ansible.builtin.include_tasks: ../../common/tasks/aur.yml
+  when: ansible_facts['distribution'] == "Archlinux" and aur_ran is not defined
+
 - name: Install AUR pacakges
   kewlfft.aur.aur:
-    name: 
+    name:
       - dosbox-staging  # <-- Requires qt6. Is is worth it?
       - heroic-games-launcher-bin
       - gamehub

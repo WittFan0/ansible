@@ -1,9 +1,12 @@
 ---
+  # This play executes in the directory it is called from. Since this play is included by other plays,
+  # all file references in this play must redirect to the desktopenv path.
+
 - name: Set OS distribution dependent variables
-  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  ansible.builtin.include_vars: "../../desktopenv/vars/os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Set desktop environment dependent variables
-  ansible.builtin.include_vars: "os_{{ desktop_environment }}.yml"
+  ansible.builtin.include_vars: "../../desktopenv/vars/de_{{ desktop_environment }}.yml"
 
 - name: Install sound system
   ansible.builtin.package:
@@ -24,32 +27,24 @@
   environment: "{{ proxy_env }}"
   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: Create wallpaper directory if it doesn't exist
+- name: Create Dracula wallpaper directory if it doesn't exist
   ansible.builtin.file:
-    path: "{{ wallpaper-dir }}"
+    path: "{{ desktopenv_wallpaper_dir }}/Dracula"
     state: directory
     mode: '0755'
-
-- name: Add wallpapers
-  ansible.builtin.copy:
-    src: wallpaper/
-    dest: "{{ wallpaper-dir }}"
-    owner: root
-    mode: '0755'
-    backup: false
 
 # - name: Clone Dracula wallpapers from github
 #   ansible.builtin.git:
 #     repo: 'https://github.com/dracula/wallpaper.git'
-#     dest: "{{ wallpaper-dir }}"
+#     dest: "{{ desktopenv_wallpaper_dir }}"
 
-- name: Unarchive Dracula wallpapers into {{ wallpaper-dir }}
+- name: Unarchive Dracula wallpapers
   ansible.builtin.unarchive:
-    src: dracula-wallpaper.zip
-    dest: "{{ wallpaper-dir }}"
+    src: ../../desktopenv/files/dracula-wallpaper.zip
+    dest: "{{ desktopenv_wallpaper_dir }}/Dracula/"
 
-- name: Install {{ desktop_environment }} desktop environment
-  ansible.builtin.include_tasks: "{{ desktop_environment }}.yml"
+- name: Install {{ desktop_environment }}
+  ansible.builtin.include_tasks: "../../desktopenv/tasks/{{ desktop_environment }}.yml"
   when: desktop_environment is defined
 
 # - name: Install XFCE desktop environment
@@ -70,7 +65,7 @@
 
 - name: Install virtio video packages
   ansible.builtin.package:
-    name: "{{ virtio_video_packages }}"
+    name: "{{ desktopenv_virtio_video_packages }}"
     state: present
   tags:
     - packages
@@ -79,12 +74,16 @@
 
 - name: Install nvidia video packages
   ansible.builtin.package:
-    name: "{{ nvidia_video_packages }}"
+    name: "{{ desktopenv_nvidia_video_packages }}"
     state: present
   tags:
     - packages
   when: ansible_facts['virtualization_role'] != "guest"
   environment: "{{ proxy_env }}"
+
+- name: Setup a user to build AUR packages
+  ansible.builtin.include_tasks: ../../common/tasks/aur.yml
+  when: ansible_facts['distribution'] == "Archlinux" and aur_ran is not defined
 
 - name: Enable Nvidia hardware video acceleration (Arch)
   kewlfft.aur.aur:
@@ -101,14 +100,13 @@
 - name: Remove kms (nvidia requirement) and add plymouth to initial ramdisk (Arch)
   ansible.builtin.copy:
     dest: /etc/mkinitcpio.conf.d/nvidia.conf
-    content: HOOKS=(base udev autodetect modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs plymouth)
+    content: "HOOKS=(base udev autodetect modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs plymouth)\n"
     owner: root
     group: root
     mode: '0644'
     backup: true
   notify:  # <-- Handlers are executed in the order they are defined in the handlers section, not in the order listed in the notify statement.
-    - reboot_system
-    - recreate_initial_ramdisk
+    - Recreate initial ramdisk
   when: ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
 
 - name: Create a configuration directory for display manager service
@@ -120,7 +118,7 @@
 
 - name: Configure nearly smooth plymouth transition
   ansible.builtin.copy:
-    src: plymouth.conf
+    src: ../../desktopenv/files/plymouth.conf
     dest: /etc/systemd/system/display-manager.service.d/plymouth.conf
     owner: root
     mode: '0644'
@@ -130,9 +128,9 @@
 - name: Rebuild initial ramdisk if necessary and reboot
   ansible.builtin.meta: flush_handlers
 
-- name: Enable {{ display-mgr }} display manager
+- name: Enable {{ desktopenv_display_mgr }}
   ansible.builtin.service:
-    name: "{{ display-mgr }}.service"
+    name: "{{ desktopenv_display_mgr }}.service"
     enabled: true
     state: started
 
@@ -171,6 +169,7 @@
     state: present
   tags:
     - packages
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Install smartcard (AUR)
   kewlfft.aur.aur:
@@ -187,7 +186,7 @@
 
 - name: Unpack DoD root certificates into /opt
   ansible.builtin.unarchive:
-    src: unclass-certificates_pkcs7_DoD.zip
+    src: ../../desktopenv/files/unclass-certificates_pkcs7_DoD.zip
     dest: /opt/
 
 - name: Enable and start smartcard service
@@ -210,3 +209,7 @@
 #   ansible.builtin.command: |
 #     firecfg
 #   become: true
+
+- name: Mark that a desktop has already been installed
+  ansible.builtin.set_fact:
+    desktop_exists: true

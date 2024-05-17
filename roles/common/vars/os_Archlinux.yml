@@ -1,12 +1,8 @@
-aur:
-    builder: aur_builder  # <-- BEWARE:  This user will automatically be deleted at the end of the ansible run!
-    dir: aur
-
-mount_client_packages:
+common_mount_client_packages:
   - nfs-utils
   - rclone
- 
-zsh_packages:
+
+common_zsh_packages:
   - zsh
   - zsh-completions
   - zsh-syntax-highlighting

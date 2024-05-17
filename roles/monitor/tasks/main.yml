@@ -8,7 +8,7 @@
     backup: true
     owner: root
     group: root
-    mode: '0600'
+    mode: '0640'
 
 - name: Install s-nail
   ansible.builtin.package:
@@ -16,7 +16,7 @@
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Install nullmailer  # <-- logwatch depends on included sendmail
   ansible.builtin.package:
@@ -24,41 +24,42 @@
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Configure nullmailer admin address
   ansible.builtin.copy:
-    content: "{{ vault_user_email }}"
+    content: "{{ vault_user_email }}\n"
     dest: /etc/nullmailer/adminaddr
-    owner: "{{ nullmailer_owner }}"
+    owner: "{{ monitor_nullmailer_owner }}"
     mode: '0644'
     backup: true
-  notify: restart_nullmailer
+  notify: Restart nullmailer
 
 - name: Configure nullmailer network domain name
   ansible.builtin.copy:
-    content: "{{ lan.domain }}"
+    content: "{{ lan.domain }}\n"
     dest: /etc/nullmailer/defaultdomain
-    owner: "{{ nullmailer_owner }}"
+    owner: "{{ monitor_nullmailer_owner }}"
     mode: '0644'
     backup: true
-  notify: restart_nullmailer
+  notify: Restart nullmailer
 
 - name: Configure mailname
   ansible.builtin.copy:
-    content: "{{ hostname }}.{{ lan.domain }}"
+    content: "{{ hostname }}.{{ lan.domain }}\n"
     dest: /etc/mailname
+    mode: '0644'
     backup: true
-  notify: restart_nullmailer
+  notify: Restart nullmailer
 
 - name: Configure nullmailer remote server
   ansible.builtin.template:
     src: nullmailer-remotes.j2
     dest: /etc/nullmailer/remotes
-    owner: "{{ nullmailer_owner }}"
-    mode: '0600'
+    owner: "{{ monitor_nullmailer_owner }}"
+    mode: '0640'
     backup: true
-  notify: restart_nullmailer
+  notify: Restart nullmailer
 
 - name: Copy nullmailer test script
   ansible.builtin.template:
@@ -72,13 +73,28 @@
     enabled: true
     state: started
 
+- name: Create directory for smartmon email templates
+  ansible.builtin.file:
+    path: /etc/smartmontools/run.d
+    state: directory
+    mode: '0755'
+
+- name: Create smartmon email template
+  ansible.builtin.copy:
+    src: email
+    dest: /etc/smartmontools/run.d/email
+    owner: root
+    group: root
+    mode: '0755'
+    backup: true
+
 - name: Install hardrive monitor
   ansible.builtin.package:
     name: smartmontools
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Configure hardrive monitor
   ansible.builtin.template:
@@ -87,27 +103,27 @@
     backup: true
     mode: '0644'
   notify:
-    - restart_smartd
+    - Restart smartd
 
 - name: Install sensors
   ansible.builtin.package:
-    name: "{{ sensors_package }}"
+    name: "{{ monitor_sensors_package }}"
     state: present
   tags:
     - packages
-    
-- name: Download sensors config file
-  become: true
-  ansible.builtin.get_url:
-    url: "{{ sensors_conf_url }}"
-    dest: '/etc/sensors.d/'
-    mode: '0644'
-    force: true
-  tags:
-    - packages
-  when: sensors_conf_url is defined
-  notify: restart_sensorsd
-  environment: "{{proxy_env}}"
+
+# - name: Download sensors config file
+#   become: true
+#   ansible.builtin.get_url:
+#     url: "{{ sensors_conf_url }}"
+#     dest: '/etc/sensors.d/'
+#     mode: '0644'
+#     force: true
+#   tags:
+#     - packages
+#   when: sensors_conf_url is defined
+#   notify: Restart sensorsd
+#   environment: "{{ proxy_env }}"
 
 - name: Create sensors config file
   ansible.builtin.shell: |
@@ -117,11 +133,11 @@
     sensors-detect --auto
   become: true
   when: sensors_conf_url is not defined
-  notify: restart_sensorsd
+  notify: Restart sensorsd
 
 - name: Enable and start sensors daemon
   ansible.builtin.service:
-    name: "{{ sensors_service }}"
+    name: "{{ monitor_sensors_service }}"
     enabled: true
     state: started
   when: ansible_facts['virtualization_role'] != "guest"
@@ -139,14 +155,14 @@
     dest: /etc/logwatch/conf/logwatch.conf
     backup: true
     mode: '0644'
-  notify: restart_logwatch
+  notify: Restart logwatch
 
 - name: Configure smartd log monitoring
   ansible.builtin.copy:
     content: "LogFile = syslog"
     dest: /etc/logwatch/conf/services/smartd.conf
     mode: '0644'
-  notify: restart_logwatch
+  notify: Restart logwatch
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Enable and start logwatch timer

@@ -10,8 +10,6 @@
   hosts: beelink
   connection: local
   become: true
-  environment:
-    proxy_env: http://dan:3128
 
   pre_tasks:
     - name: Classify hosts depending on their OS distribution

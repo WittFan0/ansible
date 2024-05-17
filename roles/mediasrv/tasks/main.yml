@@ -1,4 +1,43 @@
 ---
+- name: Create media group
+  ansible.builtin.group:
+    name: media
+    state: present
+    gid: 497
+
+- name: Create an unencrypted Docker Compose secrets directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ dockersecretsdir }}"
+    state: directory
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    mode: '0700'
+
+- name: Create unencrypted mail_address file for Docker Compose
+  ansible.builtin.copy:
+    content: "{{ vault_user_email }}\n"
+    dest: "{{ dockersecretsdir }}/mail_address"
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    mode: '0600'
+
+- name: Create unencrypted mail_password file for Docker Compose
+  ansible.builtin.copy:
+    content: "{{ vault_mailer_password }}\n"
+    dest: "{{ dockersecretsdir }}/mail_password"
+    owner: "{{ remote_user.name }}"
+    group: "{{ remote_user.group }}"
+    mode: '0600'
+
+# # Below is not practical since Plex claims expire after only 4 minutes
+# - name: Create unencrypted plex_claim file for Docker Compose
+#   ansible.builtin.copy:
+#     content: "{{ vault_plex_claim }}"
+#     dest: "{{ dockersecretsdir }}/plex_claim"
+#     owner: "{{ remote_user.name }}"
+#     group: "{{ remote_user.group }}"
+#     mode: '0600'
+
 - name: Install firewall
   ansible.builtin.package:
     name: ["ufw"]
@@ -13,6 +52,38 @@
     owner: root
     mode: "0640"
     backup: true
+
+- name: Allow GDM network discovery within media network
+  community.general.ufw:
+    rule: allow
+    proto: udp
+    src: "{{ media_subnet }}"
+    dest: 172.31.254.255
+    to_port: 32410,32412:32414
+    log: false
+    comment: GDM network discovery
+    # This should be the third to last IPv4 rule
+    # (insert: -1 addresses the second to last IPv4 rule;
+    #  so the new rule will be inserted before the second
+    #  to last IPv4 rule, and will be come the third to last
+    #  IPv4 rule.)
+    insert: -1
+    insert_relative_to: last-ipv4
+
+- name: Allow and log all other docker communications
+  community.general.ufw:
+    rule: allow
+    src: 172.16.0.0/12
+    # dest: 172.16.0.0/12
+    log: true
+    comment: All Docker requests
+    # This should be the third to last IPv4 rule
+    # (insert: -1 addresses the second to last IPv4 rule;
+    #  so the new rule will be inserted before the second
+    #  to last IPv4 rule, and will be come the third to last
+    #  IPv4 rule.)
+    insert: -1
+    insert_relative_to: last-ipv4
 
 - name: Increase the number of files non-root users are allowed to subscribe to via inotify
   ansible.builtin.copy:
@@ -32,7 +103,7 @@
 - name: Allow Docker containers to access everything on this host
   community.general.ufw:
     rule: allow
-    src: 172.17.0.0/16
+    src: 172.17.0.0/12
     comment: Docker containers
 
 - name: Allow Docker bridges to access DNS on this host
@@ -41,3 +112,17 @@
     port: '53'
     src: 172.0.0.0/8
     comment: Docker bridge DNS requests
+
+- name: Run GPU accelerated Docker containers with NVIDIA GPUs
+  ansible.builtin.package:
+    name: ["nvidia-container-toolkit"]
+    state: present
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
+  environment: "{{ proxy_env }}"
+
+- name: Allow Docker to use the NVIDIA Container Runtime
+  ansible.builtin.command: /usr/bin/nvidia-ctk runtime configure --runtime=docker
+  become: true
+  when: ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"

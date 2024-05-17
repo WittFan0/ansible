@@ -6,7 +6,7 @@
 - name: Add hosts
   ansible.builtin.lineinfile:
     path: /etc/hosts
-    line: "192.168.40.8  dan.q.qw  dan"
+    line: "192.168.41.8  dan.q.qw  dan"
     insertafter: 'EOF'
     mode: '0644'
     backup: true
@@ -43,6 +43,8 @@
       [multilib]
       Include = /etc/pacman.d/mirrorlist
     insertafter: 'EOF'
+    append_newline: true
+    prepend_newline: true
     backup: true
   tags:
     - packages
@@ -178,7 +180,7 @@
 
 - name: Install distro base packages
   ansible.builtin.package:
-    name: "{{ distro_packages }}"
+    name: "{{ update_distro_packages }}"
     state: present
   tags:
     - packages
@@ -191,8 +193,7 @@
 
 - name: Install base packages
   ansible.builtin.package:
-    name: "{{ base_packages }}"
+    name: "{{ update_base_packages }}"
     state: present
   tags:
     - packages
-

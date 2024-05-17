@@ -1,0 +1,510 @@
+networks:
+  # default:
+  #   driver: bridge
+  npm_proxy:
+    name: npm_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "{{ media_subnet }}"
+  # If you decide to use Socket Proxy, you need socket_proxy network as we. See https://www.smarthomebeginner.com/traefik-docker-security-best-practices/#9_Use_a_Docker_Socket_Proxy
+x-environment: &default-tz-puid-pgid
+  TZ: $TZ
+  PUID: $PUID
+  PGID: $PGID
+x-common-keys-core: &common-keys-core
+  networks:
+    - npm_proxy
+  security_opt:
+    - no-new-privileges:true
+  restart: always
+x-common-keys-apps: &common-keys-apps
+  networks:
+    - npm_proxy
+  security_opt:
+    - no-new-privileges:true
+  restart: unless-stopped
+x-common-keys-media: &common-keys-media
+  networks:
+    - npm_proxy
+  security_opt:
+    - no-new-privileges:true
+  restart: "no"
+secrets:
+  mail_address:
+    file: $SECRETSDIR/mail_address
+  mail_password:
+    file: $SECRETSDIR/mail_password
+  plex_claim:
+    file: $SECRETSDIR/plex_claim
+services:
+  ############################# FRONTENDS
+  # # Nginx Proxy Manager - Reverse Proxy with LetsEncrypt
+  # npm:
+  #   <<: *common-keys-core # See EXTENSION FIELDS at the top
+  #   container_name: nginx-proxy-manager
+  #   image: 'jc21/nginx-proxy-manager:latest'
+  #   # For Static IP
+  #   networks:
+  #   # For Static IP
+  #     npm_proxy:
+  #       ipv4_address: 192.168.89.254 # You can specify a static IP
+  #   # For Dynamic IP
+  #   # networks:
+  #   #  - npm_proxy
+  #   ports:
+  #     - '80:80' # Public HTTP Port. Port Forwarding on Router is ON.
+  #     - '443:443' # Public HTTPS Port. Port Forwarding on Router is ON.
+  #     - '81:81' # Admin Web Port. Port Forwarding on Router is OFF. Internal Home Network Access only - 192.168.89.254:81.
+  #   volumes:
+  #     - $APPDATADIR/npm/config:/config 
+  #     - $APPDATADIR/npm/letsencrypt:/etc/letsencrypt
+  #     - $APPDATADIR/npm/data:/data
+  #   environment:
+  #     DB_SQLITE_FILE: "/config/database.sqlite"
+  #     DISABLE_IPV6: 'true'
+  # Portainer - WebUI for Containers
+  portainer:
+    <<: *common-keys-core # See EXTENSION FIELDS at the top
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
+    # command: -H tcp://socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
+    networks:
+      - npm_proxy
+    ports: 
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy and comment this line out, for improved security.
+      - $APPDATADIR/portainer/data:/data # Change to local directory if you want to save/transfer config locally.
+    environment:
+      - TZ=$TZ
+  # # Heimdall - Application Dashboard
+  # heimdall:
+  #   <<: *common-keys-core # See EXTENSION FIELDS at the top
+  #   image: lscr.io/linuxserver/heimdall
+  #   container_name: heimdall
+  #   ports:
+  #     - "83:80" # 80 to 82 already taken by other services
+  #     # - "444:443" # 443 used by Nginx Proxy Manager. Disabled because we will put Heimdall behind proxy.
+  #   volumes:
+  #     - $APPDATADIR/heimdall:/config
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  ############################# DOWNLOADERS
+  
+  ## nzbget - Binary newsgrabber (NZB downloader)
+  # nzbget:
+  #   <<: *common-keys-apps # See EXTENSION FIELDS at the top
+  #   image: lscr.io/linuxserver/nzbget
+  #   container_name: nzbget
+  #   networks:
+  #     npm_proxy:
+  #       ipv4_address: 192.168.89.216
+  #   ports:
+  #     - "6789:6789"
+  #   volumes:
+  #     - $APPDATADIR/nzbget:/config
+  #     - $DLDIR:/data/downloads
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  # # TransmissionBT - Torrent Downloader
+  # # For Proxmox LXC Containers - https://pve.proxmox.com/wiki/OpenVPN_in_LXC
+  # transmission-vpn:
+  #   image: haugene/transmission-openvpn:latest
+  #   container_name: transmission-vpn
+  #   restart: unless-stopped
+  #   networks:
+  #     npm_proxy:
+  #       ipv4_address: 192.168.89.169
+  #   ports:
+  #     - "9091:9091"
+  #   cap_add:
+  #     - NET_ADMIN
+  #   devices:
+  #     - /dev/net/tun
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - $APPDATADIR/transmission-vpn/data:/data
+  #     - $APPDATADIR/transmission-vpn/config:/config
+  #     - $DLDIR:/data/downloads
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  #     OPENVPN_PROVIDER: FASTESTVPN
+  #     OPENVPN_USERNAME: $FASTEST_USERNAME
+  #     OPENVPN_PASSWORD: $FASTEST_PASSWORD
+  #     LOCAL_NETWORK: "$LOCAL_NETWORK"
+  #     UMASK_SET: 2
+  #     TRANSMISSION_RPC_AUTHENTICATION_REQUIRED: "true"
+  #     TRANSMISSION_RPC_HOST_WHITELIST: "127.0.0.1,$SERVER_IP"
+  #     TRANSMISSION_RPC_PASSWORD: $TRANSMISSION_RPC_PASSWORD
+  #     TRANSMISSION_RPC_USERNAME: $TRANSMISSION_RPC_USERNAME
+  #     TRANSMISSION_UMASK: 002
+  #     TRANSMISSION_RATIO_LIMIT: 1.00
+  #     TRANSMISSION_RATIO_LIMIT_ENABLED: "true"
+  #     TRANSMISSION_ALT_SPEED_DOWN: 40000
+  #     TRANSMISSION_ALT_SPEED_ENABLED: "false"
+  #     TRANSMISSION_ALT_SPEED_UP: 250
+  #     TRANSMISSION_SPEED_LIMIT_DOWN: 80000
+  #     TRANSMISSION_SPEED_LIMIT_DOWN_ENABLED: "true"
+  #     TRANSMISSION_SPEED_LIMIT_UP: 500
+  #     TRANSMISSION_SPEED_LIMIT_UP_ENABLED: "true"
+  #     TRANSMISSION_INCOMPLETE_DIR: /data/downloads/torrents/incomplete
+  #     TRANSMISSION_INCOMPLETE_DIR_ENABLED: "true"
+  #     TRANSMISSION_WATCH_DIR: /data/downloads/torrents
+  #     TRANSMISSION_WATCH_DIR_ENABLED: "true"
+  #     TRANSMISSION_DOWNLOAD_DIR: /data/downloads/torrents
+  #     LOG_TO_STDOUT: "true"
+  # # qBittorrent - Torrent downloader without VPN
+  # qbittorrent:
+  #   <<: *common-keys-apps # See EXTENSION FIELDS at the top
+  #   image: lscr.io/linuxserver/qbittorrent:latest
+  #   container_name: qbittorrent
+  #   #network_mode: container:transmission-vpn # Passing network through Transmission Container if VPN is needed.
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - $APPDATADIR/qbittorrent:/config
+  #     - $DLDIR:/data/downloads # Ensure that downloads folder is set to /data/downloads in qBittorrent
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  #     UMASK_SET: 002
+  ############################# PVRS
+  # # Prowlarr - Indexer Proxy
+  # prowlarr:
+  #   <<: *common-keys-apps # See EXTENSION FIELDS at the top
+  #   image: ghcr.io/linuxserver/prowlarr:develop
+  #   container_name: prowlarr
+  #   networks:
+  #     npm_proxy:
+  #       ipv4_address: 192.168.89.162
+  #   ports:
+  #     - "9696:9696"
+  #   volumes:
+  #     - $APPDATADIR/prowlarr:/config
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  # # Lidarr - Music Management
+  # lidarr:
+  #   <<: *common-keys-media # See EXTENSION FIELDS at the top
+  #   image: lscr.io/linuxserver/lidarr:latest
+  #   container_name: lidarr
+  #   networks:
+  #     npm_proxy:
+  #       ipv4_address: 192.168.89.163
+  #   ports:
+  #     - "8686:8686"
+  #   volumes:
+  #     - $APPDATADIR/lidarr:/config
+  #     - $DLDIR:/data/downloads
+  #     - $MEDIADIR/music:/data/media/music
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  # # Radarr - Movie management
+  # radarr:
+  #   <<: *common-keys-media # See EXTENSION FIELDS at the top
+  #   image: lscr.io/linuxserver/radarr:nightly # latest was causing "Error parsing column 45"
+  #   container_name: radarr
+  #   networks:
+  #     npm_proxy:
+  #       ipv4_address: 192.168.89.164
+  #   ports:
+  #     - "7878:7878"
+  #   volumes:
+  #     - $APPDATADIR/radarr:/config
+  #     - $DATADIR:/data
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  # # Sonarr - TV Shows management
+  # sonarr:
+  #   <<: *common-keys-media # See EXTENSION FIELDS at the top
+  #   image: lscr.io/linuxserver/sonarr
+  #   container_name: sonarr
+  #   networks:
+  #     npm_proxy:
+  #       ipv4_address: 192.168.89.167
+  #   ports:
+  #     - "8989:8989"
+  #   volumes:
+  #     - $APPDATADIR/sonarr:/config
+  #     - $DATADIR:/data
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  # # Readarr - Books management
+  # readarr:
+  #   <<: *common-keys-media # See EXTENSION FIELDS at the top
+  #   image: hotio/readarr:nightly
+  #   container_name: readarr
+  #   ports:
+  #     - "8987:8987"
+  #   volumes:
+  #     - $APPDATADIR/readarr:/config
+  #     - $DATADIR:/data
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  #     UMASK: 002
+  #     #ARGS: ""
+  ############################# MEDIA
+  # # Airsonic Advanced - Music Server
+  # airsonic:
+  #   <<: *common-keys-media # See EXTENSION FIELDS at the top
+  #   image: lscr.io/linuxserver/airsonic-advanced
+  #   container_name: airsonic-advanced
+  #   ports: 
+  #     - "4040:4040"
+  #     - "4041:4041" #UPnp
+  #   volumes:
+  #     - $APPDATADIR/airsonic/podcasts:/data/podcasts
+  #     - $APPDATADIR/airsonic/playlists:/data/playlists
+  #     - $APPDATADIR/airsonic/config:/config
+  #     - $MEDIADIR/music:/data/music:ro
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  #     JAVA_OPTS: '-Dserver.forward-headers-strategy=native' # Optional - if you use a reverse-proxy
+  # # Jellyfin - Media Server
+  # jellyfin:
+  #   <<: *common-keys-media # See EXTENSION FIELDS at the top
+  #   image: jellyfin/jellyfin:latest
+  #   container_name: jellyfin
+  #   #devices:
+  #   #  - /dev/dri:/dev/dri # for harware transcoding
+  #   ports:
+  #     - "8096:8096"
+  #     - "8920:8920" # Emby also uses same port if running both
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  #     UMASK_SET: 022
+  #   volumes:
+  #     - $APPDATADIR/jellyfin:/config
+  #     - $DLDIR:/data/downloads
+  #     - $MEDIADIR:/data/media
+  #     - /dev/shm:/data/transcode # Offload transcoding to RAM if you have enough RAM
+  # Plex - Media Server
+  plexms:
+    <<: *common-keys-core # See EXTENSION FIELDS at the top
+    image: plexinc/pms-docker:public
+    container_name: plexms
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           capabilities: [gpu]
+    ports:
+      - "32400:32400/tcp"
+      - "8324:8324/tcp"
+      - "32469:32469/tcp"
+      - "1900:1900/udp" # Conflicts with xTeVe and Synology default ports
+      - "32410:32410/udp"
+      - "32412:32412/udp"
+      - "32413:32413/udp"
+      - "32414:32414/udp"
+      - "33400:33400" # If you use Plex Web Tools
+    devices:
+      - /dev/dri:/dev/dri # for harware transcoding
+    volumes:
+      - $APPDATADIR/plexms:/config
+      - $MEDIADIR:/data
+      - /dev/shm:/transcode
+    secrets:
+      - plex_claim
+    environment:
+      TZ: $TZ
+      HOSTNAME: "dockerPlex"
+      PLEX_UID: $PUID
+      PLEX_GID: $PGID
+      ADVERTISE_IP: http://$SERVER_IP:32400/
+      PLEX_CLAIM_FILE: /run/secrets/plex_claim
+      # NVIDIA_VISIBLE_DEVICES: all
+      # NVIDIA_DRIVER_CAPABILITIES: all
+  # # Plex Meta Manager - Automatic Metadata Manager for Plex
+  # plexmm:
+  #   <<: *common-keys-media # See EXTENSION FIELDS at the top
+  #   image: lscr.io/linuxserver/plex-meta-manager:latest
+  #   container_name: plexmm
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  #     PMM_CONFIG: /config/config.yml #optional
+  #     PMM_TIME: 03:00 #optional
+  #     PMM_RUN: "True" #optional
+  #     PMM_TEST: "False" #optional
+  #     PMM_NO_MISSING: "False" #optional
+  #   volumes:
+  #     - $APPDATADIR/plex-meta-manager:/config
+  # Tautulli - Plex Stats and Monitoring
+  tautulli:
+    <<: *common-keys-media # See EXTENSION FIELDS at the top
+    image: linuxserver/tautulli:latest
+    container_name: tautulli
+    ports:
+      - "8181:8181"
+    volumes:
+      - $APPDATADIR/tautulli/config:/config
+      - $APPDATADIR/plexms/Library/Application Support/Plex Media Server/Logs:/logs:ro # For tautulli Plex log viewer
+    environment:
+      <<: *default-tz-puid-pgid
+  # # Ombi - Media Requests
+  # ombi:
+  #   <<: *common-keys-media # See EXTENSION FIELDS at the top
+  #   image: linuxserver/ombi:latest
+  #   container_name: ombi
+  #   ports:
+  #     - "3579:3579"
+  #   volumes:
+  #     - $APPDATADIR/ombi:/config
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  ############################# MEDIA FILE MANAGEMENT
+  # # Bazarr - Subtitle Management
+  # bazarr:
+  #   <<: *common-keys-media # See EXTENSION FIELDS at the top
+  #   image: lscr.io/linuxserver/bazarr
+  #   container_name: bazarr
+  #   ports:
+  #     - "6767:6767"
+  #   volumes:
+  #     - $APPDATADIR/bazarr:/config
+  #     - $MEDIADIR:/data/media
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  # # Picard - Music Library Tagging and Management
+  # picard:
+  #   <<: *common-keys-media # See EXTENSION FIELDS at the top
+  #   image: mikenye/picard:latest
+  #   container_name: picard
+  #   ports:
+  #     - "5800:5800"
+  #   volumes:
+  #     - $MEDIADIR/music:/data:rw
+  #     - $APPDATADIR/picard:/config:rw
+  #     - /dev/shm:/dev/shm
+  #   environment:
+  #     USER_ID: $PUID
+  #     GROUP_ID: $PGID
+  #     TZ: $TZ
+  #     UMASK: 002
+  #     DISPLAY_WIDTH: 1600
+  #     DISPLAY_HEIGHT: 960
+  # # Handbrake - Video Conversion (Transcoding and compression)
+  # handbrake:
+  #   <<: *common-keys-apps # See EXTENSION FIELDS at the top
+  #   image: jlesage/handbrake:latest
+  #   container_name: handbrake
+  #   ports:
+  #     - "5801:5800"
+  #   volumes:
+  #     - $DLDIR:/data/downloads
+  #     - $APPDATADIR/handbrake/config:/config
+  #     - $APPDATADIR/handbrake/watch:/watch
+  #   environment:
+  #     USER_ID: $PUID
+  #     GROUP_ID: $PGID
+  #     UMASK: 002
+  #     TZ: $TZ
+  #     KEEP_APP_RUNNING: 1
+  #     CLEAN_TMP_DIR: 1
+  #     DISPLAY_WIDTH: 1600
+  #     DISPLAY_HEIGHT: 960
+  #     AUTOMATED_CONVERSION_KEEP_SOURCE: 1
+  #     VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
+  ############################# UTILITIES
+  # Dozzle - Real-time Docker Log Viewer
+  dozzle:
+    <<: *common-keys-apps # See EXTENSION FIELDS at the top
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    networks:
+      - npm_proxy
+    ports:
+      - "8081:8080" # qBittorrent is using port 8080
+    environment:
+      DOZZLE_LEVEL: info
+      DOZZLE_FILTER: "status=running"
+      # DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label.
+      # DOCKER_HOST: tcp://socket-proxy:2375 # Use this instead if you have Socket Proxy enabled.
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy and comment this line for improved security.
+  # # File Browser - Explorer
+  # filebrowser:
+  #   <<: *common-keys-core # See EXTENSION FIELDS at the top
+  #   image: filebrowser/filebrowser:s6
+  #   container_name: filebrowser
+  #   ports:
+  #     - "82:80" # 80 and 81 are used by Nginx Proxy Manager
+  #   volumes:
+  #     - $APPDATADIR/filebrowser:/config 
+  #     - $USERDIR:/srv
+  #   environment:
+  #     <<: *default-tz-puid-pgid
+  ############################# MAINTENANCE
+  # # Docker-GC - Automatic Docker Garbage Collection
+  # # Create docker-gc-exclude file
+  # dockergc:
+  #   <<: *common-keys-apps # See EXTENSION FIELDS at the top
+  #   image: clockworksoul/docker-gc-cron:latest
+  #   container_name: docker-gc
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy and comment this line for improved security.
+  #     - $APPDATADIR/docker-gc/docker-gc-exclude:/etc/docker-gc-exclude # Create empty file
+  #   environment:
+  #     CRON: 0 0 0 * * ? # Everyday at midnight. Previously 0 0 * * *
+  #     FORCE_IMAGE_REMOVAL: 1
+  #     FORCE_CONTAINER_REMOVAL: 0
+  #     GRACE_PERIOD_SECONDS: 604800
+  #     DRY_RUN: 0
+  #     CLEAN_UP_VOLUMES: 1
+  #     TZ: $TZ
+  #     # DOCKER_HOST: tcp://socket-proxy:2375 # Use this if you have Socket Proxy enabled.
+  # Docker Image Update Notifier - receive notifications when a Docker image is updated on a Docker registry.
+  diun:
+    image: crazymax/diun:latest
+    hostname: diun
+    container_name: diun
+    command: serve
+    volumes:
+      - $APPDATADIR/diun/db:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    secrets:
+      - mail_address
+      - mail_password
+    environment:
+      - TZ=$TZ
+      - LOG_LEVEL=info
+      - LOG_JSON=false
+      - DIUN_WATCH_WORKERS=20
+      - DIUN_WATCH_SCHEDULE=0 0 16 * * *  # check everyday at 4pm
+      - DIUN_WATCH_JITTER=30s
+      - DIUN_PROVIDERS_DOCKER=true
+      - DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true  # analyze all running containers
+      - DIUN_NOTIF_MAIL_HOST=smtp.gmail.com
+      # - DIUN_NOTIF_MAIL_PORT=25
+      # - DIUN_NOTIF_MAIL_SSL=false
+      # - DIUN_NOTIF_MAIL_INSECURESKIPVERIFY=false
+      # - DIUN_NOTIF_MAIL_LOCALNAME=localhost
+      - DIUN_NOTIF_MAIL_USERNAMEFILE=/run/secrets/mail_address
+      - DIUN_NOTIF_MAIL_PASSWORDFILE=/run/secrets/mail_password
+      # - DIUN_NOTIF_MAIL_FROM=/run/secrets/mail_address  # Container won't read from file here
+      # - DIUN_NOTIF_MAIL_TO=/run/secrets/mail_address  # Container won't read from file here
+      # - DIUN_NOTIF_MAIL_TEMPLATETITLE=
+      # - DIUN_NOTIF_MAIL_TEMPLATEBODY=
+    restart: always
+  # watchtower:
+  #   <<: *common-keys-core # See EXTENSION FIELDS at the top
+  #   image: containrrr/watchtower
+  #   container_name: watchtower
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   environment:
+  #     TZ: $TZ
+  #     WATCHTOWER_CLEANUP: "true"
+  #     WATCHTOWER_REMOVE_VOLUMES: "true"
+  #     WATCHTOWER_INCLUDE_STOPPED: "true"
+  #     WATCHTOWER_NO_STARTUP_MESSAGE: "false"
+  #     WATCHTOWER_SCHEDULE: "0 18 4 * * *" # Everyday at 4:18
+  #     # DOCKER_HOST: tcp://socket-proxy:2375 # Use this if you have Socket Proxy enabled.
+  #     DOCKER_API_VERSION: "1.40"

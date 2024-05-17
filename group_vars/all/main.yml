@@ -1,21 +1,44 @@
 ansible_python_interpreter: /usr/bin/python3
 
+proxy_addr: http://dan:3138
+
+proxy_env: 
+  http_proxy: "{{ proxy_addr }}"
+  https_proxy: "{{ proxy_addr }}"
+  ftp_proxy: "{{ proxy_addr }}"
+
 remote_user:
   name: lance
-  # uid: 1000
+  uid: 1000
   group: lance
+  gid: 1000
   shell: bash
   shell_path: /bin/bash  # <-- This must have a matching entry in /etc/shells
 
+aur:
+    builder: aur_builder  # <-- BEWARE:  This user will automatically be deleted at the end of the ansible run!
+    dir: aur
+
 lan:
-  domain: r.qw
-  subnet: 192.168.2.0/24
-  gateway: 192.168.40.1
-  base: 192.168.2
+  domain: q.qw
+  subnet: 192.168.41.0/24
+  gateway: 192.168.41.1
+  base: 192.168.41
 
 lan_base: "{{ lan.subnet | regex_replace('.0/[0-9]{2}', '') }}"
 
+docker_install_compose_plugin: true
+docker_install_compose: false
 docker_users:
-  - lance
+  - "{{ remote_user.name }}"
 
-proxy_env: http://dan:3128
+media_subnet: 172.31.254.0/24
+plex_addr: 172.31.254.2
+
+timezone: "America/Detroit"
+
+ntp_timezone: "{{ timezone }}"
+ntp_restrict:
+  - "127.0.0.1"
+  - "::1"
+  - "{{ lan.subnet }}"

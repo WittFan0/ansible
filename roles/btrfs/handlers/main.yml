@@ -1,15 +1,9 @@
 ---
-# Handlers are executed in the order they are defined in this section, 
+# Handlers are executed in the order they are defined in this section,
 # not in the order listed in the notify statement.
 
-- name: restart_
-  ansible.builtin.service:
-    name: .service
-    state: restarted
-
-- name: recreate_initial_ramdisk
+- name: Recreate initial ramdisk
   ansible.builtin.command: mkinitcpio -P
 
-- name: reboot_system
+- name: Reboot system
   ansible.builtin.reboot:
-

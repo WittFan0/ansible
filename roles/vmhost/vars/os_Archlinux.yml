@@ -1,4 +1,4 @@
-virtualization_packages:
+vmhost_packages:
   - iptables-nft    # required for default NAT networking
   - dnsmasq         # required for default NAT/DHCP for guests
   - dmidecode       # DMI system info support
@@ -12,5 +12,5 @@ virtualization_packages:
   - edk2-ovmf
   - power-profiles-daemon
 
-grub_boot_conf_dest: '/boot/grub/grub.cfg'
-grub_mkconfig_command: 'grub-mkconfig'
+vmhost_grub_boot_conf_dest: '/boot/grub/grub.cfg'
+vmhost_grub_mkconfig_command: 'grub-mkconfig'

@@ -5,16 +5,17 @@
 - name: Add btrfs binary to initial ramdisk (Arch)
   ansible.builtin.copy:
     dest: /etc/mkinitcpio.conf.d/btrfs.conf
-    content: BINARIES=(btrfs)
+    content: |
+      BINARIES=(btrfs)
+      HOOKS=(base udev autodetect modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs plymouth)
     owner: root
     group: root
     mode: '0644'
     backup: true
   notify:  # <-- Handlers are executed in the order they are defined in the handlers section, not in the order listed in the notify statement.
-    - reboot_system
-    - recreate_initial_ramdisk
+    - Reboot system
+    - Recreate initial ramdisk
   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Reboot if necessary
   ansible.builtin.meta: flush_handlers
-

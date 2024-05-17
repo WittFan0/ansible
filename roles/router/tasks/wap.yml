@@ -1,6 +1,7 @@
 ---
 - name: Set OS distribution dependent variables
   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  when: wap.ifname is defined
 
 # # wpa supplicant is not installed by default
 # - name: Stop wpa-supplicant
@@ -10,13 +11,9 @@
 #     enabled: true
 #     state: stopped
 
-
-
 - name: Create a bridge to serve multiple internal-facing interfaces
   ansible.builtin.include_tasks: ../../vmhost/tasks/lanbridge.yml
-
-
-
+  when: wap.ifname is defined
 
 # # Config from https://raspberrypi.stackexchange.com/questions/98511/configuring-raspberry-pi-as-router-wifi-and-ethernet-bridge/98551#98551
 # - name: Create a directory for the access point config file
@@ -72,14 +69,12 @@
 #     dest: /etc/systemd/system/wpa_supplicant@{{ wap.ifname }}.service.d/override.conf
 #     backup: true
 
-
-
-
 - name: Create hostapd config directory if it does not exist
   ansible.builtin.file:
     path: /etc/hostapd
     state: directory
     mode: '0755'
+  when: wap.ifname is defined
 
 - name: Configure hostapd for access point
   become: true
@@ -122,18 +117,21 @@
     dest: /etc/hostapd/hostapd.conf
     mode: '0600'
     backup: true
+  when: wap.ifname is defined
 
 - name: Install wireless packages
   become: true
   ansible.builtin.package:
-    name: "{{ wap_packages }}"
+    name: "{{ router_wap_packages }}"
     state: present
   tags:
     - packages
   environment: "{{ proxy_env }}"
+  when: wap.ifname is defined
 
 - name: Set {{ wap.ifname }} to Access Point mode
   ansible.builtin.command: iw dev {{ wap.ifname }} set type __ap
+  when: wap.ifname is defined
 
 - name: Allow hostapd to be run as a service [ DEPRECATED IN UBUNTU!!! ]
   become: true
@@ -142,6 +140,7 @@
     regexp: '^DAEMON_CONF='
     line: DAEMON_CONF="/etc/hostapd/hostapd.conf"
     backup: true
+  when: wap.ifname is defined and ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Enable and start hostapd
   become: true
@@ -149,3 +148,4 @@
     name: hostapd.service
     enabled: true
     state: started
+  when: wap.ifname is defined

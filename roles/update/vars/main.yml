@@ -1,4 +1,4 @@
-base_packages:
+update_base_packages:
     # - base-devel
     # - man-pages
     # - fwupd
@@ -25,7 +25,5 @@ base_packages:
     - pigz
     - dosfstools
     - ntfs-3g
-    - exfatprogs
     - tree
     - cryfs
-    - etckeeper

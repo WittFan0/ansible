@@ -1,4 +1,4 @@
-xfce_packages:
+desktopenv_xfce_packages:
   # - xubuntu-desktop  # <-- full install
   - xfce4  # <-- minimal install
   - desktop-base
@@ -18,7 +18,7 @@ xfce_packages:
   - xfce4-indicator-plugin
   - gnome-disk-utility
 
-kde_packages:
+desktopenv_kde_packages:
   # - kde-full
   # - kde-standard
   # - kubuntu-desktop
@@ -32,12 +32,12 @@ kde_packages:
   - print-manager
   - sweeper
 
-gnome_packages:
+desktopenv_gnome_packages:
   # - ubuntu-desktop  # <-- full install
   - gnome-session   # <-- minimal install part 1
   - gnome-terminal  # <-- minimal install part 2
 
-sway_packages:
+desktopenv_sway_packages:
   - sway
   - foot
   - suckless-tools
@@ -46,12 +46,8 @@ sway_packages:
   - swaylock
   - xdg-desktop-portal-wlr
 
-nvidia_video_packages:
-  - 
+desktopenv_nvidia_video_packages:
+  -
 
-intel_video_packages:
-  - 
-
-virtio_video_packages:
-  - 
-
+desktopenv_virtio_video_packages:
+  -

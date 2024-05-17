@@ -1,9 +1,8 @@
-kde_dependency_packages:
+gaming_kde_dependency_packages:
   - xdg-desktop-portal-kde
 
-gtk_dependency_packages:
+gaming_gtk_dependency_packages:
   - xdg-desktop-portal-gtk
 
-gnome_dependency_packages:
+gaming_gnome_dependency_packages:
   - xdg-desktop-portal-gnome
-  

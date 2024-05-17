@@ -1,23 +1,31 @@
+---
+  # This play executes in the directory it is called from. Since this play is included by other plays,
+  # all file references in this play must redirect to the desktopenv path.
+
 - name: Set OS distribution dependent variables
-  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+  ansible.builtin.include_vars: "../../desktopenv/vars/os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install Gnome packages
   ansible.builtin.package:
-    name: "{{ gnome_packages }}"
+    name: "{{ desktopenv_gnome_packages }}"
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
+  when: desktop_environment == "gnome"
+
+- name: Setup a user to build AUR packages
+  ansible.builtin.include_tasks: ../../common/tasks/aur.yml
+  when: ansible_facts['distribution'] == "Archlinux" and aur_ran is not defined and desktop_environment == "gnome"
 
 - name: Install Gnome AUR pacakges
   kewlfft.aur.aur:
-    name: "{{ gnome_packages_aur }}"
+    name: "{{ desktopenv_gnome_packages_aur }}"
     state: present
   tags:
     - aur
     - packages
   become: true
   become_user: "{{ aur.builder }}"
-  when: ansible_facts['distribution'] == "Archlinux"
-  environment: "{{proxy_env}}"
-
+  when: ansible_facts['distribution'] == "Archlinux" and desktop_environment == "gnome"
+  environment: "{{ proxy_env }}"

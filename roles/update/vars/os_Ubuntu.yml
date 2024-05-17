@@ -1,4 +1,4 @@
-distro_packages:
+update_distro_packages:
     - aptitude
     - dialog
     - cron

@@ -1,28 +1,5 @@
-- name: Set OS distribution dependent variables
-  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
-
-- name: Push pacman cache cleanup service
-  copy: src=paccache.service dest=/etc/systemd/system/paccache.service backup=true
-  notify:
-    - reload_systemd_config
-  tags:
-    - packages
-  when: ansible_facts['distribution'] == "Archlinux"
-
-- name: Push pacman cache cleanup timer
-  copy: src=paccache.timer dest=/etc/systemd/system/paccache.timer backup=true
-  notify:
-    - reload_systemd_config
-    - restart_paccache
-  tags:
-    - packages
-  when: ansible_facts['distribution'] == "Archlinux"
-
-- name: Enable and start pacman cache cleanup timer
-  ansible.builtin.service: name=paccache.timer enabled=yes state=started
-  tags:
-    - packages
-  when: ansible_facts['distribution'] == "Archlinux"
+# - name: Set OS distribution dependent variables
+#   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
 
 - name: Install compiling tools
   ansible.builtin.package:
@@ -46,7 +23,7 @@
   become: true
   ansible.builtin.user:
     name: "{{ aur.builder }}"
-    create_home: yes
+    create_home: true
     uid: 1110
     group: wheel
   tags:
@@ -59,28 +36,35 @@
   ansible.builtin.lineinfile:
     path: /etc/sudoers.d/11-install-aur_builder
     line: "{{ aur.builder }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
-    create: yes
+    create: true
     validate: 'visudo -cf %s'
+    owner: root
+    group: root
+    mode: '0640'
   tags:
     - aur
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Create AUR directory
-  file: path=/home/{{ aur.builder }}/{{ aur.dir }}
-        state=directory
-        owner="{{ aur.builder }}"
-        group="wheel"
+  ansible.builtin.file:
+    path: /home/{{ aur.builder }}/{{ aur.dir }}
+    state: directory
+    owner: "{{ aur.builder }}"
+    group: wheel
+    mode: '0750'
   tags:
     - aur
     - packages
   when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Create package configuration directory
-  file: path=/home/{{ aur.builder }}/.config/pacman
-        state=directory
-        owner="{{ aur.builder }}"
-        group="wheel"
+  ansible.builtin.file:
+    path: /home/{{ aur.builder }}/.config/pacman
+    state: directory
+    owner: "{{ aur.builder }}"
+    group: wheel
+    mode: '0750'
   tags:
     - aur
     - packages
@@ -88,15 +72,17 @@
 
 - name: Configure software packaging
   ansible.builtin.template:
-    src: makepkg_conf.j2
+    src: ../../common/templates/makepkg_conf.j2
     dest: /home/{{ aur.builder }}/.config/pacman/makepkg.conf
     owner: "{{ aur.builder }}"
     group: wheel
+    mode: '0640'
     backup: true
+  when: ansible_facts['distribution'] == "Archlinux"
 
 - name: Install yay
   kewlfft.aur.aur:
-    name: 
+    name:
       - yay
     state: present
     update_cache: "yes"
@@ -107,3 +93,6 @@
   become_user: "{{ aur.builder }}"
   when: ansible_facts['distribution'] == "Archlinux"
 
+- name: Indicate that aur.yml has already been run
+  ansible.builtin.set_fact:
+    aur_ran: true

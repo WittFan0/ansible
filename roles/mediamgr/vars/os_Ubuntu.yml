@@ -1,4 +1,4 @@
-gtk_graphics_packages: 
+graphics_gtk_packages:
   - geeqie
   - gawk
   - gphoto2

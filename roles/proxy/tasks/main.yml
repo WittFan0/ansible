@@ -39,8 +39,9 @@
       refresh_pattern .              0       0%      0
     dest: /etc/squid/conf.d/50-packagecache.conf
     # validate: /usr/sbin/squid -k parse
+    mode: '0750'
     backup: false
-  notify: reload_proxy
+  notify: Reload proxy
 
 # - name: Set OS distribution dependent variables
 #   ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
@@ -48,13 +49,13 @@
 - name: Install proxy and firewall
   become: true
   ansible.builtin.package:
-    name: 
+    name:
       - squid
       - ufw
     state: present
   tags:
     - packages
-  environment: "{{proxy_env}}"
+  environment: "{{ proxy_env }}"
 
 - name: Open proxy port
   become: true
@@ -69,5 +70,5 @@
   become: true
   ansible.builtin.service:
     name: squid.service
-    enabled: yes
+    enabled: true
     state: started

@@ -1,4 +1,4 @@
-xfce_packages: 
+desktopenv_xfce_packages:
   - lightdm
   - xfce4
   - thunar
@@ -42,13 +42,13 @@ xfce_packages:
   - vinagre
   - gwakeonlan
 
-xfce_packages_aur:
+desktopenv_xfce_packages_aur:
   - thunar-custom-actions
   # - xfce4-sysinfo  # Doesn't build -- Key import error
   # - xfce4-theme-switcher  # Doesn't start
   # - cryptkeeper  # requires gtk2
 
-kde_packages: 
+desktopenv_kde_packages:
   - phonon-qt5-vlc
   - ttf-liberation
   - plasma-desktop
@@ -71,7 +71,7 @@ kde_packages:
   # - kactivities
   - kcmutils
   - kdesu
-  - kparts 
+  - kparts
   - kholidays
   - kio-extras
   - kio-fuse
@@ -97,7 +97,7 @@ kde_packages:
   # - kdepim-addons  # <-- (optional) - displaying PIM events in the calendar
   # - networkmanager-qt  # <-- (optional) - IP based geolocation
   # - plasma-workspace-wallpapers  # <-- (optional) - additional wallpapers
-  - kgamma5
+  - kgamma
   - khotkeys
   - kinfocenter
   - kscreen
@@ -111,7 +111,6 @@ kde_packages:
   - plasma-firewall
   # - plasma-nm
   - plasma-pa
-  - plasma5-applets-thermal-monitor # <-- only plasmoid I can find that shows nvidia temp
   - plasma-systemmonitor
   - plasma-thunderbolt
   - plasma-vault
@@ -178,7 +177,7 @@ kde_packages:
   - ttf-roboto # <-- optional dependency for dracula-kde-theme-git
   - ttf-ubuntu-font-family # <-- optional dependency for dracula-kde-theme-git
 
-kde_packages_aur:
+desktopenv_kde_packages_aur:
   - kde-servicemenus-rootactions
   - kde-servicemenus-komparemenu
   - dracula-kde-theme-git
@@ -187,11 +186,10 @@ kde_packages_aur:
   # - dracula-cursors-git  # <-- included in dracula-gtk-theme?
   # - dracula-grub-theme-git  # <-- deosn't work well with nvidia?
   - plymouth-theme-dracula-git
-  - konsole-dracula-git
   - kvantum-theme-arc
   - kvantum-theme-libadwaita-git
 
-gnome_packages:
+desktopenv_gnome_packages:
   - noto-fonts-emoji
   - gnome
   - dconf-editor
@@ -226,7 +224,7 @@ gnome_packages:
   - firefox
   - meld
 
-gnome_packages_aur:
+desktopenv_gnome_packages_aur:
   # - gnome-shell-extension-sound-output-device-chooser
   # - gnome-icon-theme  # <-- lots of perl
   # - gnome-icon-theme-symbolic  # <-- lots of perl
@@ -241,7 +239,7 @@ gnome_packages_aur:
   - nautilus-bluetooth
   - nautilus-gnome-disks
 
-sway_packages:
+desktopenv_sway_packages:
   - ttf-liberation
   - sway
   - bemenu  # <-- Wayland-native alternative to dmenu
@@ -254,18 +252,17 @@ sway_packages:
   - swaylock  # <-- Screen locker
   - waybar  # <-- Highly customizable bar
 
-sway_packages_aur:
+desktopenv_sway_packages_aur:
 
-nvidia_video_packages: 
+desktopenv_nvidia_video_packages:
   - nvidia-utils
   - lib32-nvidia-utils
   - libva-utils
 
-intel_video_packages: 
+desktopenv_intel_video_packages:
   - vulkan-intel
   - lib32-vulkan-intel
 
-virtio_video_packages: 
+desktopenv_virtio_video_packages:
   - vulkan-virtio
   - lib32-vulkan-virtio
-

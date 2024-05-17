@@ -2,89 +2,91 @@ all:
   children:
     new_build:
       hosts:
-        # office:
-        # taichi:
-        # archvm:
-        # beelink:
-        # mythboxtest:
-        # mythboxtest-vagrant:
-        # tc:
+        taichi:
+        archvm:
+        beelink:
+        mythboxtest:
+        qotom:
     printing:
       hosts:
-        # office:
-        # taichi:
-        # archvm:
-        # beelink:
-        # mythboxtest:
-        # mythboxtest-vagrant:
-        # tc
+        taichi:
+        archvm:
+        beelink:
+        mythboxtest:
+        qotom:
     collab_server:
       hosts:
-        # taichi:
-        # archvm:
-        # beelink:
-        # mythboxtest:
-        # mythboxtest-vagrant:
-        # tc
+        taichi:
+        archvm:
+        beelink:
+        mythboxtest:
+        qotom:
     media_server:
       hosts:
-        # taichi:
-        # archvm:
-        # beelink:
-        # mythboxtest:
-        # mythboxtest-vagrant:
-        # tc
+        taichi:
+        archvm:
+        beelink:
+        mythboxtest:
+        qotom:
     lan_controller:
       hosts:
-        # taichi:
-        # archvm:
-        # beelink:
-        # mythboxtest:
-        # mythboxtest-vagrant:
-        # tc
+        taichi:
+        archvm:
+        beelink:
+        mythboxtest:
+        qotom:
     router:
       hosts:
-        # taichi:
-        # archvm:
-        # beelink:
-        # mythboxtest:
-        # mythboxtest-vagrant:
-        # tc
-    workstation:
+        taichi:
+        archvm:
+        beelink:
+        mythboxtest:
+        qotom:
+    mediamgr:
       hosts:
-        # office:
-        # taichi:
-        # archvm:
-        # tc
+        taichi:
+        beelink:
+        archvm:
+        mythboxtest:
+        qotom:
+    ripping:
+      hosts:
+        taichi:
+        beelink:
+        archvm:
+        mythboxtest:
+        qotom:
     development:
       hosts:
-        # office:
-        # taichi:
-        # archvm:
-        # mythboxtest:
-        # tc
+        taichi:
+        beelink:
+        archvm:
+        mythboxtest:
+        qotom:
     btrfs:
       hosts:
-        # office:
-        # archvm:
-        # tc
+        taichi:
+        beelink:
+        archvm:
+        mythboxtest:
+        qotom:
     gaming:
       hosts:
-        # taichi:
-        # office:
-        # archvm:
+        taichi:
+        archvm:
+        mythboxtest:
     proxy:
       hosts:
-        # archvm:
-        # tc
-        # dan:
-        # beelink:
-        # mythboxtest:
-        # mythboxtest-vagrant:
+        # taichi:
+        dan:
+        beelink:
+        archvm:
+        mythboxtest:
+        qotom:
     vmhost:
       hosts:
-        # office:
-        # taichi:
-        # archvm:
-        # mythboxtest:
-        # tc
+        taichi:
+        beelink:
+        archvm:
+        mythboxtest:
+        qotom:

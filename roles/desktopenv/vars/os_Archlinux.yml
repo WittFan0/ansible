@@ -116,7 +116,8 @@ desktopenv_kde_packages:
   - plasma-vault
   # - plasma-welcome
   # - plasma-workspace-wallpapers
-  - sddm-kcm
+  - sddm-kcm # <-- KDE Config Module for SDDM
+  - layer-shell-qt5 # <-- needed until SDDM drops Qt5
   - xdg-desktop-portal-kde
   - breeze-grub  # <-- (optional) - Breeze theme for GRUB
   - breeze-plymouth  # <-- (optional) - Breeze theme for Plymouth
@@ -157,14 +158,11 @@ desktopenv_kde_packages:
   - kate
   - kbackup
   - kcalc
-  - kclock
   - kdialog
   - kfind
   # - kgpg  # <-- keeps prompting for initial config?
   - kleopatra
   - kwalletmanager
-  - kweather
-  - kompare
   - print-manager
   - skanpage
   - sweeper
@@ -173,17 +171,15 @@ desktopenv_kde_packages:
   - dolphin-plugins
   - intel-media-sdk  # <-- wayland hardware video acceleration on Intel GPUs (Broadwell to Rocket Lake)
   - firefox
-  - cantarell-fonts # <-- optional dependency for dracula-kde-theme-git
-  - ttf-roboto # <-- optional dependency for dracula-kde-theme-git
-  - ttf-ubuntu-font-family # <-- optional dependency for dracula-kde-theme-git
+  - cantarell-fonts # <-- optional dependency for dracula-gtk-theme-full
+  - ttf-roboto # <-- optional dependency for dracula-gtk-theme-full
+  - ttf-ubuntu-font-family # <-- optional dependency for dracula-gtk-theme-full
 
 desktopenv_kde_packages_aur:
   - kde-servicemenus-rootactions
-  - kde-servicemenus-komparemenu
-  - dracula-kde-theme-git
-  - dracula-gtk-theme
+  - dracula-gtk-theme-full
   - dracula-icons-git
-  # - dracula-cursors-git  # <-- included in dracula-gtk-theme?
+  # - dracula-cursors-git  # <-- included in dracula-gtk-theme-full?
   # - dracula-grub-theme-git  # <-- deosn't work well with nvidia?
   - plymouth-theme-dracula-git
   - kvantum-theme-arc

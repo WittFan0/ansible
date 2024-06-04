@@ -52,25 +52,25 @@
     backup: true
   when: desktop_environment == "kde"
 
-# # *** SDDP support for Wayland is not yet fully functional ***
+# *** SDDP support for Wayland is not yet fully functional ***
 
-# - name: Create SSDM config directory if it doesn't exist
-#   ansible.builtin.file:
-#     path: /etc/sddm.conf.d/
-#     state: directory
-#     mode: '0755'
-#   when: desktop_environment == "kde"
+- name: Create SSDM config directory if it doesn't exist
+  ansible.builtin.file:
+    path: /etc/sddm.conf.d/
+    state: directory
+    mode: '0755'
+  when: desktop_environment == "kde"
 
-# - name: Configure SDDM to use Wayland
-#   ansible.builtin.copy:
-#     content: |
-#       [General]
-#       DisplayServer=wayland
-#       GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
+- name: Configure SDDM to use Wayland
+  ansible.builtin.copy:
+    content: |
+      [General]
+      DisplayServer=wayland
+      GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
 
-#       [Wayland]
-#       CompositorCommand=kwin_wayland --no-lockscreen --no-kactivities --no-global-shortcuts --lock --drm --locale1
-#     dest: /etc/sddm.conf.d/10-wayland.conf
-#     mode: '0644'
-#     backup: false
-#   when: desktop_environment == "kde"
+      [Wayland]
+      CompositorCommand=kwin_wayland --no-lockscreen --no-kactivities --no-global-shortcuts --lock --drm --locale1
+    dest: /etc/sddm.conf.d/10-wayland.conf
+    mode: '0644'
+    backup: false
+  when: desktop_environment == "kde"

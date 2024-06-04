@@ -100,7 +100,7 @@
 - name: Remove kms (nvidia requirement) and add plymouth to initial ramdisk (Arch)
   ansible.builtin.copy:
     dest: /etc/mkinitcpio.conf.d/nvidia.conf
-    content: "HOOKS=(base udev autodetect modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs plymouth)\n"
+    content: "HOOKS=(base udev autodetect microcode modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs plymouth)\n"
     owner: root
     group: root
     mode: '0644'

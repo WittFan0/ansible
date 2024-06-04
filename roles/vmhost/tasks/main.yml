@@ -211,7 +211,7 @@
       BINARIES=(btrfs)
       MODULES=(vfio_pci vfio vfio_iommu_type1)
       FILES="/etc/modprobe-vfio.conf"
-      HOOKS=(base udev autodetect modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs)
+      HOOKS=(base udev autodetect microcode modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs)
     owner: root
     group: root
     mode: '0644'

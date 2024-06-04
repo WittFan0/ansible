@@ -26,12 +26,6 @@
     line: LANG=en_US.UTF-8
   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: By default make new files not world-readable
-  ansible.builtin.lineinfile:
-    path: /etc/login.defs
-    regexp: '^UMASK '
-    line: UMASK           027
-
 - name: Make users aware that systems are monitored
   ansible.builtin.copy:
     src: issue
@@ -133,6 +127,16 @@
 # - name: Set system clock
 #   ansible.builtin.command: hwclock --systohc --utc
 #   become: true
+
+- name: Don't load microcode, it is already in initramfs
+  ansible.builtin.lineinfile:
+    dest: /etc/default/grub
+    regexp: '^GRUB_EARLY_INITRD_LINUX_STOCK'
+    line: GRUB_EARLY_INITRD_LINUX_STOCK=''
+    state: present
+  # when: bootloader == 'grub'
+  notify:
+    - Rebuild grub
 
 - name: Set bootloader resolution
   ansible.builtin.lineinfile:

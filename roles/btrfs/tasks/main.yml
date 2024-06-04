@@ -7,7 +7,7 @@
     dest: /etc/mkinitcpio.conf.d/btrfs.conf
     content: |
       BINARIES=(btrfs)
-      HOOKS=(base udev autodetect modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs plymouth)
+      HOOKS=(base udev autodetect microcode modconf keyboard keymap block filesystems fsck grub-btrfs-overlayfs plymouth)
     owner: root
     group: root
     mode: '0644'

@@ -2,6 +2,8 @@ update_distro_packages:
     - base
     - linux-zen
     - linux-firmware
+    - amd-ucode
+    - intel-ucode
     - openssh
     - reflector
     - grub

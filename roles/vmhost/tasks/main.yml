@@ -207,7 +207,7 @@
   become: true
   ansible.builtin.copy:
     dest: /etc/mkinitcpio-vfio.conf
-    content:
+    content: |
       BINARIES=(btrfs)
       MODULES=(vfio_pci vfio vfio_iommu_type1)
       FILES="/etc/modprobe-vfio.conf"
@@ -225,7 +225,7 @@
   become: true
   ansible.builtin.copy:
     dest: /etc/mkinitcpio.d/linux-zen-vfio.preset
-    content:
+    content: |
       # mkinitcpio preset file for the 'linux-zen' package
 
       PRESETS=('vfio')

@@ -138,6 +138,14 @@
   notify:
     - Rebuild grub
 
+- name: Maximize number of lines displayed in virtual consoles
+  ansible.builtin.lineinfile:
+    dest: /etc/vconsole.conf
+    regexp: '^FONT='
+    line: 'FONT="{{ vconsole_font }}"'
+    state: present
+  when: vconsole_font is defined
+
 - name: Set bootloader resolution
   ansible.builtin.lineinfile:
     dest: /etc/default/grub

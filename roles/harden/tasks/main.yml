@@ -2,7 +2,6 @@
   ansible.builtin.package:
     name:
       - ufw
-      # - sshguard
     state: present
   tags:
     - packages
@@ -93,41 +92,6 @@
     group: root
     mode: '0644'
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
-
-# # Using blockinfile here doesn't work because Ansible can only manage
-# # a single block in each file. before.rules already has a managed block
-# # in the *nat section of the file for router rules. There is no way to
-# # add this sshguard block to the *filter section of before.rules.
-
-# - name: Configure UFW for sshguard (ipv4)
-#   ansible.builtin.blockinfile:
-#     path: /etc/ufw/before.rules
-#     insertbefore: COMMIT
-#     block: |
-#       # hand off control for sshd to sshguard
-#       :sshguard - [0:0]
-#       -A ufw-before-input -p tcp --dport "{{ ssh_port }}" -j sshguard
-#     append_newline: true
-#     prepend_newline: true
-#     backup: true
-
-# - name: Configure UFW for sshguard (ipv6)
-#   ansible.builtin.blockinfile:
-#     path: /etc/ufw/before6.rules
-#     insertbefore: COMMIT
-#     block: |
-#       # hand off control for sshd to sshguard
-#       :sshguard - [0:0]
-#       -A ufw6-before-input -p tcp --dport "{{ ssh_port }}" -j sshguard
-#     append_newline: true
-#     prepend_newline: true
-#     backup: true
-
-# - name: Enable and start sshguard
-#   ansible.builtin.service:
-#     name: sshguard.service
-#     enabled: true
-#     state: started
 
 - name: Open SSH port
   community.general.ufw:

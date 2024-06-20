@@ -3,7 +3,6 @@ Python encryption warning
 disable root login
 endlessh for ubuntu
 replace firejail with bubblewrap
-sshguard before.rule file modification
 tighten docker ufw rules
 what is the purpose of /etc/ssh/sshd_config.d/50-ansible.conf?
 

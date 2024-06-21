@@ -41,3 +41,4 @@ build dirs for aur_builder
 de-duplicate handlers: To ensure that a handler from a role is notified as opposed to one from outside the role with the same name, notify the handler by using its name in the following form: role_name : handler_name.
 is alsa-utils needed?
 docker directory structure?
+move non-xdg global environment variables out of shell2xdg.yml

@@ -106,6 +106,10 @@
       SUDO_EDITOR     DEFAULT=nano
       VISUAL          DEFAULT=nano
       HISTCONTROL     DEFAULT=ignoreboth
+
+      # qt5 virtual keyboard support in wayland
+      # required by Dracula SDDM theme
+      QT_IM_MODULE=qtvirtualkeyboard
     insertafter: 'EOF'
     mode: '0644'
     append_newline: true

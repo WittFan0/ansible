@@ -198,7 +198,7 @@
       - dosbox-staging  # <-- Requires qt6. Is is worth it?
       - heroic-games-launcher-bin
       - gamehub
-      - ludusavi
+      - ludusavi-bin
     state: present
   tags:
     - aur

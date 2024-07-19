@@ -1,0 +1,9 @@
+[Unit]
+Description="Timer for the archpkgcheck.service"
+
+[Timer]
+Unit=archpkgcheck.service
+OnCalendar=Mon..Fri *-*-* 16:30:00
+
+[Install]
+WantedBy=timers.target

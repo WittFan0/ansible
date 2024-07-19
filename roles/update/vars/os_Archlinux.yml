@@ -18,3 +18,4 @@ update_distro_packages:
     - go  # fails when installed as a dependecy during yay build
     - lib32-zlib  # needed by Brother printer driver, but printing to Brother printer over network isn't working
     - cronie
+    - arch-audit

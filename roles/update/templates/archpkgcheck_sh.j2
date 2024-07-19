@@ -1,0 +1,12 @@
+#!/bin/bash
+
+OUTPUT="$(arch-audit -u)"
+MYEMAIL="{{ vault_user_email }}"
+
+if [[ -n $OUTPUT ]]
+then
+    systemd-cat -t archpkgcheck echo "<2>Security update available. Sending email notification to $MYEMAIL"
+    printf -- "%s\n" "$OUTPUT" | /usr/bin/mail -s "Arch Security Update Available" "$MYEMAIL"
+else
+    systemd-cat -t archpkgcheck echo "No security updates available"
+fi

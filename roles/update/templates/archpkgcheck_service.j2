@@ -1,0 +1,8 @@
+[Unit]
+Description="Pacman security update check"
+Requires=archpkgcheck.timer
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/archpkgcheck.sh
+User="{{ remote_user.name }}"

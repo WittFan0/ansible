@@ -60,10 +60,12 @@
     mode: '0644'
     backup: true
 
-- name: Make sure DNS blocklist update check service unit is enabled
+- name: Make sure DNS blocklist update check timer unit is enabled
   ansible.builtin.systemd_service:
+    state: started
     enabled: true
-    name: dns-blocklist-update
+    daemon_reload: true
+    name: dns-blocklist-update.timer
 
 - name: Create PXE directory if it does not exist
   ansible.builtin.file:

@@ -166,9 +166,10 @@
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
 - name: Enable and start logwatch timer
-  ansible.builtin.service:
+  ansible.builtin.systemd_service:
     name: logwatch.timer
     enabled: true
+    daemon_reload: true
     state: started
   when: ansible_facts['distribution'] == "Archlinux"
 
@@ -228,7 +229,7 @@
     backup: true
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
-- name: Create reboot check service unit (Arch)
+- name: Create reboot check service unit
   ansible.builtin.copy:
     src: reboot-check.service
     dest: /etc/systemd/system/reboot-check.service
@@ -237,8 +238,9 @@
     backup: true
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
-- name: Make sure reboot check service unit is enabled
+- name: Make sure reboot check timer unit is active
   ansible.builtin.systemd_service:
+    state: started
     enabled: true
-    name: reboot-check
+    name: reboot-check.timer
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]

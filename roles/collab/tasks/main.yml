@@ -149,8 +149,9 @@
     mode: '0644'
     backup: true
 
-- name: Make sure cloud mirror service unit is enabled
+- name: Make sure cloud mirror timer unit is enabled
   ansible.builtin.systemd_service:
     enabled: true
-    name: nc-offsite-bak
-
+    state: started
+    daemon_reload: true
+    name: nc-offsite-bak.timer

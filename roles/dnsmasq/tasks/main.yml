@@ -36,13 +36,34 @@
     backup: false
   notify: Restart dnsmasq
 
-- name: Add cron job for refreshing DNS blacklist
+- name: Add script for refreshing DNS blacklist
   ansible.builtin.copy:
-    src: dns-blacklist-update
-    dest: /etc/cron.daily/dns-blacklist-update
+    src: dns-blocklist-update.sh
+    dest: /usr/local/bin/dns-blocklist-update.sh
+    owner: root
     mode: '0755'
     backup: false
-  notify: Restart dnsmasq
+
+- name: Create DNS blocklist update check timer unit
+  ansible.builtin.copy:
+    src: dns-blocklist-update.timer
+    dest: /etc/systemd/system/dns-blocklist-update.timer
+    owner: root
+    mode: '0644'
+    backup: true
+
+- name: Create DNS blocklist update check service unit
+  ansible.builtin.copy:
+    src: dns-blocklist-update.service
+    dest: /etc/systemd/system/dns-blocklist-update.service
+    owner: root
+    mode: '0644'
+    backup: true
+
+- name: Make sure DNS blocklist update check service unit is enabled
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: dns-blocklist-update
 
 - name: Create PXE directory if it does not exist
   ansible.builtin.file:

@@ -124,3 +124,33 @@
     port: '53'
     src: 172.0.0.0/8
     comment: Docker bridge DNS requests
+
+- name: Add script for mirroring backup files to cloud
+  ansible.builtin.copy:
+    src: nc-offsite-bak.sh
+    dest: /usr/local/bin/nc-offsite-bak.sh
+    owner: root
+    mode: '0755'
+    backup: true
+
+- name: Create cloud mirror timer unit
+  ansible.builtin.copy:
+    src: nc-offsite-bak.timer
+    dest: /etc/systemd/system/nc-offsite-bak.timer
+    owner: root
+    mode: '0644'
+    backup: true
+
+- name: Create cloud mirror service unit
+  ansible.builtin.copy:
+    src: nc-offsite-bak.service
+    dest: /etc/systemd/system/nc-offsite-bak.service
+    owner: root
+    mode: '0644'
+    backup: true
+
+- name: Make sure cloud mirror service unit is enabled
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: nc-offsite-bak
+

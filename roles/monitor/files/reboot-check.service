@@ -1,0 +1,7 @@
+[Unit]
+Description="System reboot check"
+Requires=reboot-check.timer
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/reboot-check.sh

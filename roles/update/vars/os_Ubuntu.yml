@@ -1,8 +1,7 @@
 update_distro_packages:
     - aptitude
     - dialog
-    - cron
     - openssh-server
     - grub-efi-amd64-signed
     - gdisk
-    - lib32z1  # needed by Brother printer driver
+    - lib32z1 # needed by Brother printer driver

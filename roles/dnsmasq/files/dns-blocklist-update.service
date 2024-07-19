@@ -1,0 +1,7 @@
+[Unit]
+Description="Update DNS blocklist"
+Requires=dns-blocklist-update.timer
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/dns-blocklist-update.sh

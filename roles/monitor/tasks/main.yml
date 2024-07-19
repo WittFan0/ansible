@@ -172,9 +172,73 @@
     state: started
   when: ansible_facts['distribution'] == "Archlinux"
 
-- name: Install reboot check cron job
+- name: Create Arch package update check script
+  ansible.builtin.template:
+    src: archpkgcheck_sh.j2
+    dest: /usr/local/bin/archpkgcheck.sh
+    owner: root
+    mode: '0755'
+    backup: true
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Create Arch package update check timer unit
+  ansible.builtin.copy:
+    src: archpkgcheck.timer
+    dest: /etc/systemd/system/archpkgcheck.timer
+    owner: root
+    mode: '0644'
+    backup: true
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Create Arch package update check service unit
+  ansible.builtin.template:
+    src: archpkgcheck_service.j2
+    dest: /etc/systemd/system/archpkgcheck.service
+    owner: root
+    mode: '0644'
+    backup: true
+  tags:
+    - packages
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Make sure Arch package update check service unit is enabled
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: archpkgcheck
+  when: ansible_facts['distribution'] == "Archlinux"
+
+- name: Install reboot check script
   ansible.builtin.template:
     src: reboot-check.j2
-    dest: /etc/cron.daily/reboot-check
+    dest: /usr/local/bin/reboot-check.sh
+    owner: root
     mode: '0755'
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Create reboot check timer unit
+  ansible.builtin.copy:
+    src: reboot-check.timer
+    dest: /etc/systemd/system/reboot-check.timer
+    owner: root
+    mode: '0644'
+    backup: true
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Create reboot check service unit (Arch)
+  ansible.builtin.copy:
+    src: reboot-check.service
+    dest: /etc/systemd/system/reboot-check.service
+    owner: root
+    mode: '0644'
+    backup: true
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+- name: Make sure reboot check service unit is enabled
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: reboot-check
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]

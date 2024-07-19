@@ -1,0 +1,10 @@
+[Unit]
+Description="Timer for the dns-blocklist-update.service"
+
+[Timer]
+Unit=dns-blocklist-update.service
+OnCalendar=daily
+RandomizedDelaySec=7200
+
+[Install]
+WantedBy=timers.target

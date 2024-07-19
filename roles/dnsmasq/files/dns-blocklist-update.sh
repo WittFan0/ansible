@@ -1,7 +1,5 @@
 #!/bin/sh
 
-SEC=$(/usr/bin/shuf -i 1-3600 -n 1)
-
 # Exit immediately if a command exits with a non-zero status
 set -e
 
@@ -9,13 +7,6 @@ set -e
 [ -x /usr/bin/curl ] || exit 0
 echo "curl exists and is executable" | sudo systemd-cat -t dnsmasq-blacklist-update -p info
 
-sleep_then_download() {
-# Sleep for up to an hour to spread the load of checking for updates
-echo "Sleeping for $SEC seconds" | systemd-cat -t dnsmasq-blacklist-update -p info
-/usr/bin/sleep $SEC
 echo "Downloading DNS blacklist" | systemd-cat -t dnsmasq-blacklist-update -p info
 /usr/bin/curl -o /etc/dnsmasq.blacklist.txt https://big.oisd.nl/dnsmasq2
 echo "DNS blacklist downloaded" | systemd-cat -t dnsmasq-blacklist-update -p info
-}
-
-sleep_then_download &

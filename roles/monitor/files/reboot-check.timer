@@ -1,0 +1,9 @@
+[Unit]
+Description="Timer for the reboot-check.service"
+
+[Timer]
+Unit=reboot-check.service
+OnCalendar=daily
+
+[Install]
+WantedBy=timers.target

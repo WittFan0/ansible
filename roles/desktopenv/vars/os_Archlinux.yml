@@ -124,7 +124,6 @@ desktopenv_kde_packages:
   # - plasma-sdk  # <-- (optional) - Development tools
   - plymouth-kcm  # <-- (optional) - Configure Plymouth from systemsettings
   - dolphin
-  # - kcron
   - kde-inotify-survey
   # - khelpcenter
   - kio-admin

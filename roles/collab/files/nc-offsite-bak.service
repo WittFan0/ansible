@@ -1,0 +1,7 @@
+[Unit]
+Description="Clone Nextcloud backup to the cloud"
+Requires=nc-offsite-bak.timer
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/nc-offsite-bak.sh

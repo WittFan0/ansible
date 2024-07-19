@@ -1,0 +1,9 @@
+[Unit]
+Description="Timer for the nc-offsite-bak.service"
+
+[Timer]
+Unit=nc-offsite-bak.service
+OnCalendar=*-*-* 06:00:00
+
+[Install]
+WantedBy=timers.target

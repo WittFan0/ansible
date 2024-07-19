@@ -35,7 +35,6 @@ switch to using ansible.posix.authorized_key module
 smartd.conf lineinfile
 nullmailer-remotes lineinfile
 tie python-docker to geerlingguy.docker
-switch from cron to systemd timer
 loop build /etc/skel/build/
 build dirs for aur_builder
 de-duplicate handlers: To ensure that a handler from a role is notified as opposed to one from outside the role with the same name, notify the handler by using its name in the following form: role_name : handler_name.

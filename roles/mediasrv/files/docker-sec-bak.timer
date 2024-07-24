@@ -1,0 +1,9 @@
+[Unit]
+Description="Timer for the docker-sec-bak.service"
+
+[Timer]
+Unit=docker-sec-bak.service
+OnCalendar=*-*-* 02:00:00
+
+[Install]
+WantedBy=timers.target

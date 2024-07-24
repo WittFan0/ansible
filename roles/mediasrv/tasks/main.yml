@@ -126,3 +126,34 @@
   ansible.builtin.command: /usr/bin/nvidia-ctk runtime configure --runtime=docker
   become: true
   when: ansible_facts['distribution'] == "Archlinux" and ansible_facts['virtualization_role'] != "guest"
+
+- name: Add script for mirroring docker secrets to cloud
+  ansible.builtin.template:
+    src: docker-sec-bak_sh.j2
+    dest: /usr/local/bin/docker-sec-bak.sh
+    owner: root
+    mode: '0755'
+    backup: true
+
+- name: Create docker secrets mirroring timer unit
+  ansible.builtin.copy:
+    src: docker-sec-bak.timer
+    dest: /etc/systemd/system/docker-sec-bak.timer
+    owner: root
+    mode: '0644'
+    backup: true
+
+- name: Create docker secrets mirroring service unit
+  ansible.builtin.template:
+    src: docker-sec-bak_service.j2
+    dest: /etc/systemd/system/docker-sec-bak.service
+    owner: root
+    mode: '0644'
+    backup: true
+
+- name: Ensure docker secrets mirroring timer unit is enabled
+  ansible.builtin.systemd_service:
+    enabled: true
+    state: started
+    daemon_reload: true
+    name: docker-sec-bak.timer

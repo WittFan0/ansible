@@ -1,0 +1,22 @@
+#!/bin/sh
+
+XYZ="docker-sec-bak"
+SYNCDIR="{{ dockersecretsdir }}"
+LOGLVL="info"
+LOGCMD="systemd-cat -t $XYZ -p $LOGLVL"
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+# # Below doesn't account for deleted secrets
+# [ -z "$(find $SYNCDIR/ -type f -newermt '-22 hours')" ] && echo "No additions or updates to docker secrets in the past 22 hours. Exiting" | $LOGCMD && exit 0
+
+[ -x /usr/bin/rclone ] || exit 0
+echo "rclone exists and is executable" | $LOGCMD
+
+[ -f /opt/nextcloud_rclone.conf ] || exit 0
+echo "offsite login credentials file exists" | $LOGCMD
+
+echo "Copying Docker secrets to offsite storage" | $LOGCMD
+rclone sync $SYNCDIR blomp-encrypted:docker -v --config /opt/nextcloud_rclone.conf > "/var/log/$XYZ.log" 2>&1
+echo "Docker secrets successfully copied to offsite storage" | $LOGCMD

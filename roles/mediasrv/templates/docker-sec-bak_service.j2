@@ -1,0 +1,8 @@
+[Unit]
+Description="Clone Docker secrets to the cloud"
+Requires=docker-sec-bak.timer
+
+[Service]
+Type=simple
+User="{{ remote_user.name }}"
+ExecStart=/usr/local/bin/docker-sec-bak.sh

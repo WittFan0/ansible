@@ -107,10 +107,6 @@
       VISUAL          DEFAULT=nano
       HISTCONTROL     DEFAULT=ignoreboth
 
-      # qt5 virtual keyboard support in wayland
-      # required by Dracula SDDM theme
-      QT_IM_MODULE=qtvirtualkeyboard
-
       # Settings required by nvidia-vaapi-driver
       __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json
       LIBVA_DRIVER_NAME=nvidia

@@ -3,7 +3,7 @@ hostname: archsrv
 # kernel_parameters: "quiet consoleblank=60"
 
 lan0:
-    ip: "{{ lan.base }}.2"
+    ip: "{{ lan.base }}.7"
     ifname: eno1
     mac: "{{ vault_mac_office }}"
 

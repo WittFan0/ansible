@@ -19,11 +19,12 @@ dhcp-option=option:ntp-server,{{ lan0.ip }}
 dhcp-option=option:tftp-server,{{ lan0.ip }}
 dhcp-option=option:domain-search,{{ lan.domain }}
 # dhcp-no-override     # Disable re-use of the DHCP servername and filename fields as extra option space
-dhcp-host={{ vault_mac_sabre15 }},{{ lan.base }}.2,sabre15-wired
+dhcp-host={{ vault_mac_qotom5 }},{{ lan.base }}.2,qotom
 dhcp-host={{ vault_mac_sabre15_wireless }},{{ lan.base }}.3,sabre15-wireless
 dhcp-host={{ vault_mac_mythbox }},{{ lan.base }}.4,mythbox
 dhcp-host={{ vault_mac_taichi }},{{ lan.base }}.5,taichi
 dhcp-host={{ vault_mac_calistasair }},{{ lan.base }}.6,calistas-air
+dhcp-host={{ vault_mac_c720 }},{{ lan.base }}.7,c720
 dhcp-host={{ vault_mac_dan }},{{ lan.base }}.8,dan
 dhcp-host={{ vault_mac_beelink }},{{ lan.base }}.9,beelink
 dhcp-host={{ vault_mac_rpi301 }},{{ lan.base }}.14,rpi3-01

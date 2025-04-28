@@ -6,8 +6,9 @@ ansible_user: lance
 # grub_gfxmode: 
 
 lan0:
-    ip: "{{ lan.base }}.7"
-    ifname: enp2s0
+    ip: "{{ lan.base }}.2"
+    ifname: enp5s0
+    mac: "{{ vault_mac_qotom5 }}"
 
 wan: 
     ifname: enp1s0

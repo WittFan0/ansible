@@ -1,3 +1,5 @@
+netplan_packages: netplan
+
 router_wap_packages:
     - iw
     - hostapd

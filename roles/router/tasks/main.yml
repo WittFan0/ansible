@@ -1,4 +1,7 @@
 ---
+- name: Set OS distribution dependent variables
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
 - name: Remove existing network configuration
   ansible.builtin.file:
     state: "{{ item }}"
@@ -14,7 +17,7 @@
   become: true
   ansible.builtin.package:
     name:
-      - netplan
+      - "{{ netplan_package }}"
     state: present
   tags:
     - packages

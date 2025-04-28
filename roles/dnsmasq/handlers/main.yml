@@ -2,3 +2,4 @@
   ansible.builtin.service:
     name: dnsmasq.service
     state: restarted
+  when: not ansible_check_mode

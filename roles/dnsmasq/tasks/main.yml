@@ -60,12 +60,21 @@
     mode: '0644'
     backup: true
 
+- name: Check for DNS blocklist update check timer
+  ansible.builtin.stat:
+    path: /etc/systemd/system/dns-blocklist-update.timer
+  register: register_dns_blocklist_update_timer
+- name: Report missing DNS blocklist update check timer
+  ansible.builtin.debug:
+    msg: "The DNS blocklist update check timer is missing"
+  when: not register_dns_blocklist_update_timer.stat.exists
 - name: Make sure DNS blocklist update check timer unit is enabled
   ansible.builtin.systemd_service:
     state: started
     enabled: true
     daemon_reload: true
     name: dns-blocklist-update.timer
+  when: register_dns_blocklist_update_timer.stat.exists
 
 - name: Create PXE directory if it does not exist
   ansible.builtin.file:
@@ -79,6 +88,7 @@
     dest: /srv/tftp/pxe/undionly.kpxe
     mode: '0644'
     backup: false
+  when: not ansible_check_mode
 
 - name: Download boot file for UEFI netbooting
   ansible.builtin.get_url:
@@ -86,6 +96,7 @@
     dest: /srv/tftp/pxe/ipxe.efi
     mode: '0644'
     backup: false
+  when: not ansible_check_mode
 
 - name: Create netboot menu
   ansible.builtin.copy:
@@ -125,29 +136,47 @@
   tags:
     - packages
 
+- name: Check for dnsmasq config file
+  ansible.builtin.stat:
+    path: /etc/dnsmasq.conf
+  register: register_dns_config
+- name: Report missing dnsmasq config file
+  ansible.builtin.debug:
+    msg: "The dnsmasq config file is missing"
+  when: not register_dns_config.stat.exists
 - name: Allow dnsmasq to process .conf files in /etc/dnsmasq.d/
   ansible.builtin.lineinfile:
     path: /etc/dnsmasq.conf
     line: conf-dir=/etc/dnsmasq.d/,*.conf
   notify: Restart dnsmasq
+  when: register_dns_config.stat.exists
 
+- name: Check for dnscrypt-proxy config file
+  ansible.builtin.stat:
+    path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
+  register: register_dnscrypt_proxy_config
+- name: Report missing dnscrypt-proxy config file
+  ansible.builtin.debug:
+    msg: "The dnscrypt-proxy config file is missing"
+  when: not register_dnscrypt_proxy_config.stat.exists
 - name: Run dnscrypt-proxy as a forwarder for dnsmasq
   ansible.builtin.lineinfile:
     path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
     insertbefore: "BOF"
     line: cache = false
-
+  when: register_dnscrypt_proxy_config.stat.exists
 - name: Have dnscrypt-proxy listen on port 53000
   ansible.builtin.lineinfile:
     path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
     regexp: '^listen_addresses'
     line: listen_addresses = ['127.0.0.1:53000']
-
+  when: register_dnscrypt_proxy_config.stat.exists
 - name: Have dnscrypt-proxy choose the fastest server from the sources already configured under [sources]
   ansible.builtin.lineinfile:
     path: /etc/dnscrypt-proxy/dnscrypt-proxy.toml
     regexp: '^server_names'
     state: absent
+  when: register_dnscrypt_proxy_config.stat.exists
 
 # # The Ubuntu package uses unsupported systemd sockets to accept connections.
 # # In order to configure the local port, the /lib/systemd/system/dnscrypt-proxy.socket file
@@ -229,13 +258,13 @@
     name: dnscrypt-proxy.service
     enabled: true
     state: started
-  # Only start if the lan subnet hasn't changed
-  when: ansible_facts['default_ipv4']['address'] == lan0.ip
+  # Only start if the lan subnet hasn't changed and this isn't a dry-run
+  when: ansible_facts['default_ipv4']['address'] == lan0.ip and not ansible_check_mode
 
 - name: Enable and start DNS, DHCP and TFTP servers
   ansible.builtin.service:
     name: dnsmasq.service
     enabled: true
     state: started
-  # Only start if the lan subnet hasn't changed
-  when: ansible_facts['default_ipv4']['address'] == lan0.ip
+  # Only start if the lan subnet hasn't changed and this isn't a dry-run
+  when: ansible_facts['default_ipv4']['address'] == lan0.ip and not ansible_check_mode

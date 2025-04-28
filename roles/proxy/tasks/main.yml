@@ -72,3 +72,4 @@
     name: squid.service
     enabled: true
     state: started
+  when: not ansible_check_mode

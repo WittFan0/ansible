@@ -58,11 +58,19 @@
     dest: /opt
   when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
 
+- name: Check for printer driver install file
+  ansible.builtin.stat:
+    path: /opt/linux-brprinter-installer-2.2.3-1.tar.gz
+  register: register_brprinter_installer
+- name: Report missing printer install file
+  ansible.builtin.debug:
+    msg: "The printer install file is missing"
+  when: not register_brprinter_installer.stat.exists
 - name: Make Brother printer driver installer file executable (Debian)
   ansible.builtin.file:
     path: /opt/linux-brprinter-installer-2.2.3-1
     mode: '0755'
-  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"] and register_brprinter_installer.stat.exists
 
 # # Because the installation script is interactive,
 # # it cannot be run using ansible.

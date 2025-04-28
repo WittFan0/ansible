@@ -18,7 +18,7 @@
   ansible.builtin.copy:
     content: |
       # From: https://wiki.libvirt.org/Net.bridge.bridge-nf-call_and_sysctl.conf.html
-      ACTION=="add", SUBSYSTEM=="module", KERNEL=="br_netfilter", RUN+="/usr/lib/systemd/systemd-sysctl --prefix=net/bridge
+      ACTION=="add", SUBSYSTEM=="module", KERNEL=="br_netfilter", RUN+="/usr/lib/systemd/systemd-sysctl --prefix=net/bridge"
     dest: /etc/udev/rules.d/99-bridge.rules
     owner: root
     group: root

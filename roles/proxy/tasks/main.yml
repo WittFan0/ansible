@@ -1,4 +1,7 @@
 ---
+- name: Set OS distribution dependent variables
+  ansible.builtin.include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
 - name: Create proxy config directory if it does not exist
   become: true
   ansible.builtin.file:
@@ -55,7 +58,7 @@
     state: present
   tags:
     - packages
-  environment: "{{ proxy_env }}"
+  # environment: "{{ proxy_env }}"
 
 - name: Open proxy port
   become: true
@@ -73,3 +76,32 @@
     enabled: true
     state: started
   when: not ansible_check_mode
+
+- name: Configure system-wide proxy settings
+  ansible.builtin.blockinfile:
+    path: /etc/environment
+    insertafter: "EOF"
+    block: |
+      http_proxy="{{ proxy_addr }}"
+      https_proxy="{{ proxy_addr }}"
+      ftp_proxy="{{ proxy_addr }}"
+      no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com"
+      HTTP_PROXY="{{ proxy_addr }}"
+      HTTPS_PROXY="{{ proxy_addr }}"
+      FTP_PROXY="{{ proxy_addr }}"
+      NO_PROXY="localhost,127.0.0.1,localaddress,.localdomain.com"
+    append_newline: true
+    prepend_newline: true
+    backup: true
+
+- name: Configure apt to use proxy
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/95proxies
+    content: |
+      Acquire::http::proxy "{{ proxy_addr }}"; Acquire::ftp::proxy "{{ proxy_addr }}"; Acquire::https::proxy "{{ proxy_addr }}";
+    owner: root
+    group: root
+    mode: '0640'
+    backup: true
+  when: ansible_facts['distribution'] in ["Debian", "Ubuntu"]

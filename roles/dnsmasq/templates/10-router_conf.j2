@@ -6,7 +6,7 @@ no-resolv                # Do not read /etc/resolv.conf or any other file beside
 cache-size=10000         # cache 10000 names (maximum allowed)
 server=127.0.0.1#53000   # local dnscrypt-proxy server
 listen-address=::1,127.0.0.1,{{ lan0.ip }}
-bind-interfaces          # This appears to be needed to coexist with systemd-resolved
+bind-dynamic             # This appears to be needed to coexist with systemd-resolved
 no-hosts                 # Do not read /etc/hosts
 addn-hosts=/etc/hosts.dnsmasq
 expand-hosts             # Automatically append domain to simple names in a hosts-file

@@ -37,10 +37,6 @@ plex_addr: 172.31.254.2
 
 timezone: "America/Detroit"
 
-# These variables are defined by geerlingguy.ntp
-# at https://github.com/geerlingguy/ansible-role-ntp
-ntp_package: chrony
-ntp_config_file: /etc/chrony.conf 
 ntp_timezone: "{{ timezone }}"
 ntp_restrict:
   - "127.0.0.1"

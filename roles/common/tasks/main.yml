@@ -111,7 +111,6 @@
     mode: '0644'
     backup: true
 
-# geerlingguy.ntp will overwrite timezone
 - name: Set timezone to {{ timezone }}
   community.general.timezone:
     name: "{{ timezone }}"

@@ -1,7 +1,7 @@
 ---
 # Run the following commands on localhost
 #   pacman -S git ansible
-#   ansible-galaxy install geerlingguy.ntp geerlingguy.docker
+#   ansible-galaxy install geerlingguy.docker
 #   ansible-galaxy collection install kewlfft.aur
 #   ansible-pull -J -K -U http://github.com/WittFan0/ansible.git
 
@@ -31,7 +31,6 @@
     - monitor
     # - harden  # TODO: Limit to WAN interface
     # - printing
-    - geerlingguy.ntp
     - dnsmasq
     - proxy
     - geerlingguy.docker

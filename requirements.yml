@@ -2,5 +2,4 @@
 collections:
   - name: kewlfft.aur
   - name: geerlingguy.docker
-  - name: geerlingguy.ntp
   

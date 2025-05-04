@@ -34,7 +34,6 @@
   hosts: lan_controller
   become: true
   roles:
-    - geerlingguy.ntp
     - dnsmasq
 
 - name: Proxy role

@@ -60,7 +60,7 @@
 
 - name: Check for printer driver install file
   ansible.builtin.stat:
-    path: /opt/linux-brprinter-installer-2.2.3-1.tar.gz
+    path: /opt/linux-brprinter-installer-2.2.3-1
   register: register_brprinter_installer
 - name: Report missing printer install file
   ansible.builtin.debug:
@@ -84,3 +84,4 @@
     name: cups.service
     enabled: true
     state: started
+  when: not ansible_check_mode

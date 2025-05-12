@@ -1,9 +1,10 @@
 [security]
 Python encryption warning
+downgrade nftables to iptables for better docker compatibility?
+replace ufw with firewalld(?) because of incompatibility with docker
 disable root login
 endlessh for ubuntu
 replace firejail with bubblewrap
-tighten docker ufw rules
 what is the purpose of /etc/ssh/sshd_config.d/50-ansible.conf?
 
 
@@ -22,7 +23,6 @@ get dracula wallpapers from git
 install netdata monitor?
 /etc/grub.d/42_isoboot?
 gitconfig?
-downgrade nftables to iptables for better docker compatibility?
 
 
 [optimization]

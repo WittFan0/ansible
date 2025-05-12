@@ -1,1 +1,2 @@
 router_xbox_ip: "{{ lan.base }}.86"
+router_nextcloud_ip: "{{ lan.base }}.5"

@@ -1,0 +1,4 @@
+[xbox]
+title=Xbox
+description=Xbox
+ports=53|3074|4500/udp|3544/udp|500/udp|88/udp|80/tcp

@@ -36,9 +36,9 @@
           {{ lan0.ifname }}:
             addresses:
             - {{ lan0.ip }}/24
-            routes:
-                - to: default
-                  via: {{ lan.gateway }}
+            # routes:
+            #     - to: default
+            #       via: {{ lan.gateway }}
             nameservers:
               search: [{{ lan.domain }}]
               addresses:
@@ -113,20 +113,37 @@
     path: /etc/ufw/before.rules
     insertafter: "^\\*nat"
     block: |
-      :PREROUTING ACCEPT [0:0]
+      #:PREROUTING ACCEPT [0:0]  # <-- only needed for port forwarding?
       :POSTROUTING ACCEPT [0:0]
 
       # # Redirect all DNS requests to this machine  # <-- EXPERIMENTAL
       # -A PREROUTING -d {{ lan0.ip }} --dport 53 -j DNAT --to-destination {{ lan0.ip }}:53
 
       # # Xbox port forwardings  # <-- UFW won't start at boot with these enabled?
-      # -A PREROUTING -i {{ wan.ifname }} --dport 53 -j DNAT --to-destination {{ router_xbox_ip }}:53
-      # -A PREROUTING -i {{ wan.ifname }} --dport 3074 -j DNAT --to-destination {{ router_xbox_ip }}:3074
+      # -A PREROUTING -i {{ wan.ifname }} -p tcp --dport 53 -j DNAT --to-destination {{ router_xbox_ip }}:53
+      # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 53 -j DNAT --to-destination {{ router_xbox_ip }}:53
+      # -A PREROUTING -i {{ wan.ifname }} -p tcp --dport 3074 -j DNAT --to-destination {{ router_xbox_ip }}:3074
+      # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 3074 -j DNAT --to-destination {{ router_xbox_ip }}:3074
       # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 4500 -j DNAT --to-destination {{ router_xbox_ip }}:4500
       # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 3544 -j DNAT --to-destination {{ router_xbox_ip }}:3544
       # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 500 -j DNAT --to-destination {{ router_xbox_ip }}:500
       # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 88 -j DNAT --to-destination {{ router_xbox_ip }}:88
       # -A PREROUTING -i {{ wan.ifname }} -p tcp --dport 80 -j DNAT --to-destination {{ router_xbox_ip }}:80
+
+      # Dropbox token
+      # -A PREROUTING -i {{ wan.ifname }} -p tcp --dport 53682 -j DNAT --to-destination {{ router_nextcloud_ip }}:53682
+      # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 53682 -j DNAT --to-destination {{ router_nextcloud_ip }}:53682
+
+      # Nextcloud certificate
+      # -A PREROUTING -i {{ wan.ifname }} -p tcp --dport 8443 -j DNAT --to-destination {{ router_nextcloud_ip }}:8443
+      # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 53682 -j DNAT --to-destination {{ router_nextcloud_ip }}:53682
+
+      # Nextcloud Talk
+      # -A PREROUTING -i {{ wan.ifname }} -p tcp --dport 3478 -j DNAT --to-destination {{ router_nextcloud_ip }}:3478
+      # -A PREROUTING -i {{ wan.ifname }} -p udp --dport 53682 -j DNAT --to-destination {{ router_nextcloud_ip }}:53682
+
+      # HTTPS forwarding
+      # -A PREROUTING -i {{ wan.ifname }} -p tcp --dport 443 -j DNAT --to-destination {{ router_nextcloud_ip }}:443
 
       # Masquerade traffic exiting through {{ wan.ifname }} interface
       -A POSTROUTING -s {{ lan.base }}.0/24 -o {{ wan.ifname }} -j MASQUERADE
@@ -134,3 +151,10 @@
     prepend_newline: true
     backup: true
   when: wan.ifname is defined
+
+- name: Open Xbox ports
+  community.general.ufw:
+    rule: allow
+    name: xbox
+    comment: Xbox
+  become: true

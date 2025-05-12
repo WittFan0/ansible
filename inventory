@@ -2,91 +2,54 @@ all:
   children:
     new_build:
       hosts:
-        taichi:
-        archvm:
-        beelink:
-        mythboxtest:
-        qotom:
+        # archvm:
+        # beelink:
+        # mythboxtest:
+        # qotom:
     printing:
       hosts:
-        taichi:
-        archvm:
-        beelink:
-        mythboxtest:
+        # taichi:
         qotom:
     collab_server:
       hosts:
-        taichi:
-        archvm:
+        # taichi:
+        # qotom:
+    mediamgr:
+      hosts:
+        # taichi:
         beelink:
+        archvm:
         mythboxtest:
-        qotom:
     media_server:
       hosts:
-        taichi:
-        archvm:
-        beelink:
-        mythboxtest:
-        qotom:
+        # taichi:
+        # qotom:
     lan_controller:
       hosts:
-        taichi:
-        archvm:
-        beelink:
-        mythboxtest:
+        # taichi:
         qotom:
     router:
       hosts:
-        taichi:
-        archvm:
-        beelink:
-        mythboxtest:
-        qotom:
-    mediamgr:
-      hosts:
-        taichi:
-        beelink:
-        archvm:
-        mythboxtest:
-        qotom:
+        # taichi:
+        # qotom:
     ripping:
       hosts:
-        taichi:
-        beelink:
-        archvm:
-        mythboxtest:
-        qotom:
+        dan:
     development:
       hosts:
-        taichi:
-        beelink:
-        archvm:
-        mythboxtest:
-        qotom:
+        # taichi:
     btrfs:
       hosts:
-        taichi:
-        beelink:
+        # taichi:
         archvm:
         mythboxtest:
-        qotom:
     gaming:
       hosts:
-        taichi:
-        archvm:
-        mythboxtest:
+        # taichi:
     proxy:
       hosts:
-        # taichi:
         dan:
-        beelink:
-        archvm:
-        mythboxtest:
         qotom:
     vmhost:
       hosts:
-        taichi:
-        beelink:
-        archvm:
-        mythboxtest:
-        qotom:
+        # taichi:

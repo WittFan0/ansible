@@ -6,7 +6,7 @@
 - name: Add hosts
   ansible.builtin.lineinfile:
     path: /etc/hosts
-    line: "192.168.41.8  dan.q.qw  dan"
+    line: "192.168.41.8  dan.{{ lan.domain }}  dan"
     insertafter: 'EOF'
     mode: '0644'
     backup: true

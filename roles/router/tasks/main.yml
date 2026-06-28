@@ -49,6 +49,7 @@
               # - 208.67.220.220
               # - 8.8.8.8
               # - 8.8.4.4
+              wakeonlan: true  # First time may also need:  sudo ethtool -s {{ lan0.ifname }} wol g
           {{ wan.ifname }}:
             dhcp4: true
             dhcp6: true

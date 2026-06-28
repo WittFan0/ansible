@@ -38,6 +38,7 @@
             optional: true
             dhcp4: false
             dhcp6: false
+            wakeonlan: true  # First time may also need:  sudo ethtool -s {{ lan0.ifname }} wol g
 
         bridges:
           br0:

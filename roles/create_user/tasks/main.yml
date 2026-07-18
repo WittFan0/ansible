@@ -4,8 +4,8 @@
 
 - name: Create user group
   ansible.builtin.group:
-    name: "{{ remote_user.group }}"
-    gid: "{{ remote_user.uid }}"
+    name: "{{ my_remote_user.group }}"
+    gid: "{{ my_remote_user.uid }}"
     state: present
   tags:
     - user
@@ -20,13 +20,13 @@
 
 - name: Create user and assign to group
   ansible.builtin.user:
-    name: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    name: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     password: "{{ vault_user_password | password_hash('sha512') }}"
     password_lock: false
     update_password: on_create # --> only set the password for newly created users
-    shell: "{{ remote_user.shell_path }}"
-    uid: "{{ remote_user.uid }}"
+    shell: "{{ my_remote_user.shell_path }}"
+    uid: "{{ my_remote_user.uid }}"
     groups: sys,floppy,users,video,lp,audio,adm,{{ create_user_os_groups }}
     append: true   # --> user is not removed from existing groups
     generate_ssh_key: true
@@ -39,7 +39,7 @@
 - name: Allow prime user to run `sudo`
   ansible.builtin.lineinfile:
     path: /etc/sudoers.d/20-primeuser
-    line: "{{ remote_user.name }} ALL=(ALL:ALL) ALL"
+    line: "{{ my_remote_user.name }} ALL=(ALL:ALL) ALL"
     create: true
     mode: '0644'
     validate: 'visudo -cf %s'
@@ -47,71 +47,71 @@
 - name: Add authorized SSH keys
   ansible.builtin.template:
     src: authorized_keys.j2
-    dest: /home/{{ remote_user.name }}/.ssh/authorized_keys
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    dest: /home/{{ my_remote_user.name }}/.ssh/authorized_keys
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0600'
     force: true
     backup: false
 
 - name: Create rclone config directory if it does not exist
   ansible.builtin.file:
-    path: /home/{{ remote_user.name }}/.config/rclone
+    path: /home/{{ my_remote_user.name }}/.config/rclone
     state: directory
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0700'
 
 - name: Create rclone config
   ansible.builtin.template:
     src: rclone_conf.j2
-    dest: /home/{{ remote_user.name }}/.config/rclone/rclone.conf
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    dest: /home/{{ my_remote_user.name }}/.config/rclone/rclone.conf
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     backup: false
     mode: '0600'
 
 - name: Create Nextcloud storage directory if it does not exist
   ansible.builtin.file:
-    path: /home/{{ remote_user.name }}/nextcloud
+    path: /home/{{ my_remote_user.name }}/nextcloud
     state: directory
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0750'
 
 - name: Create davfs2 config directory if it does not exist
   ansible.builtin.file:
-    path: /home/{{ remote_user.name }}/.davfs2
+    path: /home/{{ my_remote_user.name }}/.davfs2
     state: directory
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0750'
 
 - name: Allow davfs2 to use local secrets
   ansible.builtin.lineinfile:
-    path: /home/{{ remote_user.name }}/.davfs2/davfs2.conf
+    path: /home/{{ my_remote_user.name }}/.davfs2/davfs2.conf
     regexp: '^secrets '
     line: 'secrets         ~/.davfs2/secrets # user config file only'
     create: true
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0640'
 
 - name: Create davfs2 secrets
   ansible.builtin.lineinfile:
-    path: /home/{{ remote_user.name }}/.davfs2/secrets
-    regexp: '^/home/{{ remote_user.name }}/nextcloud  '
-    line: /home/{{ remote_user.name }}/nextcloud  {{ remote_user.name }}  {{ vault_nextcloud_davfs_password }}
+    path: /home/{{ my_remote_user.name }}/.davfs2/secrets
+    regexp: '^/home/{{ my_remote_user.name }}/nextcloud  '
+    line: /home/{{ my_remote_user.name }}/nextcloud  {{ my_remote_user.name }}  {{ vault_nextcloud_davfs_password }}
     create: true
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0600'
 
 - name: Create other config files
   ansible.builtin.copy:
     src: dotfiles/config/
-    dest: /home/{{ remote_user.name }}/.config/
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    dest: /home/{{ my_remote_user.name }}/.config/
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0750'
     backup: true

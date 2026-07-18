@@ -30,7 +30,7 @@ lan_base: "{{ lan.subnet | regex_replace('.0/[0-9]{2}', '') }}"
 docker_install_compose_plugin: true
 docker_install_compose: false
 docker_users:
-  - "{{ remote_user.name }}"
+  - "{{ my_remote_user.name }}"
 
 media_subnet: 172.31.254.0/24
 plex_addr: 172.31.254.2

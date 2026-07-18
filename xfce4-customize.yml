@@ -5,9 +5,9 @@
 - hosts: archvm
   # connection: local
   become: true
-  become_user: "{{ remote_user.name }}"
+  become_user: "{{ my_remote_user.name }}"
   environment:
-    DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/{{ remote_user.uid }}/bus
+    DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/{{ my_remote_user.uid }}/bus
   
   tasks:
     - name: Change the DPI to "96"
@@ -17,7 +17,7 @@
         value_type: int
         value: 96
 
-    - name: Customize {{ remote_user.name }}'s wallpaper
+    - name: Customize {{ my_remote_user.name }}'s wallpaper
       community.general.xfconf:
         channel: xfce4-desktop
         property: /backdrop/screen0/monitorVirtual-1/workspace0/last-image
@@ -25,7 +25,7 @@
         value: /usr/share/backgrounds/xfce/XFCE_83_No_Logo.png
         state: present
 
-    - name: Customize {{ remote_user.name }}'s theme
+    - name: Customize {{ my_remote_user.name }}'s theme
       community.general.xfconf:
         channel: xsettings
         property: /Net/ThemeName
@@ -33,7 +33,7 @@
         value: Gradient-black-46
         state: present
 
-    - name: Customize {{ remote_user.name }}'s icons
+    - name: Customize {{ my_remote_user.name }}'s icons
       community.general.xfconf:
         channel: xsettings
         property: /Net/IconThemeName
@@ -41,7 +41,7 @@
         value: EFDark-IconsCream
         state: present
 
-    - name: Load custom actions into {{ remote_user.name }}'s filemanager
+    - name: Load custom actions into {{ my_remote_user.name }}'s filemanager
       ansible.builtin.command: |
         uca-apply
 

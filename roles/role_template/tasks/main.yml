@@ -63,8 +63,8 @@
 #   ansible.builtin.copy:
 #     src: 
 #     dest: /
-#     owner: "{{ remote_user.name }}"
-#     group: "{{ remote_user.group }}"
+#     owner: "{{ my_remote_user.name }}"
+#     group: "{{ my_remote_user.group }}"
 #     backup: true
 #   notify: 
 

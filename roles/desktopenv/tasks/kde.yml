@@ -32,10 +32,10 @@
 
 - name: Create settings file for kdesu if it doesn't exist
   ansible.builtin.file:
-    path: /home/{{ remote_user.name }}/.config/
+    path: /home/{{ my_remote_user.name }}/.config/
     state: directory
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0755'
     recurse: false
   when: desktop_environment == "kde"
@@ -45,10 +45,10 @@
     content: |
       [super-user-command]
       super-user-command=sudo
-    dest: /home/{{ remote_user.name }}/.config/kdesurc
+    dest: /home/{{ my_remote_user.name }}/.config/kdesurc
     mode: '0644'
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     backup: true
   when: desktop_environment == "kde"
 

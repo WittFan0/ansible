@@ -4,5 +4,5 @@ Requires=docker-sec-bak.timer
 
 [Service]
 Type=simple
-User="{{ remote_user.name }}"
+User="{{ my_remote_user.name }}"
 ExecStart=/usr/local/bin/docker-sec-bak.sh

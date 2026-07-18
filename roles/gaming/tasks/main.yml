@@ -62,7 +62,7 @@
 
 - name: Add user to gamemode group
   ansible.builtin.user:
-    name: "{{ remote_user.name }}"
+    name: "{{ my_remote_user.name }}"
     groups: gamemode
     append: true
 

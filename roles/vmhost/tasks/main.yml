@@ -69,7 +69,7 @@
 
 - name: Add prime user to kvm group
   ansible.builtin.command: |
-    usermod -a -G kvm {{ remote_user.name }}
+    usermod -a -G kvm {{ my_remote_user.name }}
   become: true
 
 # The libvirt group is optional. It is not needed if the user is a member of the wheel group (arch) or sudo group (ubuntu)
@@ -83,7 +83,7 @@
 
 - name: Add prime user to libvirt group
   ansible.builtin.command: |
-    usermod -a -G libvirt {{ remote_user.name }}
+    usermod -a -G libvirt {{ my_remote_user.name }}
   become: true
 
 - name: Create directory for libvirt images
@@ -257,19 +257,19 @@
 - name: Invoke lanbridge.yml
   ansible.builtin.include_tasks: lanbridge.yml
 
-- name: Create custom qemu config allowing {{ remote_user.name }} to connect VM guests to br0
+- name: Create custom qemu config allowing {{ my_remote_user.name }} to connect VM guests to br0
   become: true
   ansible.builtin.copy:
     content: "allow br0\n"
-    dest: /etc/qemu/{{ remote_user.name }}.conf
+    dest: /etc/qemu/{{ my_remote_user.name }}.conf
     owner: root
-    group: "{{ remote_user.group }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0660'
     backup: true
 
-- name: Source {{ remote_user.name }}'s qemu custom config
+- name: Source {{ my_remote_user.name }}'s qemu custom config
   become: true
   ansible.builtin.lineinfile:
     path: /etc/qemu/bridge.conf
-    line: include /etc/qemu/{{ remote_user.name }}.conf
+    line: include /etc/qemu/{{ my_remote_user.name }}.conf
     backup: true

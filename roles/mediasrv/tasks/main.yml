@@ -9,24 +9,24 @@
   ansible.builtin.file:
     path: "{{ dockersecretsdir }}"
     state: directory
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0700'
 
 - name: Create unencrypted mail_address file for Docker Compose
   ansible.builtin.copy:
     content: "{{ vault_user_email }}\n"
     dest: "{{ dockersecretsdir }}/mail_address"
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0600'
 
 - name: Create unencrypted mail_password file for Docker Compose
   ansible.builtin.copy:
     content: "{{ vault_mailer_password }}\n"
     dest: "{{ dockersecretsdir }}/mail_password"
-    owner: "{{ remote_user.name }}"
-    group: "{{ remote_user.group }}"
+    owner: "{{ my_remote_user.name }}"
+    group: "{{ my_remote_user.group }}"
     mode: '0600'
 
 # # Below is not practical since Plex claims expire after only 4 minutes
@@ -34,8 +34,8 @@
 #   ansible.builtin.copy:
 #     content: "{{ vault_plex_claim }}"
 #     dest: "{{ dockersecretsdir }}/plex_claim"
-#     owner: "{{ remote_user.name }}"
-#     group: "{{ remote_user.group }}"
+#     owner: "{{ my_remote_user.name }}"
+#     group: "{{ my_remote_user.group }}"
 #     mode: '0600'
 
 - name: Install firewall

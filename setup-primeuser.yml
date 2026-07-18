@@ -5,32 +5,32 @@
 - hosts: archvm
   # connection: local
   become: true
-  become_user: "{{ remote_user.name }}"
+  become_user: "{{ my_remote_user.name }}"
   tasks:
     - name: Create ansible project directory if it does not exist
       ansible.builtin.file:
-        path: /home/{{ remote_user.name }}/Projects/ansible
+        path: /home/{{ my_remote_user.name }}/Projects/ansible
         state: directory
-        owner: "{{ remote_user.name }}"
-        group: "{{ remote_user.group }}"
+        owner: "{{ my_remote_user.name }}"
+        group: "{{ my_remote_user.group }}"
         mode: '0755'
         recurse: true
 
     - name: Checkout ansible project from github
       ansible.builtin.git:
         repo: https://github.com/WittFan0/ansible.git
-        dest: /home/{{ remote_user.name }}/Projects/ansible
+        dest: /home/{{ my_remote_user.name }}/Projects/ansible
 
     - name: Create myscripts project directory if it does not exist
       ansible.builtin.file:
-        path: /home/{{ remote_user.name }}/Projects/myscripts
+        path: /home/{{ my_remote_user.name }}/Projects/myscripts
         state: directory
-        owner: "{{ remote_user.name }}"
-        group: "{{ remote_user.group }}"
+        owner: "{{ my_remote_user.name }}"
+        group: "{{ my_remote_user.group }}"
         mode: '0755'
         recurse: true
 
     - name: Checkout myscripts from github
       ansible.builtin.git:
         repo: https://github.com/WittFan0/myscripts.git
-        dest: /home/{{ remote_user.name }}/Projects/myscripts
+        dest: /home/{{ my_remote_user.name }}/Projects/myscripts

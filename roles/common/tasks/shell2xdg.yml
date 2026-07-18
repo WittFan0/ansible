@@ -1,28 +1,28 @@
 ---
-- name: Create XDG-compliant skeleton dirs for {{ remote_user.shell }}
+- name: Create XDG-compliant skeleton dirs for {{ my_remote_user.shell }}
   ansible.builtin.file:
-    path: /etc/skel/.config/{{ remote_user.shell }}/
+    path: /etc/skel/.config/{{ my_remote_user.shell }}/
     state: directory
     mode: '0755'
   when: remote_user.shell is defined
   tags:
     - shell
 
-- name: Create XDG-compliant skeleton files for {{ remote_user.shell }}_profile
-  ansible.builtin.command: /usr/bin/mv /etc/skel/.{{ remote_user.shell }}_profile /etc/skel/.config/{{ remote_user.shell }}/profile
+- name: Create XDG-compliant skeleton files for {{ my_remote_user.shell }}_profile
+  ansible.builtin.command: /usr/bin/mv /etc/skel/.{{ my_remote_user.shell }}_profile /etc/skel/.config/{{ my_remote_user.shell }}/profile
   args:
-    creates: /etc/skel/.config/{{ remote_user.shell }}/profile
-    removes: /etc/skel/.{{ remote_user.shell }}_profile
+    creates: /etc/skel/.config/{{ my_remote_user.shell }}/profile
+    removes: /etc/skel/.{{ my_remote_user.shell }}_profile
   become: true
   when: remote_user.shell is defined
   tags:
     - shell
 
-- name: Create XDG-compliant skeleton files for {{ remote_user.shell }}rc
-  ansible.builtin.command: /usr/bin/mv /etc/skel/.{{ remote_user.shell }}rc /etc/skel/.config/{{ remote_user.shell }}/{{ remote_user.shell }}rc
+- name: Create XDG-compliant skeleton files for {{ my_remote_user.shell }}rc
+  ansible.builtin.command: /usr/bin/mv /etc/skel/.{{ my_remote_user.shell }}rc /etc/skel/.config/{{ my_remote_user.shell }}/{{ my_remote_user.shell }}rc
   args:
-    creates: /etc/skel/.config/{{ remote_user.shell }}/{{ remote_user.shell }}rc
-    removes: /etc/skel/.{{ remote_user.shell }}rc
+    creates: /etc/skel/.config/{{ my_remote_user.shell }}/{{ my_remote_user.shell }}rc
+    removes: /etc/skel/.{{ my_remote_user.shell }}rc
   when: remote_user.shell is defined
   become: true
   tags:
@@ -84,7 +84,7 @@
 # - name: Create local XDG-compliant BASH interactive shell
 #   ansible.builtin.copy:
 #     src: bashrc_xdg
-#     dest: /etc/skel/.{{ remote_user.shell }}rc
+#     dest: /etc/skel/.{{ my_remote_user.shell }}rc
 #     backup: false
 #     mode: '0644'
 #   tags:

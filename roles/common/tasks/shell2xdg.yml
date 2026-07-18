@@ -4,7 +4,7 @@
     path: /etc/skel/.config/{{ my_remote_user.shell }}/
     state: directory
     mode: '0755'
-  when: remote_user.shell is defined
+  when: my_remote_user.shell is defined
   tags:
     - shell
 
@@ -14,7 +14,7 @@
     creates: /etc/skel/.config/{{ my_remote_user.shell }}/profile
     removes: /etc/skel/.{{ my_remote_user.shell }}_profile
   become: true
-  when: remote_user.shell is defined
+  when: my_remote_user.shell is defined
   tags:
     - shell
 
@@ -23,7 +23,7 @@
   args:
     creates: /etc/skel/.config/{{ my_remote_user.shell }}/{{ my_remote_user.shell }}rc
     removes: /etc/skel/.{{ my_remote_user.shell }}rc
-  when: remote_user.shell is defined
+  when: my_remote_user.shell is defined
   become: true
   tags:
     - shell
@@ -77,7 +77,7 @@
     append_newline: true
     prepend_newline: true
     backup: true
-  when: remote_user.shell  == "bash"
+  when: my_remote_user.shell  == "bash"
   tags:
     - shell
 
@@ -130,7 +130,7 @@
     state: present
   tags:
     - shell
-  when: remote_user.shell == "bash"
+  when: my_remote_user.shell == "bash"
 
 - name: Install ZSH
   ansible.builtin.package:
@@ -138,4 +138,4 @@
     state: present
   tags:
     - shell
-  when: remote_user.shell == "zsh"
+  when: my_remote_user.shell == "zsh"

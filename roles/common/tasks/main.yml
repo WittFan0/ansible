@@ -239,7 +239,7 @@
 
 - name: Invoke shell2xdg playbook
   ansible.builtin.include_tasks: shell2xdg.yml
-  when: remote_user.shell is defined
+  when: my_remote_user.shell is defined
 
 - name: Invoke user_skel playbook
   ansible.builtin.include_tasks: user_skel.yml

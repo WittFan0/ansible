@@ -7,7 +7,7 @@ proxy_env:
   https_proxy: "{{ proxy_addr }}"
   ftp_proxy: "{{ proxy_addr }}"
 
-remote_user:
+my_remote_user:
   name: lance
   uid: 1000
   group: lance
